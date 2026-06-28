@@ -104,11 +104,11 @@ export const useUserStore = create<UserState & UserActions>()(
 
       // ── Auth ───────────────────────────────────────────────────────────
       login: (name, email) =>
-        set({
+        set((state) => ({
           isAuthenticated: true,
-          name: name.trim() || DEFAULT_STATE.name,
+          name: name.trim() || state.name,
           email,
-        }),
+        })),
 
       logout: () => set({ ...DEFAULT_STATE }),
 
