@@ -2,9 +2,10 @@ import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, ScrollView, Text, View, Pressable, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useUserStore } from '../store/useUserStore';
+import { AVATAR_CHARACTERS } from '@/data/avatars';
+import { useUserStore } from '@/store/useUserStore';
 
-const AVATAR_OPTIONS = ['🦉', '🦊', '🐺', '🦁', '🐯', '🦅', '🐸', '🎓'];
+const AVATAR_OPTIONS = AVATAR_CHARACTERS;
 
 export default function PersonalDetailsScreen() {
   const storeName = useUserStore((s) => s.name);

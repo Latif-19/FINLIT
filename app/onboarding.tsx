@@ -10,31 +10,12 @@ import {
 } from "react-native";
 import "@/types/navigation";
 
+import { ONBOARDING_SLIDES } from "@/data/onboarding";
+
 const { width } = Dimensions.get("window");
 
-const slides = [
-  {
-    id: "1",
-    image: require("../assets/images/onboarding1.png"),
-    title: "Set Financial Goals",
-    description:
-      "Define your savings and financial goals. Build a clear roadmap toward financial success.",
-  },
-  {
-    id: "2",
-    image: require("../assets/images/onboarding2.png"),
-    title: "Track Your Progress",
-    description:
-      "Monitor your financial growth and stay motivated with real-time progress tracking.",
-  },
-  {
-    id: "3",
-    image: require("../assets/images/onboarding3.png"),
-    title: "Celebrate Achievements",
-    description:
-      "Reach important milestones and celebrate every step toward financial freedom.",
-  },
-];
+const slides = ONBOARDING_SLIDES;
+
 
 export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
