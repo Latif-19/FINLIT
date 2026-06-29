@@ -8,6 +8,7 @@ import {
   Pressable,
   ActivityIndicator,
   StyleSheet,
+  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../store/useUserStore";
@@ -31,37 +32,10 @@ interface PaymentMethod {
   color: string;
 }
 
-const PLANS: Plan[] = [
-  {
-    id: "monthly",
-    title: "Monthly Pass",
-    price: "GH₵ 19.99",
-    period: "month",
-    desc: "Perfect for a quick learning sprint",
-  },
-  {
-    id: "three_months",
-    title: "Quarterly Saver",
-    price: "GH₵ 49.99",
-    period: "3 months",
-    badge: "POPULAR",
-    desc: "Saves 16% compared to monthly",
-  },
-  {
-    id: "yearly",
-    title: "Yearly Pro",
-    price: "GH₵ 129.99",
-    period: "year",
-    badge: "BEST VALUE",
-    desc: "Saves 45% — our ultimate package",
-  },
-];
+import { SUBSCRIPTION_PLANS, PAYMENT_METHODS } from "@/data/paywall";
 
-const METHODS: PaymentMethod[] = [
-  { id: "momo", name: "MTN MoMo", icon: "phone-portrait", color: "#facc15" },
-  { id: "telecel", name: "Telecel Cash", icon: "phone-portrait", color: "#ef4444" },
-  { id: "card", name: "Credit/Debit Card", icon: "card", color: "#3b82f6" },
-];
+const PLANS = SUBSCRIPTION_PLANS;
+const METHODS = PAYMENT_METHODS;
 
 export default function PaywallScreen() {
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("three_months");
@@ -220,7 +194,15 @@ export default function PaywallScreen() {
                     { backgroundColor: m.color + "15" },
                   ]}
                 >
-                  <Ionicons name={m.icon as any} size={18} color={m.color} />
+                  {m.image ? (
+                    <Image
+                      source={m.image}
+                      style={{ width: 26, height: 26, borderRadius: 4 }}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Ionicons name={m.icon as any} size={18} color={m.color} />
+                  )}
                 </View>
                 <Text style={styles.methodName}>{m.name}</Text>
                 <View style={styles.radioOuter}>

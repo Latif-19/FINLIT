@@ -12,51 +12,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../../store/useUserStore";
-import "@/types/navigation";
+import { AVATAR_OPTIONS } from "@/data/avatars";
+import { RECOMMENDED_LESSONS } from "@/data/lessons";
+import { DAILY_QUIZ } from "@/data/quizzes";
 
-const AVATAR_OPTIONS = [
-  { char: "🦉", name: "Wise Owl" },
-  { char: "🦁", name: "Wealth Lion" },
-  { char: "📈", name: "Bull Trader" },
-  { char: "🪙", name: "Gold Saver" },
-  { char: "🚀", name: "Investor Rocket" },
-  { char: "🦊", name: "Smart Fox" },
-  { char: "💼", name: "Entrepreneur" },
-  { char: "🎓", name: "Scholar" },
-];
-
-const RECOMMENDED_LESSONS: Record<string, { tag: string; title: string; desc: string }> = {
-  "Build an Emergency Fund": {
-    tag: "Emergency Fund",
-    title: "MoMo Savings & Vaults",
-    desc: "Learn to separate savings from spending money using MTN MoMo Vault or Telecel Cash.",
-  },
-  "Improve Budgeting": {
-    tag: "Budgeting Basics",
-    title: "Managing MoMo Fees & E-levy",
-    desc: "Identify transaction costs and E-levy fees that leak money, and learn to minimize them.",
-  },
-  "Learn Investing": {
-    tag: "Investing Pro",
-    title: "Ghana Treasury Bills 101",
-    desc: "An entry-level guide to buying 91-day and 182-day government Treasury Bills.",
-  },
-  "Become Debt Free": {
-    tag: "Debt Payoff",
-    title: "Avoiding Digital Loan Traps",
-    desc: "Learn why high-interest mobile apps (Qwikloan, Fido) can be dangerous and how to avoid debt traps.",
-  },
-  "Start a Business": {
-    tag: "Business Finance",
-    title: "Student Side-Hustles 101",
-    desc: "Explore business ideation, managing startup costs, and cash flow on a student budget.",
-  },
-  "Save for Education": {
-    tag: "Education Saving",
-    title: "Student Loans & Bursaries in Ghana",
-    desc: "Learn how the Student Loan Trust Fund (SLTF) works, alongside local KNUST and GETFund bursaries.",
-  },
-};
 
 export default function HomeScreen() {
   const params = useLocalSearchParams();
@@ -120,12 +79,8 @@ export default function HomeScreen() {
   };
 
   // Quiz configuration
-  const quizQuestion = "What is the primary benefit of compounding interest?";
-  const quizOptions = [
-    { text: "It pays out monthly cash dividends instantly", isCorrect: false },
-    { text: "Your interest earns interest, accelerating growth over time", isCorrect: true },
-    { text: "It prevents market stocks from ever losing value", isCorrect: false },
-  ];
+  const quizQuestion = DAILY_QUIZ.question;
+  const quizOptions = DAILY_QUIZ.options;
 
   const handleQuizAnswer = (index: number, isCorrect: boolean) => {
     if (hasDoneDailyQuiz) return;

@@ -162,14 +162,14 @@ export default function LoginScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
               opacity: pressed ? 0.95 : 1,
             })}
-            className="border border-gray-200 bg-white rounded-xl py-3.5 flex-row justify-center items-center shadow-sm"
+            className="border border-gray-200 bg-white rounded-xl py-4 flex-row justify-center items-center shadow-sm"
           >
             <Image
               source={require("../assets/images/google-logo.jpg")}
-              className="w-5 h-5 rounded-full"
+              className="w-9 h-9 rounded-full"
               resizeMode="contain"
             />
-            <Text className="ml-3 font-semibold text-gray-700 text-sm">
+            <Text className="ml-3 font-bold text-gray-700 text-base">
               Continue with Google
             </Text>
           </Pressable>
@@ -180,14 +180,14 @@ export default function LoginScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
               opacity: pressed ? 0.95 : 1,
             })}
-            className="border border-gray-200 bg-white rounded-xl py-3.5 flex-row justify-center items-center mt-3 shadow-sm"
+            className="border border-gray-200 bg-white rounded-xl py-4 flex-row justify-center items-center mt-3 shadow-sm"
           >
             <Image
               source={require("../assets/images/facebook-logo.jpg")}
-              className="w-5 h-5 rounded-full"
+              className="w-9 h-9 rounded-full"
               resizeMode="contain"
             />
-            <Text className="ml-3 font-semibold text-gray-700 text-sm">
+            <Text className="ml-3 font-bold text-gray-700 text-base">
               Continue with Facebook
             </Text>
           </Pressable>
