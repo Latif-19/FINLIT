@@ -15,7 +15,11 @@ export const ONBOARDING_SLIDES: OnboardingSlide[] = [
   },
   {
     id: "2",
+<<<<<<< HEAD
     image: require("../assets/cimages/onboarding2.png"),
+=======
+    image: require("../assets/images/onboarding2.png"),
+>>>>>>> f74c49fa451ab3731a3f96b4b20b267ad1812622
     title: "Track Your Progress",
     description:
       "Monitor your financial growth and stay motivated with real-time progress tracking.",
