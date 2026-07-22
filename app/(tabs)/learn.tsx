@@ -1,18 +1,40 @@
-import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   Text,
   View,
   Pressable,
   Modal,
-  ActivityIndicator,
-  StyleSheet,
-  SafeAreaView,
+  Dimensions,
+  Alert,
+  Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useUserStore } from "../../store/useUserStore";
+import * as Haptics from "expo-haptics";
+import * as Speech from "expo-speech";
+import { Audio } from "expo-av";
 import "@/types/navigation";
+import { LESSON_MODULES } from "@/data/lessons";
+import { MODULE_QUIZZES } from "@/data/quizzes";
+import { progressService } from "../../services/progress";
+import { gamificationService } from "../../services/gamification";
+
+// A professional vector icon per lesson topic (replaces the emoji on each node).
+const LESSON_ICONS: Record<number, React.ComponentProps<typeof Ionicons>["name"]> = {
+  1: "wallet-outline",           // MoMo Budgeting & Saving
+  2: "card-outline",             // Avoiding Digital Debt Traps
+  3: "trending-up-outline",      // Treasury Bills & Mutual Funds
+  4: "shield-checkmark-outline", // Pensions & Provident Funds
+  5: "school-outline",           // Student Loans & Bursaries
+  6: "briefcase-outline",        // Side Hustles & Business Finance
+};
+
+function lessonIcon(id: number): React.ComponentProps<typeof Ionicons>["name"] {
+  return LESSON_ICONS[id] ?? "book-outline";
+}
 
 interface LessonModule {
   id: number;
@@ -23,909 +45,939 @@ interface LessonModule {
   xpVal: number;
   content: string[];
   audioUrl?: string;
+  audioLocalPath?: any;
+  images?: any[];
+  emoji?: string;
 }
-import { LESSON_MODULES } from "@/data/lessons";
+
+const { width } = Dimensions.get("window");
 
 export default function LearnScreen() {
-  const userName = useUserStore((s) => s.name);
-  const isPremium = useUserStore((s) => s.isPremium);
   const lessonsCompleted = useUserStore((s) => s.lessonsCompleted);
+  const userXp = useUserStore((s) => s.xp);
+  const streak = useUserStore((s) => s.streak);
+  const userGoal = useUserStore((s) => s.goal);
 
-  // Expanded card tracking
-  const [expandedLessonId, setExpandedLessonId] = useState<number | null>(null);
+  // Main UI States
+  const [selectedModule, setSelectedModule] = useState<LessonModule | null>(null);
+  
+  // Interactive Session State
+  const [sessionLesson, setSessionLesson] = useState<LessonModule | null>(null);
+  const [sessionStep, setSessionStep] = useState<number>(0); // 0 to content.length + 1
+  const [hearts, setHearts] = useState<number>(5);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [isAnswerChecked, setIsAnswerChecked] = useState(false);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  // The user's first answer per question, submitted to the backend at the end.
+  const [quizAnswers, setQuizAnswers] = useState<{ questionIndex: number; selectedOptionIndex: number }[]>([]);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  // Lesson Reading Modal State
-  const [readingLesson, setReadingLesson] = useState<LessonModule | null>(null);
-
-  // Audio Player State
-  const [activeAudioLesson, setActiveAudioLesson] = useState<LessonModule | null>(null);
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-
-  // Download simulation state
-  const [downloadingId, setDownloadingId] = useState<number | null>(null);
-  const [downloadProgress, setDownloadProgress] = useState(0);
-  const [downloadedIds, setDownloadedIds] = useState<Set<number>>(new Set());
-
-  // Certificate Modal State
-  const [certModalVisible, setCertModalVisible] = useState(false);
-
-  const handleLessonComplete = (lesson: LessonModule) => {
-    // If the completed lesson count is less than the lesson id, increment it
-    if (lessonsCompleted < lesson.id) {
-      const store = useUserStore.getState();
-      store.incrementLessons();
-      store.addXp(lesson.xpVal);
-    }
-    setReadingLesson(null);
-  };
-
-  const handleToggleExpand = (id: number) => {
-    setExpandedLessonId(expandedLessonId === id ? null : id);
-  };
-
-  const handleStartAudio = (lesson: LessonModule) => {
-    if (!isPremium) {
-      router.push("/paywall");
+  // Node triggers
+  const handleNodePress = (mod: LessonModule, isUnlocked: boolean) => {
+    if (!isUnlocked) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      Alert.alert(
+        "Module Locked 🔒",
+        "Complete the previous modules to unlock this learning session."
+      );
       return;
     }
-    setActiveAudioLesson(lesson);
-    setIsPlayingAudio(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setSelectedModule(mod);
   };
 
-  const handleDownload = (id: number) => {
-    if (!isPremium) {
-      router.push("/paywall");
-      return;
-    }
-    if (downloadedIds.has(id)) {
-      // Remove download
-      const copy = new Set(downloadedIds);
-      copy.delete(id);
-      setDownloadedIds(copy);
-      return;
-    }
+  // Starts the interactive slide-by-slide session
+  const startSession = (lesson: LessonModule) => {
+    setSelectedModule(null);
+    setSessionLesson(lesson);
+    setSessionStep(0);
+    setHearts(5);
+    setCurrentQuestionIndex(0);
+    setQuizAnswers([]);
+    setSelectedOptionIndex(null);
+    setIsAnswerChecked(false);
+    setIsAnswerCorrect(null);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
 
-    setDownloadingId(id);
-    setDownloadProgress(0);
-
-    const interval = setInterval(() => {
-      setDownloadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setDownloadingId(null);
-          setDownloadedIds(new Set([...downloadedIds, id]));
-          return 100;
+  // Quitting active session
+  const confirmQuitSession = () => {
+    Alert.alert(
+      "Quit Lesson? 🦉",
+      "You will lose your progress in this learning session.",
+      [
+        { text: "Keep Learning", style: "cancel" },
+        { 
+          text: "Quit", 
+          style: "destructive", 
+          onPress: async () => {
+            Speech.stop();
+            if (sound) {
+              await sound.stopAsync();
+              await sound.unloadAsync();
+              setSound(null);
+            }
+            setIsSpeaking(false);
+            setIsPlaying(false);
+            setSessionLesson(null);
+          } 
         }
-        return prev + 25;
-      });
-    }, 400);
+      ]
+    );
   };
 
-  const handleShowCertificate = () => {
-    if (!isPremium) {
-      router.push("/paywall");
+  // Handle continuing inside session
+  const handleSessionContinue = async () => {
+    if (!sessionLesson) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Stop any playing audio/TTS when advancing
+    Speech.stop();
+    setIsSpeaking(false);
+    if (sound) {
+      await sound.stopAsync();
+      setIsPlaying(false);
+    }
+
+    const isSlidesStage = sessionStep < sessionLesson.content.length;
+    const isQuizStage = sessionStep === sessionLesson.content.length;
+
+    if (isSlidesStage) {
+      setSessionStep((prev) => prev + 1);
+      setSelectedOptionIndex(null);
+      setIsAnswerChecked(false);
+      setIsAnswerCorrect(null);
+    } else if (isQuizStage) {
+      if (isAnswerChecked) {
+        if (isAnswerCorrect) {
+          const quizList = MODULE_QUIZZES[sessionLesson.id];
+          if (quizList && currentQuestionIndex < quizList.length - 1) {
+            setCurrentQuestionIndex((prev) => prev + 1);
+            setSelectedOptionIndex(null);
+            setIsAnswerChecked(false);
+            setIsAnswerCorrect(null);
+          } else {
+            setSessionStep((prev) => prev + 1);
+          }
+        } else {
+          setSelectedOptionIndex(null);
+          setIsAnswerChecked(false);
+          setIsAnswerCorrect(null);
+        }
+      }
+    } else {
+      // Lesson finished. Persist to the backend, then re-sync the store from the
+      // backend's truth so XP / lessons / badges are authoritative.
+      const lessonId = sessionLesson.id;
+      const xpVal = sessionLesson.xpVal;
+      const answers = quizAnswers;
+
+      Speech.stop();
+      setIsSpeaking(false);
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+      }
+      setIsPlaying(false);
+      setSessionLesson(null);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      const store = useUserStore.getState();
+      try {
+        await progressService.completeLesson(lessonId);
+        if (answers.length > 0) {
+          await gamificationService.submitQuizScore({ moduleId: lessonId, answers });
+        }
+        const res = await progressService.getProgress();
+        store.applyProgress(res.data);
+      } catch {
+        // Offline / server down — keep the user progressing locally.
+        if (store.lessonsCompleted < lessonId) {
+          store.incrementLessons();
+          store.addXp(xpVal);
+          store.saveQuizScore(lessonId, hearts);
+        }
+      }
+    }
+  };
+
+  // Checking quiz answer
+  const handleCheckQuizAnswer = () => {
+    if (!sessionLesson || selectedOptionIndex === null) return;
+    const quizList = MODULE_QUIZZES[sessionLesson.id];
+    if (!quizList) return;
+    const currentQuestion = quizList[currentQuestionIndex];
+    if (!currentQuestion) return;
+
+    const selectedOption = currentQuestion.options[selectedOptionIndex];
+    const isCorrect = selectedOption.isCorrect;
+
+    setIsAnswerCorrect(isCorrect);
+    setIsAnswerChecked(true);
+
+    // Record the FIRST answer for this question so the backend can score the quiz.
+    setQuizAnswers((prev) =>
+      prev.some((a) => a.questionIndex === currentQuestionIndex)
+        ? prev
+        : [...prev, { questionIndex: currentQuestionIndex, selectedOptionIndex }]
+    );
+
+    if (isCorrect) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setHearts((h) => {
+        const nextHearts = Math.max(0, h - 1);
+        if (nextHearts === 0) {
+          // Trigger a slight delay before showing no hearts screen or manage it
+        }
+        return nextHearts;
+      });
+    }
+  };
+
+  // Handle refill hearts
+  const handleRefillHearts = () => {
+    const store = useUserStore.getState();
+    if (store.xp >= 50) {
+      store.addXp(-50);
+      setHearts(5);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert("Hearts Restored! ❤️", "50 XP spent. You now have 5 hearts.");
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      Alert.alert("Not Enough XP ⚡", "You need at least 50 XP to buy a refill.");
+    }
+  };
+
+  // Toggle speech / audio for current slide
+  const toggleSpeech = async () => {
+    if (!sessionLesson) return;
+
+    // If lesson has a local audio file, play it with expo-av
+    if (sessionLesson.audioLocalPath) {
+      if (sound && isPlaying) {
+        await sound.stopAsync();
+        setIsPlaying(false);
+        return;
+      }
+
+      try {
+        if (sound) {
+          await sound.setPositionAsync(0);
+          await sound.playAsync();
+          setIsPlaying(true);
+        } else {
+          const { sound: newSound } = await Audio.Sound.createAsync(
+            sessionLesson.audioLocalPath,
+            { shouldPlay: true },
+            (status) => {
+              if (status.isLoaded && !status.isPlaying && status.didJustFinish) {
+                setIsPlaying(false);
+              }
+            }
+          );
+          setSound(newSound);
+          setIsPlaying(true);
+        }
+      } catch {
+        Alert.alert("Audio Error", "Could not play the audio file.");
+      }
       return;
     }
-    setCertModalVisible(true);
+
+    // Fallback to expo-speech TTS
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      const text = sessionLesson.content[sessionStep] || "";
+      Speech.speak(text, {
+        language: "en-US",
+        rate: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+      setIsSpeaking(true);
+    }
   };
+
+  const handleTrophyPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push("/certificate");
+  };
+
+  // Mascot Tip Text
+  const mascotTips = [
+    "🦉: Track your daily wallet fees. MTN MoMo Cash-out fees compound quickly over a year!",
+    "🦉: High-interest mobile quick-loans like Qwikloan have APRs exceeding 82%. Avoid them!",
+    "🦉: Ghana Treasury Bills pay out by discount - you buy under face value and receive full amount at maturity.",
+    "🦉: Tier 3 pensions are voluntary, tax-free, and let you withdraw early in emergencies.",
+    "🦉: Student loans (SLTF) are now guarantor-free with a Ghana Card. Use them strictly for educational expenses!",
+    "🦉: Keep side hustle funds separate from daily money. Separating accounts is key to campus business success!",
+  ];
+  const activeTip = mascotTips[lessonsCompleted % mascotTips.length] || mascotTips[0];
+
+  const GOAL_LESSON: Record<string, { id: number; title: string; emoji: string }> = {
+    "Build an Emergency Fund": { id: 1, title: "MoMo Budgeting", emoji: "📱" },
+    "Improve Budgeting":       { id: 1, title: "MoMo Budgeting", emoji: "📱" },
+    "Learn Investing":         { id: 3, title: "Treasury Bills", emoji: "📈" },
+    "Become Debt Free":        { id: 2, title: "Digital Loans", emoji: "⚠️" },
+    "Start a Business":        { id: 6, title: "Side Hustles & Business Finance", emoji: "💼" },
+    "Save for Education":      { id: 5, title: "Student Loans & Bursaries", emoji: "🎓" },
+  };
+  const recommendedLesson = userGoal ? GOAL_LESSON[userGoal] : null;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Learn Finance</Text>
-          <Text style={styles.headerSubtitle}>
-            {"Master personal finance through interactive syllabus pathways"}
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
+      {/* DUOLINGO STYLE HEADER STATS */}
+      <View className="flex-row justify-between items-center bg-white px-5 pt-3.5 pb-3.5 border-b-2 border-slate-200">
+        <View className="flex-1">
+          <Text className="text-[10px] font-inter-bold text-slate-500 tracking-widest">
+            UNIT {Math.floor(lessonsCompleted / 4) + 1}
           </Text>
+          <Text className="text-[15px] font-inter-bold text-slate-900">
+            Ghana Personal Finance
+          </Text>
+        </View>
+        <View className="flex-row gap-3">
+          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+            <Text className="text-[13px]">🔥</Text>
+            <Text className="text-xs font-inter-bold text-slate-600">{streak}</Text>
+          </View>
+          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+            <Text className="text-[13px]">⚡</Text>
+            <Text className="text-xs font-inter-bold text-slate-600">{userXp}</Text>
+          </View>
+          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+            <Text className="text-[13px]">❤️</Text>
+            <Text className="text-xs font-inter-bold text-red-500">{hearts}</Text>
+          </View>
         </View>
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Certificate Progress Card */}
-        <View style={styles.certCard}>
-          <View style={styles.certHeader}>
-            <View style={styles.certBadge}>
-              <Ionicons name="ribbon-outline" size={16} color="#15803d" />
-              <Text style={styles.certBadgeText}>ACCREDITED PATHWAY</Text>
+        {/* Personalized Path Banner — shown only after assessment is done */}
+        {userGoal && recommendedLesson && (
+          <View className="bg-brand-emerald/5 border border-brand-emerald/20 rounded-2xl p-4 mb-5 flex-row items-center gap-3">
+            <View className="w-10 h-10 bg-brand-emerald/10 rounded-xl items-center justify-center">
+              <Ionicons name={lessonIcon(recommendedLesson.id)} size={20} color="#16A34A" />
             </View>
-            <Text style={styles.certProgressText}>
-              {lessonsCompleted}/4 Completed
+            <View className="flex-1">
+              <Text className="text-[9px] font-inter-bold text-brand-emerald tracking-widest uppercase">
+                Your Personalized Path
+              </Text>
+              <Text className="text-sm font-inter-bold text-brand-navy mt-0.5">
+                Goal: {userGoal}
+              </Text>
+              <Text className="text-xs text-brand-dark mt-0.5">
+                Start with Lesson {recommendedLesson.id}: {recommendedLesson.title}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Certificate Progress Card */}
+        <View className="bg-white rounded-2xl p-4 border-2 border-slate-200 shadow-sm mb-5">
+          <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center bg-[#16A34A12] px-2 py-1 rounded-md gap-[3px]">
+              <Ionicons name="ribbon-outline" size={15} color="#16a34a" />
+              <Text className="text-[9px] font-inter-bold text-green-600">
+                ACCREDITED PATHWAY
+              </Text>
+            </View>
+            <Text className="text-[11px] font-inter-semibold text-slate-500">
+              {lessonsCompleted}/{LESSON_MODULES.length} Completed
             </Text>
           </View>
-          <Text style={styles.certTitle}>Financial Literacy Certificate</Text>
-          <Text style={styles.certDesc}>
-            Complete all modules to generate and download your verified FinLit certificate.
+          <Text className="text-base font-inter-bold text-slate-900 mt-2.5">
+            Financial Literacy Certificate
           </Text>
-          
+          <Text className="text-xs text-slate-500 mt-1 leading-4">
+            Walk down the learning path and complete all {LESSON_MODULES.length} lessons to earn
+            your official FinLit certificate.
+          </Text>
+
           {/* Progress bar */}
-          <View style={styles.progressBarBg}>
+          <View className="h-2 bg-slate-100 rounded mt-3 overflow-hidden">
             <View
-              style={[
-                styles.progressBarFill,
-                { width: `${(lessonsCompleted / 4) * 100}%` },
-              ]}
+              className="h-full bg-brand-emerald rounded"
+              style={{
+                width: `${Math.min(100, (lessonsCompleted / LESSON_MODULES.length) * 100)}%`,
+              }}
             />
           </View>
-
-          {lessonsCompleted === 4 ? (
-            <Pressable
-              onPress={handleShowCertificate}
-              style={styles.certButton}
-            >
-              <Ionicons name="ribbon" size={20} color="white" />
-              <Text style={styles.certButtonText}>
-                {isPremium ? "View Certificate" : "Unlock Verified Certificate"}
-              </Text>
-              {!isPremium && (
-                <Ionicons name="lock-closed" size={14} color="white" style={{ marginLeft: 6 }} />
-              )}
-            </Pressable>
-          ) : (
-            <View style={styles.disabledCertButton}>
-              <Text style={styles.disabledCertText}>
-                Complete all modules to unlock certification
-              </Text>
-            </View>
-          )}
         </View>
 
-        {/* Modules List */}
-        <Text style={styles.sectionLabel}>MODULE CURRICULUM</Text>
-        <View style={styles.modulesContainer}>
-          {LESSON_MODULES.map((mod) => {
+        {/* THE DUOLINGO WINDING PATH */}
+        <View className="items-center relative my-6 w-full">
+          {/* Vertical connecting line */}
+          <View className="absolute top-[30px] bottom-[30px] left-1/2 w-1.5 bg-slate-200 -translate-x-[3px] z-[-1]" />
+
+          {LESSON_MODULES.map((mod, index) => {
             const isCompleted = lessonsCompleted >= mod.id;
-            const isExpanded = expandedLessonId === mod.id;
-            const isDownloading = downloadingId === mod.id;
-            const isDownloaded = downloadedIds.has(mod.id);
+            const isUnlocked = lessonsCompleted >= index;
+            const isCurrent = lessonsCompleted === index;
+
+            let layoutClass = "justify-center";
+            if (index % 2 === 0) {
+              layoutClass = "justify-center -translate-x-[35px]";
+            } else {
+              layoutClass = "justify-center translate-x-[35px]";
+            }
+
+            const isBig = index % 2 === 0;
+            const nodeIconColor = isCompleted ? "#ffffff" : isCurrent ? "#0A2540" : "#64748b";
 
             return (
               <View
                 key={mod.id}
-                style={[
-                  styles.moduleCard,
-                  isCompleted && styles.completedModuleCard,
-                ]}
+                className={`flex-row items-center my-[18px] w-full px-3 ${layoutClass}`}
               >
-                <Pressable
-                  onPress={() => handleToggleExpand(mod.id)}
-                  style={styles.moduleHeaderRow}
-                >
-                  <View style={styles.moduleMeta}>
-                    <View style={styles.badgeRow}>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          { backgroundColor: isCompleted ? "#e0f2fe" : "#f3f4f6" },
-                        ]}
-                      >
-                        <Text style={{ fontSize: 10, fontWeight: "800", color: isCompleted ? "#0369a1" : "#4b5563" }}>
-                          {isCompleted ? "COMPLETED" : "IN PROGRESS"}
-                        </Text>
-                      </View>
-                      <Text style={styles.durationText}>
-                        {mod.duration} • {mod.xp}
-                      </Text>
-                    </View>
-                    <Text style={styles.moduleCardTitle}>{mod.title}</Text>
-                  </View>
-                  <Ionicons
-                    name={isExpanded ? "chevron-up" : "chevron-down"}
-                    size={20}
-                    color="#6b7280"
+                {isCurrent && (
+                  <View
+                    className={`absolute border-[3px] border-yellow-400 opacity-60 ${
+                      isBig
+                        ? "w-[96px] h-[96px] rounded-[48px]"
+                        : "w-[78px] h-[78px] rounded-[39px]"
+                    }`}
                   />
+                )}
+
+                <Pressable
+                  onPress={() => handleNodePress(mod, isUnlocked)}
+                  style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.95 : 1 }] })}
+                  className={`w-[76px] h-[76px] rounded-[38px] justify-center items-center shadow-md ${
+                    isBig ? "w-[84px] h-[84px] rounded-[42px]" : "w-[66px] h-[66px] rounded-[33px]"
+                  } ${
+                    isCompleted
+                      ? "bg-green-500 border-b-[6px] border-b-green-700"
+                      : isCurrent
+                      ? "bg-yellow-400 border-b-[6px] border-b-orange-500"
+                      : !isUnlocked
+                      ? "bg-slate-300 border-b-[6px] border-b-slate-400"
+                      : ""
+                  }`}
+                >
+                  <Ionicons
+                    name={lessonIcon(mod.id)}
+                    size={isBig ? 36 : 28}
+                    color={nodeIconColor}
+                    style={!isUnlocked ? { opacity: 0.6 } : undefined}
+                  />
+                  {!isUnlocked && (
+                    <View className="absolute -bottom-[2px] -right-[2px] bg-slate-500 w-6 h-6 rounded-full justify-center items-center border-2 border-white shadow-sm">
+                      <Ionicons name="lock-closed" size={12} color="white" />
+                    </View>
+                  )}
                 </Pressable>
 
-                {/* Expanded contents */}
-                {isExpanded && (
-                  <View style={styles.moduleExpandedBody}>
-                    <Text style={styles.moduleCardDesc}>{mod.desc}</Text>
-                    
-                    {/* Action buttons */}
-                    <View style={styles.actionRow}>
-                      <Pressable
-                        onPress={() => setReadingLesson(mod)}
-                        style={styles.readBtn}
-                      >
-                        <Ionicons name={"book-open-outline" as any} size={16} color="white" />
-                        <Text style={styles.readBtnText}>Read Lesson</Text>
-                      </Pressable>
-
-                      <Pressable
-                        onPress={() => handleStartAudio(mod)}
-                        style={styles.audioBtn}
-                      >
-                        <Ionicons
-                          name={isPremium ? "volume-high-outline" : "lock-closed-outline"}
-                          size={16}
-                          color="#15803d"
-                        />
-                        <Text style={styles.audioBtnText}>Listen Audio</Text>
-                      </Pressable>
-
-                      <Pressable
-                        onPress={() => handleDownload(mod.id)}
-                        disabled={isDownloading}
-                        style={styles.downloadBtn}
-                      >
-                        {isDownloading ? (
-                          <ActivityIndicator size="small" color="#4b5563" />
-                        ) : (
-                          <>
-                            <Ionicons
-                              name={
-                                isDownloaded
-                                  ? "checkmark-circle"
-                                  : isPremium
-                                  ? "cloud-download-outline"
-                                  : "lock-closed-outline"
-                              }
-                              size={16}
-                              color="#4b5563"
-                            />
-                            <Text style={styles.downloadBtnText}>
-                              {isDownloaded ? "Saved" : "Offline"}
-                            </Text>
-                          </>
-                        )}
-                      </Pressable>
-                    </View>
-
-                    {/* Download percentage spinner */}
-                    {isDownloading && (
-                      <Text style={styles.progressSub}>
-                        Downloading offline data: {downloadProgress}%
-                      </Text>
-                    )}
-                  </View>
-                )}
+                {/* Node Label Card — right side for left-offset nodes, left side for right-offset nodes */}
+                <View
+                  className="absolute w-[140px] bg-white border-[1.5px] border-slate-200 rounded-[10px] py-1.5 px-2.5 shadow-sm"
+                  style={
+                    index % 2 === 0
+                      ? { left: width * 0.5 + 45 }
+                      : { right: width * 0.5 + 45 }
+                  }
+                >
+                  <Text className="text-[11px] font-inter-bold text-slate-800">
+                    {mod.title}
+                  </Text>
+                  <Text className="text-[9px] text-slate-500 mt-0.5">
+                    Lesson {mod.id} • {mod.xp}
+                  </Text>
+                </View>
               </View>
             );
           })}
+
+          {/* FINAL ACCREDITED TROPHY */}
+          <View className="flex-row items-center w-full px-3 justify-center mb-[18px] mt-6">
+            <Pressable
+              onPress={handleTrophyPress}
+              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.95 : 1 }] })}
+              className={`w-[86px] h-[86px] rounded-[43px] justify-center items-center shadow-md ${
+                lessonsCompleted >= LESSON_MODULES.length
+                  ? "bg-yellow-400 border-b-[6px] border-b-yellow-700"
+                  : "bg-slate-300 border-b-[6px] border-b-slate-400"
+              }`}
+            >
+              <Text className="text-[30px]">🏆</Text>
+            </Pressable>
+
+            <View
+              className="absolute w-[140px] bg-white border-[1.5px] border-slate-200 rounded-[10px] py-1.5 px-2.5 shadow-sm"
+              style={{ left: width * 0.5 + 45 }}
+            >
+              <Text className="text-[11px] font-inter-bold text-slate-800">
+                Accredited Certificate
+              </Text>
+              <Text className="text-[9px] text-slate-500 mt-0.5">
+                {lessonsCompleted >= LESSON_MODULES.length
+                  ? "Unlocked! Claim now"
+                  : `Locked (Complete ${LESSON_MODULES.length} lessons)`}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* MASCOT SUPPORT TIP BANNER */}
+        <View className="flex-row bg-white border-2 border-slate-200 rounded-2xl p-4 mt-8 items-center gap-3">
+          <View className="w-[50px] h-[50px] rounded-full bg-slate-100 items-center justify-center">
+            <Text className="text-[28px]">🦉</Text>
+          </View>
+          <View className="flex-1">
+            <Text className="text-[13px] font-inter-semibold text-slate-700 leading-[18px]">
+              {activeTip}
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
-      {/* ── AUDIO PLAYER MINI DASHBOARD ── */}
-      {activeAudioLesson && (
-        <View style={styles.audioPlayerDashboard}>
-          <View style={styles.playerDetails}>
-            <View style={styles.playerIconBox}>
-              <Ionicons name="headset" size={20} color="white" />
-            </View>
-            <View style={styles.playerTextWrap}>
-              <Text style={styles.playerTitle} numberOfLines={1}>
-                {activeAudioLesson.title}
-              </Text>
-              <Text style={styles.playerSubtitle}>
-                {isPlayingAudio ? "Playing Audio Lesson..." : "Paused"}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.playerControls}>
-            <Pressable
-              onPress={() => setIsPlayingAudio(!isPlayingAudio)}
-              style={styles.playPauseBtn}
-            >
-              <Ionicons
-                name={isPlayingAudio ? "pause" : "play"}
-                size={22}
-                color="#15803d"
-              />
-            </Pressable>
-            <Pressable
-              onPress={() => setActiveAudioLesson(null)}
-              style={styles.closePlayerBtn}
-            >
-              <Ionicons name="close" size={20} color="#9ca3af" />
-            </Pressable>
+      {/* SELECTED NODE TOOLTIP MODAL */}
+      <Modal
+        visible={!!selectedModule}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setSelectedModule(null)}
+      >
+        <View className="flex-1 bg-slate-900/40 justify-end">
+          <Pressable className="flex-1" onPress={() => setSelectedModule(null)} />
+          <View className="bg-white rounded-t-3xl p-6 border-2 border-slate-200 border-b-0 shadow-xl">
+            {selectedModule && (
+              <View>
+                {/* Header */}
+                <View className="flex-row justify-between items-center mb-4">
+                  <View className="bg-slate-100 px-2 py-1 rounded-md">
+                    <Text className="text-[9px] font-inter-bold text-slate-600">
+                      LESSON {selectedModule.id} OF {LESSON_MODULES.length}
+                    </Text>
+                  </View>
+                  <Pressable
+                    onPress={() => setSelectedModule(null)}
+                    className="p-1 active:opacity-80"
+                  >
+                    <Ionicons name="close" size={22} color="#94a3b8" />
+                  </Pressable>
+                </View>
+
+                {/* Content */}
+                <Text className="text-xl font-inter-bold text-slate-900 mb-2">
+                  {selectedModule.title}
+                </Text>
+                <Text className="text-sm text-slate-600 leading-5 mb-[18px]">
+                  {selectedModule.desc}
+                </Text>
+
+                <View className="flex-row items-center mb-5">
+                  <Text className="text-[13px] text-slate-500">Rewards: </Text>
+                  <Ionicons name="flash" size={14} color="#d97706" />
+                  <Text className="text-sm font-inter-bold text-amber-600 ml-1">
+                    {selectedModule.xp}{" "}
+                  </Text>
+                  <Text className="text-[13px] text-slate-500">• {selectedModule.duration}</Text>
+                </View>
+
+                {/* Primary Button */}
+                <Pressable
+                  onPress={() => startSession(selectedModule)}
+                  className="bg-green-500 border-b-[5px] border-b-green-600 h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
+                >
+                  <Text className="text-white text-base font-inter-bold tracking-wider">
+                    {lessonsCompleted >= selectedModule.id
+                      ? "REVIEW LESSON"
+                      : "START +100 XP"}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
           </View>
         </View>
-      )}
+      </Modal>
 
-      {/* ── LESSON READING OVERLAY MODAL ── */}
+      {/* INTERACTIVE LESSON MODAL (DUOLINGO SLIDES) */}
       <Modal
-        visible={!!readingLesson}
+        visible={!!sessionLesson}
         animationType="slide"
-        onRequestClose={() => setReadingLesson(null)}
+        onRequestClose={confirmQuitSession}
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#ffffff" }}>
-          {readingLesson && (
-            <View style={{ flex: 1 }}>
-              {/* Header */}
-              <View style={styles.readingHeader}>
-                <Pressable
-                  onPress={() => setReadingLesson(null)}
-                  style={styles.readingBack}
-                >
-                  <Ionicons name="arrow-back" size={22} color="#4b5563" />
+        <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+          {sessionLesson && (
+            <View className="flex-1">
+              {/* Header: Close / Progress / Hearts */}
+              <View className="flex-row items-center px-4 py-3 gap-[14px] border-b-[1.5px] border-slate-200">
+                <Pressable onPress={confirmQuitSession} className="p-1 active:opacity-80">
+                  <Ionicons name="close" size={26} color="#94a3b8" />
                 </Pressable>
-                <Text style={styles.readingTitle} numberOfLines={1}>
-                  {readingLesson.title}
-                </Text>
-                <View style={{ width: 40 }} />
+
+                {/* Progress bar */}
+                <View className="flex-1 h-4 bg-slate-200 rounded-lg overflow-hidden relative">
+                  {(() => {
+                    const quizList = MODULE_QUIZZES[sessionLesson.id] || [];
+                    const totalSteps = sessionLesson.content.length + quizList.length;
+                    let currentProgressStep = sessionStep;
+                    if (sessionStep === sessionLesson.content.length) {
+                      currentProgressStep =
+                        sessionLesson.content.length + currentQuestionIndex;
+                    } else if (sessionStep > sessionLesson.content.length) {
+                      currentProgressStep = totalSteps;
+                    }
+                    const progressPercentage = Math.min(
+                      100,
+                      Math.max(0, (currentProgressStep / totalSteps) * 100)
+                    );
+
+                    return (
+                      <View
+                        className="h-full bg-green-500 rounded-lg"
+                        style={{ width: `${progressPercentage}%` }}
+                      />
+                    );
+                  })()}
+                  <View className="absolute top-[1px] left-[2px] right-[2px] h-[3px] bg-white/40 rounded-[1.5px]" />
+                </View>
+
+                {/* Hearts */}
+                <View className="flex-row items-center gap-1">
+                  <Text className="text-lg">❤️</Text>
+                  <Text className="text-base font-inter-bold text-red-500">{hearts}</Text>
+                </View>
               </View>
 
-              <ScrollView style={{ flex: 1, padding: 24 }}>
-                <Text style={styles.readingIntro}>MODULE CONTENTS</Text>
-                {readingLesson.content.map((paragraph, index) => (
-                  <Text key={index} style={styles.readingParagraph}>
-                    {paragraph}
-                  </Text>
-                ))}
-              </ScrollView>
+              {/* Body: Slides / Quiz / Complete */}
+              {sessionStep < sessionLesson.content.length ? (
+                /* SLIDE STAGE */
+                <View className="flex-1 p-6 justify-center items-center">
+                  {/* Mascot Dialogue */}
+                  <View className="flex-row items-start mb-7 w-full">
+                    <View className="w-[60px] h-[60px] rounded-full bg-slate-100 border-2 border-slate-200 justify-center items-center">
+                      <Text className="text-[36px]">🦉</Text>
+                    </View>
+                    <View
+                      style={{
+                        width: 0,
+                        height: 0,
+                        borderTopWidth: 10,
+                        borderTopColor: "transparent",
+                        borderBottomWidth: 10,
+                        borderBottomColor: "transparent",
+                        borderRightWidth: 12,
+                        borderRightColor: "#F1F5F9",
+                        marginTop: 20,
+                        marginLeft: 6,
+                        zIndex: 2,
+                      }}
+                    />
+                    <View className="flex-1 bg-slate-100 border-[1.5px] border-slate-200 rounded-[18px] p-4 shadow-sm">
+                      <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                        {sessionLesson.content[sessionStep]}
+                      </Text>
+                    </View>
+                  </View>
 
-              {/* Mark Completed Button */}
-              <View style={styles.readingFooter}>
-                <Pressable
-                  onPress={() => handleLessonComplete(readingLesson)}
-                  style={styles.completeBtn}
-                >
-                  <Text style={styles.completeBtnText}>
-                    Mark Lesson as Completed
+                  {/* Slide image (if provided) */}
+                  {sessionLesson.images && sessionLesson.images[sessionStep] && (
+                    <View className="w-full mb-4 rounded-2xl overflow-hidden border border-slate-200">
+                      <Image
+                        source={sessionLesson.images[sessionStep]}
+                        className="w-full h-[180px]"
+                        resizeMode="contain"
+                      />
+                    </View>
+                  )}
+
+                  {/* Interactive key takeaway illustration */}
+                  <View className="bg-amber-50 border-[1.5px] border-amber-200 rounded-2xl p-4 w-full mt-3">
+                    <View className="flex-row items-center gap-2 mb-2">
+                      <Ionicons name="bulb" size={20} color="#eab308" />
+                      <Text className="text-[11px] font-inter-bold text-amber-700 tracking-wider">
+                        KEY LITERACY CONCEPT
+                      </Text>
+                    </View>
+                    <Text className="text-[13px] text-amber-900 leading-[18px] font-inter-medium">
+                      {sessionLesson.id === 1 &&
+                        "Separate savings vault accounts (like Vault/Cash) protect funds from instant transfer temptations."}
+                      {sessionLesson.id === 2 &&
+                        "Quick money apps compound flat daily/monthly interest into massive annual percentages. Check APR first!"}
+                      {sessionLesson.id === 3 &&
+                        "Government T-Bills operate under secure backing, yielding safe returns that help shield against inflation."}
+                      {sessionLesson.id === 4 &&
+                        "Pension contribution plans accumulate long-term compounds, ensuring guaranteed security in retirement years."}
+                      {sessionLesson.id === 5 &&
+                        "SLTF student loans are now guarantor-free with a Ghana Card. Use them strictly for educational expenses to avoid long-term debt."}
+                      {sessionLesson.id === 6 &&
+                        "Always separate personal and business finances. A dedicated MoMo merchant wallet helps track true profit and prevents overspending."}
+                    </Text>
+                  </View>
+
+                  {/* Listen / Audio button */}
+                  <Pressable
+                    onPress={toggleSpeech}
+                    className="flex-row items-center justify-center mt-4 bg-slate-100 rounded-xl py-3 px-5 active:bg-slate-200 gap-2"
+                  >
+                    <Ionicons
+                      name={isSpeaking || isPlaying ? "pause-circle" : "play-circle"}
+                      size={20}
+                      color="#475569"
+                    />
+                    <Text className="text-sm font-inter-semibold text-slate-600">
+                      {isSpeaking || isPlaying
+                        ? "Stop Listening"
+                        : sessionLesson.audioLocalPath
+                        ? "Listen to Audio"
+                        : "Listen to Slide"}
+                    </Text>
+                    {sessionLesson.audioLocalPath && !(isSpeaking || isPlaying) && (
+                      <View className="bg-brand-emerald/10 px-1.5 py-0.5 rounded ml-1">
+                        <Text className="text-[8px] font-inter-bold text-brand-emerald uppercase">MP3</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                </View>
+              ) : sessionStep === sessionLesson.content.length ? (
+                /* QUIZ STAGE */
+                hearts === 0 ? (
+                  /* No Hearts screen */
+                  <View className="flex-1 justify-center items-center p-6">
+                    <Text className="text-[80px] mb-6">🦉💦</Text>
+                    <Text className="text-[26px] font-inter-bold text-red-500 mb-2.5">
+                      No Hearts Left!
+                    </Text>
+                    <Text className="text-[15px] text-slate-600 text-center leading-[22px] mb-8">
+                      You made too many mistakes in this quiz. You can spend 50 XP to refill your
+                      hearts, or exit the lesson.
+                    </Text>
+
+                    <Pressable
+                      onPress={handleRefillHearts}
+                      className="bg-yellow-400 border-b-[5px] border-b-yellow-700 w-full h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
+                    >
+                      <Text className="text-white text-base font-inter-bold">
+                        Refill Hearts (50 XP)
+                      </Text>
+                    </Pressable>
+
+                    <Pressable
+                      onPress={() => {
+                        setSessionLesson(null);
+                      }}
+                      className="w-full h-[52px] rounded-2xl border-2 border-slate-200 justify-center items-center active:opacity-80"
+                    >
+                      <Text className="text-slate-500 text-base font-inter-bold">
+                        Quit Lesson
+                      </Text>
+                    </Pressable>
+                  </View>
+                ) : (
+                  /* Live Quiz Question */
+                  <ScrollView className="flex-1 p-6">
+                    <View className="flex-row items-start mb-7 w-full">
+                      <View className="w-[60px] h-[60px] rounded-full bg-slate-100 border-2 border-slate-200 justify-center items-center">
+                        <Text className="text-[36px]">🦉</Text>
+                      </View>
+                      <View
+                        style={{
+                          width: 0,
+                          height: 0,
+                          borderTopWidth: 10,
+                          borderTopColor: "transparent",
+                          borderBottomWidth: 10,
+                          borderBottomColor: "transparent",
+                          borderRightWidth: 12,
+                          borderRightColor: "#F1F5F9",
+                          marginTop: 20,
+                          marginLeft: 6,
+                          zIndex: 2,
+                        }}
+                      />
+                      <View className="flex-1 bg-slate-100 border-[1.5px] border-slate-200 rounded-[18px] p-4 shadow-sm">
+                        <Text className="text-base text-slate-700 leading-6 font-inter-bold">
+                          {"Let's verify what you've learned! Answer the question below:"}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {(() => {
+                      const quizList = MODULE_QUIZZES[sessionLesson.id];
+                      if (!quizList || quizList.length === 0) {
+                        return (
+                          <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                            No quiz configured for this lesson.
+                          </Text>
+                        );
+                      }
+                      const currentQuestion = quizList[currentQuestionIndex];
+                      if (!currentQuestion) {
+                        return (
+                          <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                            No question found for this quiz stage.
+                          </Text>
+                        );
+                      }
+
+                      return (
+                        <View className="mt-6 pb-10">
+                          <Text className="text-[10px] font-inter-bold text-slate-500 tracking-widest mb-1.5">
+                            QUESTION {currentQuestionIndex + 1} OF {quizList.length}
+                          </Text>
+                          <Text className="text-[22px] font-inter-bold text-slate-900 leading-[30px] mb-[22px]">
+                            {currentQuestion.question}
+                          </Text>
+
+                          <View className="gap-3">
+                            {currentQuestion.options.map((opt, i) => {
+                              const isSelected = selectedOptionIndex === i;
+
+                              let optBtnClass =
+                                "p-4 rounded-2xl border-2 border-slate-200 border-b-[6px] bg-white flex-row items-center justify-between active:opacity-80";
+                              let optTextClass =
+                                "text-[17px] font-inter-semibold text-slate-700 flex-1 mr-2.5 leading-6";
+                              let optionIcon = "ellipse-outline";
+                              let optionIconColor = "#94a3b8";
+
+                              if (isAnswerChecked) {
+                                if (opt.isCorrect) {
+                                  optBtnClass += " border-green-500 border-b-green-900 bg-green-50";
+                                  optTextClass += " text-green-700";
+                                  optionIcon = "checkmark-circle";
+                                  optionIconColor = "#22c55e";
+                                } else if (isSelected) {
+                                  optBtnClass += " border-red-500 border-b-red-900 bg-red-50";
+                                  optTextClass += " text-red-700";
+                                  optionIcon = "close-circle";
+                                  optionIconColor = "#ef4444";
+                                }
+                              } else if (isSelected) {
+                                optBtnClass += " border-blue-700 border-b-blue-950 bg-blue-50";
+                                optTextClass += " text-blue-700";
+                                optionIconColor = "#1d4ed8";
+                              }
+
+                              return (
+                                <Pressable
+                                  key={i}
+                                  onPress={() => {
+                                    if (isAnswerChecked && isAnswerCorrect) return;
+                                    setSelectedOptionIndex(i);
+                                    setIsAnswerChecked(false);
+                                    setIsAnswerCorrect(null);
+                                  }}
+                                  className={optBtnClass}
+                                >
+                                  <Text className={optTextClass}>{opt.text}</Text>
+                                  <Ionicons name={optionIcon as any} size={18} color={optionIconColor} />
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      );
+                    })()}
+                  </ScrollView>
+                )
+              ) : (
+                /* LESSON COMPLETE STAGE */
+                <View className="flex-1 justify-center items-center p-6">
+                  <Text className="text-[88px] mb-4">🦉🎓</Text>
+                  <Text className="text-[26px] font-inter-bold text-green-600 mb-2">
+                    Lesson Complete!
                   </Text>
-                </Pressable>
-              </View>
+                  <Text className="text-sm text-slate-600 text-center leading-5 mb-8">
+                    You successfully finished the course and demonstrated master-level understanding.
+                  </Text>
+
+                  <View className="flex-row bg-brand-slateBg border-2 border-slate-200 rounded-[20px] p-5 w-full gap-4">
+                    <View className="flex-1 items-center bg-white border-[1.5px] border-slate-200 rounded-[14px] py-3.5">
+                      <Text className="text-base mb-1">⚡</Text>
+                      <Text className="text-base font-inter-bold text-slate-900">+{sessionLesson.xpVal} XP</Text>
+                      <Text className="text-[9px] font-inter-bold text-slate-500 mt-0.5">BONUS POINTS</Text>
+                    </View>
+                    <View className="flex-1 items-center bg-white border-[1.5px] border-slate-200 rounded-[14px] py-3.5">
+                      <Text className="text-base mb-1">❤️</Text>
+                      <Text className="text-base font-inter-bold text-slate-900">{hearts}/5</Text>
+                      <Text className="text-[9px] font-inter-bold text-slate-500 mt-0.5">HEARTS LEFT</Text>
+                    </View>
+                  </View>
+                </View>
+              )}
+
+              {/* Session Footer Control Button */}
+              {sessionStep === sessionLesson.content.length && hearts === 0 ? null : (
+                <View
+                  className={`px-5 pt-4 pb-6 border-t-2 ${
+                    isAnswerChecked && isAnswerCorrect === true
+                      ? "bg-green-100 border-t-green-200"
+                      : isAnswerChecked && isAnswerCorrect === false
+                      ? "bg-red-100 border-t-red-200"
+                      : "bg-white border-t-slate-200"
+                  }`}
+                >
+                  {isAnswerChecked && (
+                    <View className="flex-row items-center mb-3.5 gap-2">
+                      <Ionicons
+                        name={isAnswerCorrect ? "checkmark-circle" : "alert-circle"}
+                        size={24}
+                        color={isAnswerCorrect ? "#22c55e" : "#ef4444"}
+                      />
+                      <Text
+                        className={`text-sm font-inter-bold flex-1 ${
+                          isAnswerCorrect ? "text-green-700" : "text-red-700"
+                        }`}
+                      >
+                        {isAnswerCorrect
+                          ? "Amazing! You got the answer correct! 🎉"
+                          : "Oops! Incorrect answer. Try again! 💔"}
+                      </Text>
+                    </View>
+                  )}
+
+                  <Pressable
+                    disabled={
+                      sessionStep === sessionLesson.content.length &&
+                      selectedOptionIndex === null
+                    }
+                    onPress={
+                      sessionStep === sessionLesson.content.length && !isAnswerChecked
+                        ? handleCheckQuizAnswer
+                        : handleSessionContinue
+                    }
+                    className={`h-[52px] rounded-2xl justify-center items-center active:opacity-80 ${
+                      isAnswerChecked && isAnswerCorrect === true
+                        ? "bg-green-500 border-b-[5px] border-b-green-700"
+                        : isAnswerChecked && isAnswerCorrect === false
+                        ? "bg-red-500 border-b-[5px] border-b-red-700"
+                        : sessionStep === sessionLesson.content.length &&
+                          selectedOptionIndex === null
+                        ? "bg-slate-200 border-b-[5px] border-b-slate-300"
+                        : "bg-green-500 border-b-[5px] border-b-green-600"
+                    }`}
+                  >
+                    <Text className="text-white text-base font-inter-bold tracking-wider">
+                      {sessionStep === sessionLesson.content.length
+                        ? isAnswerChecked
+                          ? isAnswerCorrect
+                            ? "CONTINUE"
+                            : "TRY AGAIN"
+                          : "CHECK ANSWER"
+                        : sessionStep > sessionLesson.content.length
+                        ? "FINISH"
+                        : "CONTINUE"}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
             </View>
           )}
         </SafeAreaView>
       </Modal>
-
-      {/* ── PREMIUM CERTIFICATE MODAL ── */}
-      <Modal
-        visible={certModalVisible}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setCertModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.certModalCard}>
-            {/* Stamp seal details */}
-            <View style={styles.certModalHeader}>
-              <Text style={styles.certBrand}>FINLIT ACADEMY</Text>
-              <Pressable
-                onPress={() => setCertModalVisible(false)}
-                style={styles.closeCertBtn}
-              >
-                <Ionicons name="close" size={24} color="#6b7280" />
-              </Pressable>
-            </View>
-
-            {/* Main Certificate Scrollable */}
-            <ScrollView
-              contentContainerStyle={styles.certContainer}
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.goldBorder}>
-                <View style={styles.innerCertBody}>
-                  <Ionicons name="ribbon" size={64} color="#b45309" style={{ marginBottom: 12 }} />
-                  <Text style={styles.certMainTitle}>CERTIFICATE OF COMPLETION</Text>
-                  <Text style={styles.certSubText}>This is proudly presented to</Text>
-                  <Text style={styles.certRecipientName}>{userName}</Text>
-                  <Text style={styles.certParagraph}>
-                    {"for successfully completing all advanced modules in the FinLit Financial Literacy program, covering MoMo budget audits, local Treasury Bill investments, commercial debt management, and SSNIT retirement schemes."}
-                  </Text>
-
-                  <View style={styles.certSignatures}>
-                    <View style={styles.signatureLine}>
-                      <Text style={styles.signText}>FinLit Director</Text>
-                      <View style={styles.lineSpacer} />
-                      <Text style={styles.signTitle}>Kofi Mensah</Text>
-                    </View>
-                    <View style={styles.signatureLine}>
-                      <Text style={styles.signText}>Verification Seal</Text>
-                      <View style={styles.lineSpacer} />
-                      <Text style={styles.signTitle}>ID: FL-2026-GRA</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </ScrollView>
-
-            <Pressable
-              onPress={() => setCertModalVisible(false)}
-              style={styles.downloadFileBtn}
-            >
-              <Ionicons name="download-outline" size={18} color="white" />
-              <Text style={styles.downloadFileBtnText}>Download PDF Certificate</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-  },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    backgroundColor: "#ffffff",
-  },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: "900",
-    color: "#0f172a",
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 3,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 80,
-  },
-
-  /* Certificate Card */
-  certCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 24,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  certHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  certBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#ccfbf1",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    gap: 4,
-  },
-  certBadgeText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: "#0d9488",
-  },
-  certProgressText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#4b5563",
-  },
-  certTitle: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#0f172a",
-    marginTop: 14,
-  },
-  certDesc: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 4,
-    lineHeight: 16,
-  },
-  progressBarBg: {
-    height: 6,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 3,
-    marginTop: 16,
-    overflow: "hidden",
-  },
-  progressBarFill: {
-    height: "100%",
-    backgroundColor: "#0d9488",
-  },
-  certButton: {
-    backgroundColor: "#0d9488",
-    borderRadius: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-    marginTop: 20,
-  },
-  certButtonText: {
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: "800",
-    marginLeft: 6,
-  },
-  disabledCertButton: {
-    backgroundColor: "#f3f4f6",
-    borderRadius: 16,
-    paddingVertical: 12,
-    marginTop: 20,
-    alignItems: "center",
-  },
-  disabledCertText: {
-    color: "#9ca3af",
-    fontSize: 12,
-    fontWeight: "700",
-  },
-
-  /* Section Labels */
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: "#9ca3af",
-    letterSpacing: 1.2,
-    marginTop: 28,
-    marginBottom: 12,
-    marginLeft: 2,
-  },
-
-  /* Modules Container */
-  modulesContainer: {
-    gap: 12,
-  },
-  moduleCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    overflow: "hidden",
-  },
-  completedModuleCard: {
-    borderColor: "#dcfce7",
-  },
-  moduleHeaderRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-  },
-  moduleMeta: {
-    flex: 1,
-    marginRight: 10,
-  },
-  badgeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  durationText: {
-    fontSize: 11,
-    color: "#6b7280",
-    fontWeight: "500",
-  },
-  moduleCardTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#1f2937",
-    marginTop: 8,
-  },
-  moduleExpandedBody: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#f3f4f6",
-    paddingTop: 12,
-  },
-  moduleCardDesc: {
-    fontSize: 13,
-    color: "#4b5563",
-    lineHeight: 18,
-  },
-  actionRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 16,
-  },
-  readBtn: {
-    flex: 1.2,
-    backgroundColor: "#0d9488",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    gap: 4,
-  },
-  readBtnText: {
-    color: "white",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  audioBtn: {
-    flex: 1,
-    backgroundColor: "#ccfbf1",
-    borderWidth: 1,
-    borderColor: "#99f6e4",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    gap: 4,
-  },
-  audioBtnText: {
-    color: "#0d9488",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  downloadBtn: {
-    flex: 0.8,
-    backgroundColor: "#f3f4f6",
-    borderRadius: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    gap: 4,
-  },
-  downloadBtnText: {
-    color: "#4b5563",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-  progressSub: {
-    fontSize: 10,
-    color: "#4b5563",
-    fontWeight: "700",
-    marginTop: 8,
-    textAlign: "right",
-  },
-
-  /* Audio player mini dashboard */
-  audioPlayerDashboard: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  playerDetails: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-    marginRight: 10,
-  },
-  playerIconBox: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: "#0d9488",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  playerTextWrap: {
-    flex: 1,
-  },
-  playerTitle: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: "#0f172a",
-  },
-  playerSubtitle: {
-    fontSize: 11,
-    color: "#0d9488",
-    fontWeight: "700",
-    marginTop: 2,
-  },
-  playerControls: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  playPauseBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#ccfbf1",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closePlayerBtn: {
-    padding: 4,
-  },
-
-  /* Reading modal */
-  readingHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    backgroundColor: "#ffffff",
-  },
-  readingBack: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f3f4f6",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  readingTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#0f172a",
-    flex: 1,
-    textAlign: "center",
-  },
-  readingIntro: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: "#9ca3af",
-    letterSpacing: 1.2,
-    marginBottom: 12,
-  },
-  readingParagraph: {
-    fontSize: 15,
-    color: "#374151",
-    lineHeight: 24,
-    marginBottom: 16,
-    fontWeight: "500",
-  },
-  readingFooter: {
-    padding: 16,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-  },
-  completeBtn: {
-    backgroundColor: "#0d9488",
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  completeBtnText: {
-    color: "white",
-    fontSize: 15,
-    fontWeight: "800",
-  },
-
-  /* Certificate Modal styling */
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  certModalCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 24,
-    width: "100%",
-    maxHeight: "85%",
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
-  },
-  certModalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  certBrand: {
-    fontSize: 12,
-    fontWeight: "900",
-    color: "#4b5563",
-    letterSpacing: 1.5,
-  },
-  closeCertBtn: {
-    padding: 4,
-  },
-  certContainer: {
-    padding: 20,
-  },
-  goldBorder: {
-    borderWidth: 6,
-    borderColor: "#d97706",
-    borderRadius: 16,
-    padding: 4,
-  },
-  innerCertBody: {
-    borderWidth: 2,
-    borderColor: "#fbbf24",
-    borderRadius: 10,
-    padding: 18,
-    alignItems: "center",
-    backgroundColor: "#fffdf9",
-  },
-  certMainTitle: {
-    fontSize: 16,
-    fontWeight: "900",
-    color: "#b45309",
-    textAlign: "center",
-    letterSpacing: 1,
-    marginTop: 8,
-  },
-  certSubText: {
-    fontSize: 12,
-    color: "#6b7280",
-    marginTop: 12,
-    fontStyle: "italic",
-  },
-  certRecipientName: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#1e293b",
-    marginVertical: 10,
-    textAlign: "center",
-  },
-  certParagraph: {
-    fontSize: 11,
-    color: "#475569",
-    textAlign: "center",
-    lineHeight: 16,
-    marginVertical: 12,
-  },
-  certSignatures: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 20,
-    paddingHorizontal: 8,
-  },
-  signatureLine: {
-    alignItems: "center",
-    width: "45%",
-  },
-  signText: {
-    fontSize: 9,
-    color: "#94a3b8",
-  },
-  lineSpacer: {
-    height: 1,
-    backgroundColor: "#cbd5e1",
-    width: "100%",
-    marginVertical: 4,
-  },
-  signTitle: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: "#475569",
-  },
-  downloadFileBtn: {
-    backgroundColor: "#0d9488",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 0,
-  },
-  downloadFileBtnText: {
-    color: "#ffffff",
-    fontSize: 14,
-    fontWeight: "800",
-  },
-});

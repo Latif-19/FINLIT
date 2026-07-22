@@ -40,10 +40,10 @@ export default function OnboardingScreen() {
     <View className="flex-1 bg-white">
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 pt-14">
-        <Text></Text>
+        <Text className="text-[20px] font-inter-semibold text-brand-navy">FinLit</Text>
 
-        <Pressable onPress={handleSkip}>
-          <Text className="text-gray-500 font-semibold text-base">Skip</Text>
+        <Pressable onPress={handleSkip} className="active:opacity-70 py-2">
+          <Text className="text-brand-gray font-inter-semibold text-sm">Skip</Text>
         </Pressable>
       </View>
 
@@ -60,18 +60,18 @@ export default function OnboardingScreen() {
           setCurrentIndex(index);
         }}
         renderItem={({ item }) => (
-          <View style={{ width }} className="items-center px-8">
+          <View style={{ width }} className="items-center px-8 justify-center">
             <Image
               source={item.image}
               resizeMode="contain"
-              className="w-80 h-80 mt-10"
+              className="w-72 h-72 mb-8"
             />
 
-            <Text className="text-3xl font-bold text-center text-green-700 mt-6">
+            <Text className="text-[32px] font-inter-bold text-center text-brand-navy mt-4 leading-[38px]">
               {item.title}
             </Text>
 
-            <Text className="text-center text-gray-500 text-base mt-4 leading-6">
+            <Text className="text-center text-brand-gray font-inter text-base mt-4 leading-6 px-2">
               {item.description}
             </Text>
           </View>
@@ -79,12 +79,12 @@ export default function OnboardingScreen() {
       />
 
       {/* Dots */}
-      <View className="flex-row justify-center mb-8">
+      <View className="flex-row justify-center items-center mb-8">
         {slides.map((_, index) => (
           <View
             key={index}
             className={`h-2 rounded-full mx-1 ${
-              currentIndex === index ? "bg-green-700 w-8" : "bg-gray-300 w-2"
+              currentIndex === index ? "bg-brand-emerald w-6" : "bg-slate-200 w-2"
             }`}
           />
         ))}
@@ -94,9 +94,13 @@ export default function OnboardingScreen() {
       <View className="px-6 pb-10">
         <Pressable
           onPress={handleNext}
-          className="bg-green-700 rounded-xl py-4"
+          style={({ pressed }) => ({
+            transform: [{ scale: pressed ? 0.98 : 1 }],
+            opacity: pressed ? 0.95 : 1,
+          })}
+          className="bg-brand-navy h-14 rounded-2xl justify-center items-center shadow-lg shadow-brand-navy/10"
         >
-          <Text className="text-white text-center font-bold text-lg">
+          <Text className="text-white text-center font-inter-semibold text-base">
             {currentIndex === slides.length - 1 ? "Get Started" : "Next"}
           </Text>
         </Pressable>

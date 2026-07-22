@@ -1,50 +1,114 @@
-# Welcome to your Expo app 👋
+# FinLit — Financial Literacy Mobile App 🦉
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile app that teaches personal finance to Ghanaian students, young professionals, and informal-sector workers — through bite-sized lessons, quizzes, real-world simulations, gamification, a community forum, and an AI tutor.
 
-## Get started
+Built for **KNUST CodeQuest 2026**.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## ✨ Features
 
-2. Start the app
+- **Structured learning modules** — MoMo budgeting, digital debt, Treasury Bills, pensions & SSNIT, student loans, campus side-hustles
+- **Interactive simulations** — MoMo fees, T-Bill yields, loan interest, PAYE tax, inflation (with real Ghanaian rates)
+- **Quizzes & assessment** — end-of-module quizzes and an onboarding assessment that builds a personalised learning path
+- **Gamification** — XP, streaks, 10 unlockable badges, and a live leaderboard
+- **Community forum** — post questions, reply, and like
+- **AI Tutor** — a Gemini-powered coach that answers Ghanaian personal-finance questions
+- **News feed** — curated local financial news
+- **Premium tier** — unlocked via Paystack payment
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🧱 Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React Native (Expo SDK 54) + TypeScript, Expo Router, NativeWind (Tailwind), Zustand |
+| **Backend** | Spring Boot 4 (Java 21+), Spring Web, Spring Security, Spring Data JPA |
+| **Database** | PostgreSQL |
+| **Auth** | JWT (access + refresh) with bcrypt password hashing |
+| **AI** | Google Gemini (`gemini-flash-latest`), proxied server-side |
+| **Payments** | Paystack |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📁 Repository Structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+FinLit-v2/
+├── app/               # Expo Router screens (the mobile app)
+├── components/ services/ store/ data/ types/   # frontend modules
+├── backend/           # Spring Boot API (see backend/SETUP.md)
+│   └── src/main/java/com/finlit/
+│       ├── auth/  content/  progress/  gamification/
+│       ├── simulation/  community/  notification/  tutor/  user/
+│       └── common/    # shared exceptions + global handler
+└── README.md
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The app talks to the backend over a shared API client (`services/api.ts`) that attaches the JWT and auto-refreshes on 401.
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🚀 Getting Started
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### Prerequisites
+- **Node.js** + npm and the **Expo Go** app on your phone
+- **Java 21+** (the backend uses the Maven wrapper, so no separate Maven install)
+- **PostgreSQL 16** (create an empty database named `finlit`)
 
-## Join the community
+### 1. Backend (Spring Boot)
+See **[`backend/SETUP.md`](backend/SETUP.md)** for full details. In short:
 
-Join our community of developers creating universal apps.
+```bash
+cd backend
+# set env vars first (see below), then:
+./mvnw spring-boot:run        # or run FinlitBackendApplication in IntelliJ
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Required environment variables (set them in your IntelliJ run config):
+
+| Variable | Purpose |
+|----------|---------|
+| `DB_PASSWORD` | your local PostgreSQL password |
+| `GEMINI_API_KEY` | Google AI Studio key — enables the AI Tutor (optional; falls back to canned answers) |
+
+The API runs on **`http://localhost:3000/api`**.
+
+### 2. Frontend (Expo)
+
+```bash
+npm install
+npx expo start -c
+```
+
+Create a `.env` (gitignored) with:
+
+```
+EXPO_PUBLIC_API_URL=http://<your-PC-LAN-IP>:3000/api   # e.g. http://10.84.189.51:3000/api
+EXPO_PUBLIC_PAYSTACK_KEY=pk_test_xxx
+```
+
+> On a physical phone, use your PC's LAN IP (not `localhost`), and ensure port 3000 is allowed through your firewall. On the iOS simulator, `localhost` works.
+
+---
+
+## 🔌 API Overview
+
+All routes are under `/api`. Public: `/health`, `/auth/**`. Everything else requires a Bearer token.
+
+- **Auth** — `POST /auth/register · /login · /refresh · /forgot-password`
+- **Content** — `GET /lessons · /lessons/{id} · /news · /news/{id}`
+- **Progress** — `GET /progress`, `POST /progress/lesson · /savings · /assessment`
+- **Gamification** — `GET /gamification/leaderboard · /badges`, `POST /gamification/quiz-score`
+- **Simulations** — `POST /simulations/save`, `GET /simulations/history`
+- **Community** — `GET/POST /community/posts`, `POST /community/posts/{id}/like · /replies`
+- **Notifications** — `GET /notifications`, `POST /notifications/{id}/read`
+- **Tutor** — `POST /tutor/chat`
+- **Profile** — `GET/PUT /profile`, `POST /profile/premium`
+
+---
+
+## 👥 Team — Group 100, KNUST
+
+Melchizedek Bright Kafui Attubrah · Antwi Jeffter Boakye · Abdul Latif Habib Hassim · Dapaah Lawrence · Amankwah Kwabena Owusu
