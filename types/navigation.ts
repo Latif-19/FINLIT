@@ -1,8 +1,8 @@
 /**
  * Central navigation type definitions for expo-router.
  *
- * Importing this file and using the typed helpers removes every
- * `as any` cast on router.push / router.replace calls.
+ * These types are used for documentation purposes.
+ * expo-router auto-generates route types from the file system.
  */
 
 /** All routes reachable from the root Stack navigator. */
@@ -21,19 +21,14 @@ export type RootStackParamList = {
   "help-support": undefined;
   "privacy-policy": undefined;
   paywall: undefined;
+  badges: undefined;
   simulations: undefined;
   "ai-tutor": undefined;
   "(tabs)": undefined;
   "(tabs)/home": { score?: string; goal?: string };
   "(tabs)/learn": undefined;
+  "(tabs)/leaderboard": undefined;
   "(tabs)/news": undefined;
   "(tabs)/community": undefined;
   "(tabs)/profile": undefined;
 };
-
-// Extend expo-router's type system so that `router.push()` / `router.replace()`
-// accept only the routes defined above.
-declare module "expo-router" {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface RouteParamList extends RootStackParamList {}
-}

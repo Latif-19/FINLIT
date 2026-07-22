@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-brand-navy: #0A2540;
+  --color-brand-emerald: #16A34A;
+  --color-brand-gold: #D4AF37;
+  --color-brand-bg: #FFFFFF;
+  --color-brand-slateBg: #F8FAFC;
+  --color-brand-dark: #111827;
+  --color-brand-gray: #6B7280;
+}

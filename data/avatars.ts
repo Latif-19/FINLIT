@@ -14,4 +14,4 @@ export const AVATAR_OPTIONS: AvatarOption[] = [
   { char: "🎓", name: "Scholar" },
 ];
 
-export const AVATAR_CHARACTERS: string[] = ['🦉', '🦊', '🐺', '🦁', '🐯', '🦅', '🐸', '🎓'];
+export const AVATAR_CHARACTERS: string[] = AVATAR_OPTIONS.map((a) => a.char);

@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { Pressable, SafeAreaView, Text, View, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { Pressable, Text, View, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../store/useUserStore";
 
@@ -555,7 +556,7 @@ export default function AssessmentResultScreen() {
 
   if (score > 8 && score <= 12) {
     tier = "Smart Money Manager";
-    tierColor = "#15803d"; // green-700
+    tierColor = "#16A34A"; // brand-emerald
     tierTextClass = "text-green-800";
     badgeIcon = "ribbon";
   } else if (score > 12) {
@@ -596,20 +597,20 @@ export default function AssessmentResultScreen() {
   } else if (goal === "Start a Business") {
     recommendations = ["Entrepreneurial Finance 101", "Startup Costs & Cash Flow", "Business Account Essentials"];
   } else if (goal === "Save for Education") {
-    recommendations = ["Tax-Advantaged Education Savings", "529 Plans & Student Aid", "Student Budgeting Basics"];
+    recommendations = ["SLTF Student Loans & Local Bursaries", "Education Saving Plans", "Student Budgeting Basics"];
   } else {
     // Score based default recommendations
     if (score > 12) {
-      recommendations = ["Stock Market Index Funds & ETFs 101", "Tax-Advantaged Growth: IRAs & 401(k)s", "Dollar-Cost Averaging & Risk"];
+      recommendations = ["Ghana Stock Exchange (GSE) Equities", "Tax Relief via Tier-3 Pension Contributions", "Hedging Against Cedi Inflation"];
     } else if (score > 8) {
       recommendations = ["Automating Savings & Bills", "Compounding Interest Explained", "High-Yield Saving & Inflation"];
     }
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Decorative Accent Background */}
-      <View className="absolute top-0 left-0 right-0 h-64 bg-green-800/10 rounded-b-[100px] -z-10" />
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
 
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingVertical: 40 }}
@@ -618,19 +619,19 @@ export default function AssessmentResultScreen() {
       >
         {/* Branding header */}
         <View className="items-center mt-6">
-          <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center shadow-sm border border-gray-100 overflow-hidden">
-            <Ionicons name="analytics" size={32} color="#15803d" />
+          <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center shadow-sm border border-slate-100 overflow-hidden">
+            <Ionicons name="analytics" size={32} color="#16A34A" />
           </View>
-          <Text className="text-3xl font-extrabold text-green-950 mt-4 tracking-tight">
+          <Text className="text-3xl font-inter-bold text-brand-navy mt-4 tracking-tight">
             Analysis Complete
           </Text>
-          <Text className="text-gray-500 text-sm mt-1 text-center px-4 leading-5">
+          <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4 leading-5">
             Your customized dashboard and learning curriculum have been successfully curated!
           </Text>
         </View>
 
         {/* Tier Score Summary Card */}
-        <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mt-6">
+        <View className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 mt-6">
           <View className="items-center">
             {/* Visual radial indicator */}
             <View
@@ -640,43 +641,41 @@ export default function AssessmentResultScreen() {
               <Ionicons name={badgeIcon as any} size={36} color={tierColor} />
             </View>
 
-            <Text className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-4">
+            <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mt-4">
               Your Financial Level
             </Text>
-            <Text className={`text-2xl font-extrabold text-center mt-1 ${tierTextClass}`}>
+            <Text className={`text-2xl font-inter-bold text-center mt-1 ${tierTextClass}`}>
               {tier}
             </Text>
 
-            <View className="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 mt-4 w-full">
-              <Text className="text-gray-600 text-sm text-center leading-6 font-medium">
+            <View className="bg-brand-slateBg/40 border border-slate-100 rounded-2xl p-4 mt-4 w-full">
+              <Text className="text-slate-600 font-inter text-sm text-center leading-6">
                 {description}
               </Text>
             </View>
           </View>
 
           {/* Skill Breakdown */}
-          <View className="border-t border-gray-100 pt-5 mt-5">
-            <Text className="text-gray-800 font-bold text-sm mb-3">Syllabus Breakdown</Text>
-            
-            <View className="space-y-3.5">
-              <View className="flex-row justify-between items-center mt-2.5">
-                <Text className="text-gray-500 text-sm">Budgeting & Expense Control</Text>
-                <Text className="text-green-700 text-sm font-bold">{budgetingGrade}</Text>
-              </View>
-              <View className="flex-row justify-between items-center mt-2.5">
-                <Text className="text-gray-500 text-sm">Savings Automation Rate</Text>
-                <Text className="text-green-700 text-sm font-bold">{savingsGrade}</Text>
-              </View>
-              <View className="flex-row justify-between items-center mt-2.5">
-                <Text className="text-gray-500 text-sm">Investment Strategy & Compounding</Text>
-                <Text className="text-green-700 text-sm font-bold">{investingGrade}</Text>
-              </View>
-            </View>
+          <View className="border-t border-slate-100 pt-5 mt-5">
+            <Text className="text-brand-navy font-inter-bold text-sm mb-3">Syllabus Breakdown</Text>
 
-            <View className="flex-row items-center justify-between border-t border-gray-100 w-full pt-4 mt-4">
-              <Text className="text-gray-500 font-semibold text-sm">Overall Diagnostic Score:</Text>
-              <View className="bg-green-50 px-3.5 py-1 rounded-full border border-green-200">
-                <Text className="text-green-800 font-bold text-sm">{score} / 15</Text>
+              <View className="flex-row justify-between items-center mt-2.5">
+                <Text className="text-brand-gray font-inter text-sm">Budgeting & Expense Control</Text>
+                <Text className="text-brand-emerald font-inter-bold text-sm">{budgetingGrade}</Text>
+              </View>
+              <View className="flex-row justify-between items-center mt-2.5">
+                <Text className="text-brand-gray font-inter text-sm">Savings Automation Rate</Text>
+                <Text className="text-brand-emerald font-inter-bold text-sm">{savingsGrade}</Text>
+              </View>
+              <View className="flex-row justify-between items-center mt-2.5">
+                <Text className="text-brand-gray font-inter text-sm">Investment Strategy & Compounding</Text>
+                <Text className="text-brand-emerald font-inter-bold text-sm">{investingGrade}</Text>
+              </View>
+
+            <View className="flex-row items-center justify-between border-t border-slate-100 w-full pt-4 mt-4">
+              <Text className="text-brand-gray font-inter-semibold text-sm">Overall Diagnostic Score:</Text>
+              <View className="bg-brand-emerald/10 px-3.5 py-1 rounded-full border border-brand-emerald/20">
+                <Text className="text-brand-emerald font-inter-bold text-sm">{score} / 15</Text>
               </View>
             </View>
           </View>
@@ -684,20 +683,20 @@ export default function AssessmentResultScreen() {
 
         {/* YOUR FINANCIAL PROFILE */}
         <View className="mt-8">
-          <Text className="text-xl font-bold text-gray-800 mb-4 px-1 uppercase tracking-tight">
+          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1 uppercase tracking-tight">
             📋 Your Financial Profile
           </Text>
 
-          <View className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm">
+          <View className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
             <View className="flex-row flex-wrap -mx-2">
               {/* Financial Knowledge */}
               <View className="w-1/2 px-2 mb-4 text-left">
-                <View className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex-1">
+                <View className="bg-brand-slateBg/40 p-4 rounded-2xl border border-slate-100 flex-1">
                   <Ionicons name="school-outline" size={20} color={tierColor} />
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2">
+                  <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Financial Knowledge
                   </Text>
-                  <Text className="text-sm font-extrabold text-gray-800 mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
                     {score <= 8 ? "Beginner" : score <= 12 ? "Intermediate" : "Advanced"}
                   </Text>
                 </View>
@@ -705,12 +704,12 @@ export default function AssessmentResultScreen() {
 
               {/* Primary Goal */}
               <View className="w-1/2 px-2 mb-4 text-left">
-                <View className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex-1">
+                <View className="bg-brand-slateBg/40 p-4 rounded-2xl border border-slate-100 flex-1">
                   <Ionicons name="flag-outline" size={20} color={tierColor} />
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2">
+                  <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Primary Goal
                   </Text>
-                  <Text className="text-sm font-extrabold text-gray-800 mt-1" numberOfLines={1}>
+                  <Text className="text-sm font-inter-bold text-brand-dark mt-1" numberOfLines={1}>
                     {goal || "General Literacy"}
                   </Text>
                 </View>
@@ -718,12 +717,12 @@ export default function AssessmentResultScreen() {
 
               {/* Recommended Learning Style */}
               <View className="w-1/2 px-2 text-left">
-                <View className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex-1">
+                <View className="bg-brand-slateBg/40 p-4 rounded-2xl border border-slate-100 flex-1">
                   <Ionicons name="book-outline" size={20} color={tierColor} />
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2">
+                  <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Learning Style
                   </Text>
-                  <Text className="text-sm font-extrabold text-gray-800 mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
                     Interactive Lessons
                   </Text>
                 </View>
@@ -731,12 +730,12 @@ export default function AssessmentResultScreen() {
 
               {/* Estimated Learning Journey */}
               <View className="w-1/2 px-2 text-left">
-                <View className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 flex-1">
+                <View className="bg-brand-slateBg/40 p-4 rounded-2xl border border-slate-100 flex-1">
                   <Ionicons name="calendar-outline" size={20} color={tierColor} />
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2">
+                  <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Learning Journey
                   </Text>
-                  <Text className="text-sm font-extrabold text-gray-800 mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
                     {score <= 8 ? "6 Weeks" : score <= 12 ? "4 Weeks" : "3 Weeks"}
                   </Text>
                 </View>
@@ -747,34 +746,34 @@ export default function AssessmentResultScreen() {
 
         {/* 🤖 FinLit AI Recommendation */}
         <View className="mt-8">
-          <Text className="text-xl font-bold text-gray-800 mb-4 px-1 uppercase tracking-tight">
+          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1 uppercase tracking-tight">
             🤖 FinLit AI Recommendation
           </Text>
 
-          <View className="bg-green-50 border border-green-200/60 rounded-3xl p-5 shadow-sm">
+          <View className="bg-brand-emerald/5 border border-brand-emerald/20 rounded-3xl p-5 shadow-sm">
             <View className="flex-row items-center mb-3">
-              <View className="w-10 h-10 rounded-full bg-green-700/10 items-center justify-center mr-3">
+              <View className="w-10 h-10 rounded-full bg-brand-emerald/10 items-center justify-center mr-3">
                 <Text className="text-xl">🤖</Text>
               </View>
-              <Text className="text-green-800 font-extrabold text-base">FinLit AI Tutor</Text>
+              <Text className="text-brand-navy font-inter-bold text-base">FinLit AI Tutor</Text>
             </View>
 
-            <Text className="text-gray-700 text-sm font-semibold mb-3 leading-5">
+            <Text className="text-brand-dark font-inter-semibold text-sm mb-3 leading-5">
               Based on your assessment,{"\n"}I recommend starting with:
             </Text>
 
-            <View className="space-y-2 mb-2">
+            <View className="mb-2">
               {recommendations.map((rec, index) => (
-                <View key={index} className="flex-row items-center mt-1">
-                  <View className="w-2 h-2 rounded-full bg-green-700 mr-2.5" />
-                  <Text className="text-gray-800 font-bold text-sm">{rec}</Text>
+                <View key={index} className="flex-row items-center mt-2">
+                  <View className="w-2 h-2 rounded-full bg-brand-emerald mr-2.5" />
+                  <Text className="text-brand-dark font-inter-bold text-sm">{rec}</Text>
                 </View>
               ))}
             </View>
 
-            <View className="border-t border-green-200/40 pt-3 mt-3">
-              <Text className="text-green-700 text-xs italic">
-                {"* Later this will come from AI. For now it's generated using simple rules."}
+            <View className="border-t border-brand-emerald/20 pt-3 mt-3">
+              <Text className="text-brand-emerald font-inter text-xs italic">
+                {"Tap any lesson on the Learn tab to begin your personalized journey."}
               </Text>
             </View>
           </View>
@@ -782,14 +781,14 @@ export default function AssessmentResultScreen() {
 
         {/* Learning Path Syllabus */}
         <View className="mt-8">
-          <Text className="text-xl font-bold text-gray-800 mb-4 px-1">
+          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1">
             🎯 Your Personalized Syllabus
           </Text>
 
           {syllabus.map((item, index) => (
             <View
               key={index}
-              className="bg-white p-4.5 rounded-2xl border border-gray-100 shadow-sm flex-row items-center mb-4"
+              className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex-row items-center mb-4"
             >
               <View
                 className="w-12 h-12 rounded-xl items-center justify-center mr-4"
@@ -800,19 +799,19 @@ export default function AssessmentResultScreen() {
 
               <View className="flex-1 pr-2">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                  <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider">
                     MODULE {index + 1}
                   </Text>
-                  <View className="bg-gray-100 px-2 py-0.5 rounded-full">
-                    <Text className="text-gray-500 text-[10px] font-semibold">
+                  <View className="bg-brand-slateBg px-2 py-0.5 rounded-full border border-slate-200">
+                    <Text className="text-brand-gray text-[10px] font-inter-semibold">
                       {item.duration}
                     </Text>
                   </View>
                 </View>
-                <Text className="text-base font-bold text-gray-800 mt-1 leading-5">
+                <Text className="text-base font-inter-bold text-brand-dark mt-1 leading-5">
                   {item.title}
                 </Text>
-                <Text className="text-gray-500 text-xs mt-1 leading-4">
+                <Text className="text-brand-gray font-inter text-xs mt-1 leading-4">
                   {item.desc}
                 </Text>
               </View>
@@ -821,10 +820,10 @@ export default function AssessmentResultScreen() {
         </View>
 
         {/* Dashboard Curation Info */}
-        <View className="bg-blue-50 border border-blue-100 p-4.5 rounded-2xl flex-row items-start mt-4">
+        <View className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex-row items-start mt-4">
           <Ionicons name="color-wand-outline" size={22} color="#1d4ed8" style={{ marginRight: 12, marginTop: 2 }} />
           <View className="flex-1">
-            <Text className="text-blue-900 font-bold text-sm">Your Dashboard Is Ready</Text>
+            <Text className="text-blue-900 font-inter-bold text-sm">Your Dashboard Is Ready</Text>
             <Text className="text-blue-700 text-xs mt-1 leading-4">
               {"We've personalized your dashboard with lessons, goals, recommendations, news, and financial insights based on your assessment."}
             </Text>
@@ -844,9 +843,9 @@ export default function AssessmentResultScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
             opacity: pressed ? 0.95 : 1,
           })}
-          className="bg-green-700 py-4 rounded-xl mt-8 shadow-md active:bg-green-800 flex-row justify-center items-center"
+          className="bg-brand-emerald py-4 rounded-2xl mt-8 shadow-md flex-row justify-center items-center"
         >
-          <Text className="text-white text-center font-bold text-base mr-2">
+          <Text className="text-white text-center font-inter-bold text-base mr-2">
             Continue to Dashboard
           </Text>
           <Ionicons name="arrow-forward" size={18} color="white" />

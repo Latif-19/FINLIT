@@ -122,10 +122,10 @@ export default function ForgotPasswordScreen() {
     // Simulate API call to verify verification code
     setTimeout(() => {
       setIsLoading(false);
-      // In development, accept any code or say '1234'
-      if (codeString !== "1234" && codeString !== "0000" && codeString !== "8888" && codeString !== "1111") {
-        // Let's accept anything to be developer-friendly, but add a warning or let it succeed.
-        // For demonstration, let's say '1234' is the mock correct code, but allow bypass to make testing easy.
+      if (codeString !== "1234") {
+        setIsLoading(false);
+        setError("Invalid verification code. Please try again.");
+        return;
       }
       setStep("password");
     }, 1500);
@@ -207,12 +207,12 @@ export default function ForgotPasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-brand-slateBg"
     >
       {/* Decorative Accent Background */}
-      <View className="absolute top-0 left-0 right-0 h-64 bg-green-800/10 rounded-b-[100px] -z-10" />
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
 
       <ScrollView
         contentContainerStyle={{ 
@@ -228,15 +228,15 @@ export default function ForgotPasswordScreen() {
         {step !== "success" && (
           <Pressable
             onPress={handleBack}
-            className="absolute top-14 left-6 z-10 p-2.5 bg-white rounded-full shadow-sm border border-gray-100 active:opacity-80"
+            className="absolute top-14 left-6 z-10 p-2.5 bg-white rounded-full shadow-md border border-slate-100 active:opacity-80"
           >
-            <Ionicons name="arrow-back" size={22} color="#15803d" />
+            <Ionicons name="arrow-back" size={22} color="#0A2540" />
           </Pressable>
         )}
 
         {/* Branding header */}
         <View className="items-center mt-12">
-          <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center shadow-sm border border-gray-100 overflow-hidden">
+          <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center shadow-md border border-slate-100 overflow-hidden">
             <Image
               source={require("../assets/images/finlit-logo.jpeg")}
               className="w-14 h-14"
@@ -246,10 +246,10 @@ export default function ForgotPasswordScreen() {
           
           {step === "email" && (
             <>
-              <Text className="text-3xl font-extrabold text-green-950 mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
                 Reset Password
               </Text>
-              <Text className="text-gray-500 text-sm mt-1 text-center px-4">
+              <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
                 {"Forgot your credentials? We'll help you get right back in."}
               </Text>
             </>
@@ -257,22 +257,22 @@ export default function ForgotPasswordScreen() {
 
           {step === "code" && (
             <>
-              <Text className="text-3xl font-extrabold text-green-950 mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
                 Verify Identity
               </Text>
-              <Text className="text-gray-500 text-sm mt-1 text-center px-4">
+              <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
                 We sent a 4-digit reset code to:{"\n"}
-                <Text className="font-semibold text-green-800">{email}</Text>
+                <Text className="font-inter-semibold text-brand-emerald">{email}</Text>
               </Text>
             </>
           )}
 
           {step === "password" && (
             <>
-              <Text className="text-3xl font-extrabold text-green-950 mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
                 New Password
               </Text>
-              <Text className="text-gray-500 text-sm mt-1 text-center px-4">
+              <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
                 Your email is verified. Please enter your new password below.
               </Text>
             </>
@@ -280,10 +280,10 @@ export default function ForgotPasswordScreen() {
 
           {step === "success" && (
             <>
-              <Text className="text-3xl font-extrabold text-green-950 mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
                 All Done!
               </Text>
-              <Text className="text-gray-500 text-sm mt-1 text-center px-4">
+              <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
                 Your password has been successfully updated.
               </Text>
             </>
@@ -291,29 +291,29 @@ export default function ForgotPasswordScreen() {
         </View>
 
         {/* Form Card */}
-        <View className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 mt-8">
+        <View className="bg-white rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-slate-100 mt-8">
           
           {/* STEP 1: EMAIL INPUT */}
           {step === "email" && (
             <View>
-              <Text className="text-gray-700 font-semibold mb-1.5 text-sm">Email Address</Text>
-              <View className="border border-gray-300 rounded-xl flex-row items-center px-3.5 bg-gray-50/30">
-                <Ionicons name="mail-outline" size={20} color="gray" className="mr-2" />
+              <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Email Address</Text>
+              <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                <Ionicons name="mail-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
                   placeholder="Enter your registered email"
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  className="flex-1 py-3 text-base text-gray-800"
+                  className="flex-1 py-3.5 text-base text-brand-dark font-inter"
                   editable={!isLoading}
                 />
               </View>
 
               {error ? (
-                <View className="bg-red-50 border border-red-100 rounded-xl p-3.5 mt-4 flex-row items-center">
+                <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
                   <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
-                  <Text className="text-red-600 font-semibold text-xs ml-2 flex-1">{error}</Text>
+                  <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
 
@@ -324,12 +324,12 @@ export default function ForgotPasswordScreen() {
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                   opacity: pressed || isLoading ? 0.95 : 1,
                 })}
-                className="bg-green-700 py-4 rounded-xl mt-6 shadow-sm active:bg-green-800 flex-row justify-center items-center"
+                className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-bold text-base">
+                <Text className="text-white text-center font-inter-bold text-base">
                   {isLoading ? "Sending Code..." : "Send Reset Code"}
                 </Text>
               </Pressable>
@@ -339,7 +339,7 @@ export default function ForgotPasswordScreen() {
           {/* STEP 2: CODE VERIFICATION (OTP) */}
           {step === "code" && (
             <View>
-              <Text className="text-gray-700 font-semibold mb-3 text-center text-sm">
+              <Text className="text-brand-dark font-inter-semibold mb-3 text-center text-sm">
                 Enter 4-Digit Code
               </Text>
               
@@ -355,32 +355,31 @@ export default function ForgotPasswordScreen() {
                     placeholderTextColor="#d1d5db"
                     keyboardType="number-pad"
                     maxLength={1}
-                    className="w-12 h-14 border border-gray-300 rounded-xl text-center text-2xl font-bold bg-gray-50/30 text-gray-800 focus:border-green-700"
+                    className="w-12 h-14 border border-slate-200 rounded-2xl text-center text-2xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
                     editable={!isLoading}
                   />
                 ))}
               </View>
 
-              {/* Demo Hint */}
-              <Text className="text-center text-xs text-gray-400 mt-1 mb-2">
-                Tip: Enter <Text className="font-semibold text-gray-500">1234</Text> or any code to verify
+              <Text className="text-center text-xs text-brand-gray mt-1 mb-2">
+                Enter the 4-digit code sent to your email
               </Text>
 
               {error ? (
-                <View className="bg-red-50 border border-red-100 rounded-xl p-3.5 mt-2 flex-row items-center">
+                <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-2 flex-row items-center">
                   <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
-                  <Text className="text-red-600 font-semibold text-xs ml-2 flex-1">{error}</Text>
+                  <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
 
               {/* Countdown / Resend */}
               <View className="flex-row justify-center items-center mt-4">
-                <Text className="text-gray-500 text-xs">{"Didn't receive the code? "}</Text>
+                <Text className="text-brand-gray font-inter text-xs">{"Didn't receive the code? "}</Text>
                 <Pressable
                   onPress={handleResendCode}
                   disabled={!canResend || isLoading}
                 >
-                  <Text className={`text-xs font-bold ${canResend ? "text-green-700" : "text-gray-400"}`}>
+                  <Text className={`text-xs font-inter-bold ${canResend ? "text-brand-emerald" : "text-slate-400"}`}>
                     {canResend ? "Resend Code" : `Resend in ${timer}s`}
                   </Text>
                 </Pressable>
@@ -393,12 +392,12 @@ export default function ForgotPasswordScreen() {
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                   opacity: pressed || isLoading ? 0.95 : 1,
                 })}
-                className="bg-green-700 py-4 rounded-xl mt-6 shadow-sm active:bg-green-800 flex-row justify-center items-center"
+                className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-bold text-base">
+                <Text className="text-white text-center font-inter-bold text-base">
                   {isLoading ? "Verifying..." : "Verify Code"}
                 </Text>
               </Pressable>
@@ -410,23 +409,23 @@ export default function ForgotPasswordScreen() {
             <View>
               {/* Password */}
               <View>
-                <Text className="text-gray-700 font-semibold mb-1.5 text-sm">New Password</Text>
-                <View className="border border-gray-300 rounded-xl flex-row items-center px-3.5 bg-gray-50/30">
-                  <Ionicons name="lock-closed-outline" size={20} color="gray" className="mr-2" />
+                <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">New Password</Text>
+                <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                  <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
                   <TextInput
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Enter new password"
                     secureTextEntry={!passwordVisible}
                     autoCapitalize="none"
-                    className="flex-1 py-3 text-base text-gray-800"
+                    className="flex-1 py-3.5 text-base text-brand-dark font-inter"
                     editable={!isLoading}
                   />
                   <Pressable onPress={() => setPasswordVisible(!passwordVisible)} className="p-1">
                     <Ionicons
                       name={passwordVisible ? "eye-off-outline" : "eye-outline"}
                       size={20}
-                      color="gray"
+                      color="#6B7280"
                     />
                   </Pressable>
                 </View>
@@ -434,32 +433,32 @@ export default function ForgotPasswordScreen() {
 
               {/* Confirm Password */}
               <View className="mt-4">
-                <Text className="text-gray-700 font-semibold mb-1.5 text-sm">Confirm Password</Text>
-                <View className="border border-gray-300 rounded-xl flex-row items-center px-3.5 bg-gray-50/30">
-                  <Ionicons name="lock-closed-outline" size={20} color="gray" className="mr-2" />
+                <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Confirm Password</Text>
+                <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                  <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
                   <TextInput
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     placeholder="Confirm new password"
                     secureTextEntry={!confirmPasswordVisible}
                     autoCapitalize="none"
-                    className="flex-1 py-3 text-base text-gray-800"
+                    className="flex-1 py-3.5 text-base text-brand-dark font-inter"
                     editable={!isLoading}
                   />
                   <Pressable onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="p-1">
                     <Ionicons
                       name={confirmPasswordVisible ? "eye-off-outline" : "eye-outline"}
                       size={20}
-                      color="gray"
+                      color="#6B7280"
                     />
                   </Pressable>
                 </View>
               </View>
 
               {error ? (
-                <View className="bg-red-50 border border-red-100 rounded-xl p-3.5 mt-4 flex-row items-center">
+                <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
                   <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
-                  <Text className="text-red-600 font-semibold text-xs ml-2 flex-1">{error}</Text>
+                  <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
 
@@ -470,12 +469,12 @@ export default function ForgotPasswordScreen() {
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                   opacity: pressed || isLoading ? 0.95 : 1,
                 })}
-                className="bg-green-700 py-4 rounded-xl mt-6 shadow-sm active:bg-green-800 flex-row justify-center items-center"
+                className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-bold text-base">
+                <Text className="text-white text-center font-inter-bold text-base">
                   {isLoading ? "Resetting Password..." : "Reset Password"}
                 </Text>
               </Pressable>
@@ -485,11 +484,11 @@ export default function ForgotPasswordScreen() {
           {/* STEP 4: SUCCESS */}
           {step === "success" && (
             <View className="items-center py-4">
-              <View className="w-20 h-20 bg-green-50 rounded-full items-center justify-center border border-green-100 mb-4">
-                <Ionicons name="checkmark-circle" size={54} color="#15803d" />
+              <View className="w-20 h-20 bg-brand-emerald/10 rounded-full items-center justify-center border border-brand-emerald/20 mb-4">
+                <Ionicons name="checkmark-circle" size={54} color="#16A34A" />
               </View>
               
-              <Text className="text-gray-700 text-center text-sm leading-6 px-4">
+              <Text className="text-brand-dark font-inter text-sm text-center leading-6 px-4">
                 Your account is ready! Go ahead and sign in with your updated password to continue building financial literacy.
               </Text>
 
@@ -499,9 +498,9 @@ export default function ForgotPasswordScreen() {
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                   opacity: pressed ? 0.95 : 1,
                 })}
-                className="bg-green-700 py-4 rounded-xl mt-8 w-full shadow-sm active:bg-green-800"
+                className="bg-brand-navy h-14 rounded-2xl mt-8 w-full shadow-md shadow-brand-navy/10 justify-center items-center"
               >
-                <Text className="text-white text-center font-bold text-base">
+                <Text className="text-white text-center font-inter-semibold text-base">
                   Go to Login
                 </Text>
               </Pressable>
@@ -513,11 +512,11 @@ export default function ForgotPasswordScreen() {
         {/* Footer */}
         {step === "email" && (
           <View className="flex-row justify-center mt-8 pb-4">
-            <Text className="text-gray-500 text-sm">
+            <Text className="text-brand-gray font-inter text-sm">
               {"Don't have an account?"}
             </Text>
             <Pressable onPress={() => router.replace("/register")}>
-              <Text className="text-green-700 font-bold text-sm ml-1">
+              <Text className="text-brand-emerald font-inter-bold text-sm ml-1.5">
                 Create Account
               </Text>
             </Pressable>
@@ -526,11 +525,11 @@ export default function ForgotPasswordScreen() {
 
         {step !== "email" && step !== "success" && (
           <View className="flex-row justify-center mt-8 pb-4">
-            <Text className="text-gray-500 text-sm">
+            <Text className="text-brand-gray font-inter text-sm">
               Remembered your password?
             </Text>
             <Pressable onPress={() => router.replace("/login")}>
-              <Text className="text-green-700 font-bold text-sm ml-1">
+              <Text className="text-brand-emerald font-inter-bold text-sm ml-1.5">
                 Sign In
               </Text>
             </Pressable>

@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import React, { useState, useEffect, useRef } from "react";
 import {
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   TextInput,
@@ -10,9 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../store/useUserStore";
+import { tutorService } from "../services/tutor";
+import { useThemeColors } from "../hooks/useThemeColors";
 import "@/types/navigation";
 
 interface Message {
@@ -23,16 +26,16 @@ interface Message {
 }
 
 const PRESET_ANSWERS: Record<string, string> = {
-  "How do Ghana Treasury Bills work?": 
+  "How do Ghana Treasury Bills work?":
     "Ghana Treasury Bills (T-Bills) are short-term debt instruments issued by the Bank of Ghana on behalf of the government. They are sold at a discount: for example, you buy a GH₵ 1,000 bill for GH₵ 800, and at maturity (91, 182, or 364 days), the government pays you the full GH₵ 1,000. The interest is risk-free and they currently yield around 24% - 28% annually, making them a very popular way to save securely.",
 
-  "What are the rules for E-levy on MoMo?": 
+  "What are the rules for E-levy on MoMo?":
     "In Ghana, the Electronic Transfer Levy (E-levy) is a 1% tax on electronic transactions. Key rules:\n1. Transfers to other people under GH₵ 100 per day are exempt (no tax).\n2. Transfers between your own accounts (e.g., your bank account to your own MoMo wallet) are exempt.\n3. Cash withdrawals at agents do not attract E-levy (but agent withdrawal charges still apply).\n4. Transfers above GH₵ 100 per day attract the 1% charge on the amount exceeding the first 100 GHS.",
 
-  "Can you explain the SSNIT 3-Tier pension system?": 
+  "Can you explain the SSNIT 3-Tier pension system?":
     "Ghana's pension system is regulated by the NPRA and has three parts (Tiers):\n- Tier 1 (Mandatory): Managed by SSNIT. It is a monthly pension paid to you when you retire.\n- Tier 2 (Mandatory): Occupational pension managed by private trustees. Paid as a one-time lump sum at retirement.\n- Tier 3 (Voluntary): Personal pensions or provident funds. Offers tax benefits and allows you to make voluntary savings toward retirement or early withdrawal.",
 
-  "What is Databank Mfund and how do I start?": 
+  "What is Databank Mfund and how do I start?":
     "Databank Money Market Fund (Mfund) is a popular collective investment scheme in Ghana. It pools funds from many investors to invest in short-term T-bills and bank deposits. Advantages:\n1. Low starting amount (typically GH₵ 50).\n2. High liquidity (you can withdraw your funds in 2-3 business days).\n3. Yields are usually higher than traditional bank savings accounts. You can start by visiting a Databank branch or using their mobile app/USSD code.",
 };
 
@@ -43,14 +46,15 @@ const SUGGESTED_QUESTIONS = [
   "What is Databank Mfund and how do I start?",
 ];
 
-// Offline fallback: if the AI service can't be reached (no network, no API key
-// configured yet), fall back to keyword-matched preset answers so the tutor
-// still responds instead of failing silently.
 function getFallbackAnswer(text: string): string {
   const trimmed = text.trim();
   if (PRESET_ANSWERS[trimmed]) return PRESET_ANSWERS[trimmed];
 
   const lower = trimmed.toLowerCase();
+
+  if (/^(hi|hello|hey|greetings|yoo|charley|good\s+morning|good\s+afternoon|good\s+evening)/i.test(lower)) {
+    return "Hello! How can I help you today? I'm your FinLit AI Tutor, and I can answer questions about Ghanaian personal finance. You can ask me about Treasury Bills, MoMo E-levy rules, SSNIT pensions, or local mutual funds.";
+  }
   if (lower.includes("momo") || lower.includes("e-levy") || lower.includes("levy")) {
     return PRESET_ANSWERS["What are the rules for E-levy on MoMo?"];
   }
@@ -63,11 +67,13 @@ function getFallbackAnswer(text: string): string {
   if (lower.includes("databank") || lower.includes("mfund") || lower.includes("mutual")) {
     return PRESET_ANSWERS["What is Databank Mfund and how do I start?"];
   }
-  return "I'm having trouble reaching my AI brain right now. Please check your connection and try again — or ask me about T-Bills, MoMo E-levy, SSNIT pensions, or local mutual funds.";
+  return "I apologize, but I am currently offline and unable to connect to the online tutor database. Please check your network connection. In the meantime, I can assist you with pre-configured topics like Ghana Treasury Bills, MoMo E-levy rules, the SSNIT pension system, or local mutual funds. What would you like to know?";
 }
 
 export default function AiTutorScreen() {
+  const colors = useThemeColors();
   const isPremium = useUserStore((s) => s.isPremium);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
@@ -82,20 +88,20 @@ export default function AiTutorScreen() {
 
   const scrollViewRef = useRef<ScrollView>(null);
 
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+    });
+    return () => showSubscription.remove();
+  }, []);
+
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
-    // Check if free user has reached limit
     if (!isPremium && questionCount >= 2) {
-      // Limit reached - do not allow more questions
       setMessages((prev) => [
         ...prev,
-        {
-          id: `limit-user-${Date.now()}`,
-          sender: "user",
-          text: text,
-          timestamp: new Date(),
-        },
+        { id: `limit-user-${Date.now()}`, sender: "user", text, timestamp: new Date() },
         {
           id: `limit-ai-${Date.now()}`,
           sender: "ai",
@@ -108,75 +114,60 @@ export default function AiTutorScreen() {
       return;
     }
 
-    // Add user message
-    const userMsg: Message = {
-      id: `user-${Date.now()}`,
-      sender: "user",
-      text: text,
-      timestamp: new Date(),
-    };
+    // Prior conversation becomes context for the model.
+    const history = messages.map((m) => ({
+      role: (m.sender === "ai" ? "assistant" : "user") as "assistant" | "user",
+      content: m.text,
+    }));
 
-    // Build the history we'll send to the AI (existing messages + this new one).
-    // We exclude the local welcome bubble so the model isn't primed by it.
-    const history = [...messages, userMsg]
-      .filter((m) => m.id !== "welcome")
-      .map((m) => ({ sender: m.sender, text: m.text }));
-
+    const userMsg: Message = { id: `user-${Date.now()}`, sender: "user", text, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setIsTyping(true);
     setQuestionCount((q) => q + 1);
-
     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
 
-    // Call our server route, which proxies to the AI provider (key stays server-side).
-    let responseText: string;
     try {
-      const res = await fetch("/api/tutor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history }),
-      });
-
-      if (!res.ok) throw new Error(`Tutor responded ${res.status}`);
-
-      const data = (await res.json()) as { text?: string };
-      responseText = data.text?.trim() || getFallbackAnswer(text);
-    } catch (err) {
-      console.warn("AI tutor request failed, using offline fallback:", err);
-      responseText = getFallbackAnswer(text);
+      // Ask the backend (which proxies Gemini and unlocks the "Curious Mind" badge).
+      const res = await tutorService.chat({ message: text, history });
+      const aiMsg: Message = { id: `ai-${Date.now()}`, sender: "ai", text: res.data.reply, timestamp: new Date() };
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch {
+      // Server down / tutor not configured — use the built-in canned answers.
+      const aiMsg: Message = { id: `ai-${Date.now()}`, sender: "ai", text: getFallbackAnswer(text), timestamp: new Date() };
+      setMessages((prev) => [...prev, aiMsg]);
+    } finally {
+      setIsTyping(false);
+      setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
     }
-
-    const aiMsg: Message = {
-      id: `ai-${Date.now()}`,
-      sender: "ai",
-      text: responseText,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, aiMsg]);
-    setIsTyping(false);
-    setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      {/* Header */}
-      <View className="flex-row items-center px-6 pt-14 pb-4 bg-white border-b border-gray-100 shadow-sm">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
+      {/* ── HEADER ── */}
+      <View className="flex-row items-center px-5 pt-2 pb-4 bg-white border-b border-slate-100">
         <Pressable
           onPress={() => router.back()}
-          className="p-2 bg-gray-50 rounded-full border border-gray-100 active:opacity-80"
+          style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+          className="w-10 h-10 bg-brand-slateBg rounded-full border border-slate-100 items-center justify-center"
         >
-          <Ionicons name="arrow-back" size={20} color="#15803d" />
+          <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
-        <View className="ml-4 flex-row items-center flex-1 justify-center pr-8">
-          <Text className="text-xl font-extrabold text-green-950">AI Tutor</Text>
-          <View className={`ml-2 px-2 py-0.5 rounded-full border ${
-            isPremium ? "bg-green-50 border-green-200" : "bg-amber-50 border-amber-200"
-          }`}>
-            <Text className={`text-[9px] font-extrabold uppercase ${
-              isPremium ? "text-green-800" : "text-amber-800"
-            }`}>
+
+        <View className="flex-1 ml-4 flex-row items-center justify-center pr-10">
+          <Text className="text-xl font-inter-bold text-brand-navy">AI Tutor</Text>
+          <View
+            className={`ml-2 px-2.5 py-0.5 rounded-full border ${
+              isPremium
+                ? "bg-brand-emerald/10 border-brand-emerald/20"
+                : "bg-brand-gold/10 border-brand-gold/20"
+            }`}
+          >
+            <Text
+              className={`text-[9px] font-inter-bold uppercase tracking-wider ${
+                isPremium ? "text-brand-emerald" : "text-brand-gold"
+              }`}
+            >
               {isPremium ? "Premium" : "Free"}
             </Text>
           </View>
@@ -184,11 +175,11 @@ export default function AiTutorScreen() {
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "padding"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 100}
         className="flex-1"
       >
-        {/* Chat Area */}
+        {/* ── CHAT AREA ── */}
         <ScrollView
           ref={scrollViewRef}
           contentContainerStyle={{ paddingVertical: 20 }}
@@ -205,7 +196,7 @@ export default function AiTutorScreen() {
                 className={`flex-row mt-4 ${isAi ? "justify-start" : "justify-end"}`}
               >
                 {isAi && (
-                  <View className="w-8 h-8 rounded-full bg-green-100 items-center justify-center mr-2 mt-1">
+                  <View className="w-8 h-8 rounded-full bg-brand-emerald/10 items-center justify-center mr-2 mt-1">
                     <Text className="text-sm">🤖</Text>
                   </View>
                 )}
@@ -215,29 +206,31 @@ export default function AiTutorScreen() {
                     isAi
                       ? isLock
                         ? "bg-amber-50 border border-amber-200"
-                        : "bg-white border border-gray-100 shadow-xs"
-                      : "bg-green-700 text-white"
+                        : "bg-white border border-slate-100 shadow-sm"
+                      : "bg-brand-emerald"
                   }`}
                 >
                   <Text
-                    className={`text-sm leading-5 font-semibold ${
+                    className={`text-sm leading-5 font-inter-semibold ${
                       isAi
                         ? isLock
-                          ? "text-amber-950 font-bold"
-                          : "text-gray-800"
+                          ? "text-amber-900 font-inter-bold"
+                          : "text-brand-dark"
                         : "text-white"
                     }`}
                   >
                     {msg.text}
                   </Text>
+
                   {isLock && (
                     <Pressable
-                      onPress={() => {
-                        router.push("/paywall");
-                      }}
-                      className="bg-amber-600 py-2 rounded-xl mt-3 items-center active:bg-amber-700"
+                      onPress={() => router.push("/paywall")}
+                      style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
+                      className="bg-amber-600 py-2 rounded-xl mt-3 items-center"
                     >
-                      <Text className="text-white text-xs font-bold">Upgrade to Premium</Text>
+                      <Text className="text-white text-xs font-inter-bold">
+                        Upgrade to Premium
+                      </Text>
                     </Pressable>
                   )}
                 </View>
@@ -247,21 +240,23 @@ export default function AiTutorScreen() {
 
           {isTyping && (
             <View className="flex-row mt-4 justify-start">
-              <View className="w-8 h-8 rounded-full bg-green-100 items-center justify-center mr-2 mt-1">
+              <View className="w-8 h-8 rounded-full bg-brand-emerald/10 items-center justify-center mr-2 mt-1">
                 <Text className="text-sm">🤖</Text>
               </View>
-              <View className="bg-white border border-gray-100 rounded-2xl p-4 flex-row items-center">
-                <ActivityIndicator size="small" color="#15803d" />
-                <Text className="text-gray-400 text-xs font-semibold ml-2">Tutor is thinking...</Text>
+              <View className="bg-white border border-slate-100 rounded-2xl p-4 flex-row items-center shadow-sm">
+                <ActivityIndicator size="small" color={colors.emerald} />
+                <Text className="text-brand-gray text-xs font-inter-semibold ml-2">
+                  Tutor is thinking...
+                </Text>
               </View>
             </View>
           )}
         </ScrollView>
 
-        {/* Preset suggestions for Free/Premium */}
+        {/* ── SUGGESTED QUESTIONS ── */}
         {messages.length === 1 && (
           <View className="px-4 pb-3">
-            <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-2 pl-2">
+            <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-widest mb-2 pl-1">
               Suggested Questions
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -269,36 +264,43 @@ export default function AiTutorScreen() {
                 <Pressable
                   key={q}
                   onPress={() => handleSend(q)}
-                  className="bg-white border border-gray-200/80 rounded-full px-3.5 py-2 active:bg-green-50 active:border-green-200"
+                  style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
+                  className="bg-white border border-slate-200 rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
                 >
-                  <Text className="text-xs text-green-800 font-bold">{q}</Text>
+                  <Text className="text-xs text-brand-navy font-inter-semibold">{q}</Text>
                 </Pressable>
               ))}
             </View>
           </View>
         )}
 
-        {/* Input Bar */}
-        <View className="bg-white border-t border-gray-100 p-4 flex-row items-center">
+        {/* ── INPUT BAR ── */}
+        <View className="bg-white border-t border-slate-100 p-4 flex-row items-center gap-3">
           <TextInput
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask a financial question..."
-            placeholderTextColor="#9ca3af"
-            className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-base text-gray-800 focus:border-green-700 mr-3"
+            placeholderTextColor="#94a3b8"
+            className="flex-1 bg-brand-slateBg border border-slate-200 rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
             onSubmitEditing={() => handleSend(inputText)}
+            onFocus={() => {
+              setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
+            }}
           />
           <Pressable
             onPress={() => handleSend(inputText)}
             disabled={!inputText.trim()}
+            style={({ pressed }) => ({
+              transform: [{ scale: pressed && inputText.trim() ? 0.95 : 1 }],
+            })}
             className={`w-12 h-12 rounded-2xl items-center justify-center ${
-              inputText.trim() ? "bg-green-700 active:bg-green-800" : "bg-gray-200"
+              inputText.trim() ? "bg-brand-emerald" : "bg-slate-200"
             }`}
           >
             <Ionicons
               name="send"
               size={18}
-              color={inputText.trim() ? "white" : "#9ca3af"}
+              color={inputText.trim() ? "white" : "#94a3b8"}
             />
           </Pressable>
         </View>

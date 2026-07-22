@@ -1,13 +1,12 @@
 import { router } from "expo-router";
 import React from "react";
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   Pressable,
-  StyleSheet,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 interface PolicySection {
@@ -56,29 +55,29 @@ const POLICY_SECTIONS: PolicySection[] = [
 
 export default function PrivacyPolicyScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#15803d" />
+      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-white">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-emerald/5 items-center justify-center active:opacity-80">
+          <Ionicons name="arrow-back" size={24} color="#16A34A" />
         </Pressable>
-        <Text style={styles.headerTitle}>Privacy Policy</Text>
-        <View style={{ width: 40 }} />
+        <Text className="text-lg font-inter-bold text-brand-navy">Privacy Policy</Text>
+        <View className="w-10" />
       </View>
 
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1"
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Last Updated */}
-        <View style={styles.updatedBadge}>
+        <View className="flex-row items-center self-start bg-brand-slateBg px-3 py-1.5 rounded-full gap-1.5 mb-3">
           <Ionicons name="time-outline" size={14} color="#6b7280" />
-          <Text style={styles.updatedText}>Last updated: June 2026</Text>
+          <Text className="text-xs text-brand-gray font-inter-medium">Last updated: June 2026</Text>
         </View>
 
         {/* Intro */}
-        <Text style={styles.introText}>
+        <Text className="text-sm text-brand-gray leading-[22px] mb-5 font-inter">
           At FinLit, we value your privacy and are committed to protecting your
           personal information. This policy outlines how we collect, use, and
           safeguard your data.
@@ -86,21 +85,21 @@ export default function PrivacyPolicyScreen() {
 
         {/* Policy Sections */}
         {POLICY_SECTIONS.map((section) => (
-          <View key={section.number} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <View style={styles.numberBadge}>
-                <Text style={styles.numberText}>{section.number}</Text>
+          <View key={section.number} className="bg-white rounded-2xl p-[18px] mb-3 shadow-md">
+            <View className="flex-row items-center mb-2.5 gap-2.5">
+              <View className="w-7 h-7 rounded-full bg-brand-emerald/10 items-center justify-center">
+                <Text className="text-[13px] font-inter-bold text-brand-emerald">{section.number}</Text>
               </View>
-              <Text style={styles.cardTitle}>{section.title}</Text>
+              <Text className="text-base font-inter-bold text-brand-navy flex-1">{section.title}</Text>
             </View>
-            <Text style={styles.cardBody}>{section.body}</Text>
+            <Text className="text-sm text-brand-gray leading-[22px] pl-[38px] font-inter">{section.body}</Text>
           </View>
         ))}
 
         {/* Footer */}
-        <View style={styles.footer}>
-          <Ionicons name="shield-checkmark" size={20} color="#15803d" />
-          <Text style={styles.footerText}>
+        <View className="flex-row items-center justify-center gap-2 mt-4 py-4">
+          <Ionicons name="shield-checkmark" size={20} color="#16A34A" />
+          <Text className="text-xs text-brand-gray font-inter">
             Questions? Contact us at support@finlit.app
           </Text>
         </View>
@@ -108,116 +107,3 @@ export default function PrivacyPolicyScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f9fafb",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    backgroundColor: "#ffffff",
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#f0fdf4",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
-  updatedBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: "#f3f4f6",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-    marginBottom: 12,
-  },
-  updatedText: {
-    fontSize: 12,
-    color: "#6b7280",
-    fontWeight: "500",
-  },
-  introText: {
-    fontSize: 14,
-    color: "#4b5563",
-    lineHeight: 22,
-    marginBottom: 20,
-  },
-  card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-    gap: 10,
-  },
-  numberBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#dcfce7",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  numberText: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#15803d",
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#166534",
-    flex: 1,
-  },
-  cardBody: {
-    fontSize: 14,
-    color: "#4b5563",
-    lineHeight: 22,
-    paddingLeft: 38,
-  },
-  footer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginTop: 16,
-    paddingVertical: 16,
-  },
-  footerText: {
-    fontSize: 13,
-    color: "#6b7280",
-  },
-});

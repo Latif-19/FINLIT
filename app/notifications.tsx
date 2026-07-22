@@ -1,15 +1,18 @@
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useState, useCallback } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   Text,
   View,
   Pressable,
   Switch,
-  StyleSheet,
+  RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
+import { notificationService } from '../services/notifications';
+import { AppNotification } from '../types/api';
+import { useUserStore } from '../store/useUserStore';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -76,90 +79,203 @@ const SOCIAL_ITEMS: NotificationItem[] = [
   },
 ];
 
+const NOTIFICATION_ICONS: Record<AppNotification["type"], { icon: IoniconsName; color: string; bg: string }> = {
+  lesson_reminder: { icon: "book-outline", color: "#16A34A", bg: "bg-green-50" },
+  streak_reminder: { icon: "flame-outline", color: "#F59E0B", bg: "bg-amber-50" },
+  badge_earned: { icon: "trophy-outline", color: "#7C3AED", bg: "bg-purple-50" },
+  leaderboard_milestone: { icon: "podium-outline", color: "#2563EB", bg: "bg-blue-50" },
+};
+
+function getTimeAgo(dateString: string): string {
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays}d ago`;
+}
+
+function NotificationCard({ notification }: { notification: AppNotification }) {
+  const style = NOTIFICATION_ICONS[notification.type];
+  return (
+    <View className={`flex-row items-start p-4 ${notification.read ? "opacity-60" : ""}`}>
+      <View className={`w-10 h-10 rounded-xl ${style.bg} justify-center items-center mr-3`}>
+        <Ionicons name={style.icon} size={20} color={style.color} />
+      </View>
+      <View className="flex-1 mr-2">
+        <View className="flex-row items-center gap-2">
+          <Text className="text-[14px] font-inter-semibold text-brand-dark flex-1" numberOfLines={1}>
+            {notification.title}
+          </Text>
+          {!notification.read && (
+            <View className="w-2 h-2 rounded-full bg-brand-emerald" />
+          )}
+        </View>
+        <Text className="text-[12px] text-brand-gray mt-0.5 leading-[16px]" numberOfLines={2}>
+          {notification.body}
+        </Text>
+        <Text className="text-[10px] text-brand-gray mt-1 font-inter-medium">
+          {getTimeAgo(notification.createdAt)}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 export default function NotificationsScreen() {
-  const [toggles, setToggles] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    [...LEARNING_ITEMS, ...SOCIAL_ITEMS].forEach((item) => {
-      initial[item.key] = item.defaultValue;
-    });
-    return initial;
-  });
+  const notificationPrefs = useUserStore((s) => s.notificationPrefs);
+  const setNotificationPref = useUserStore((s) => s.setNotificationPref);
+
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadNotifications = useCallback(async () => {
+    try {
+      const res = await notificationService.getNotifications();
+      setNotifications(res.data);
+    } catch {
+      // Offline — keep whatever is already shown.
+    }
+  }, []);
+
+  // Fetch the latest notifications each time the screen is focused.
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [loadNotifications])
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadNotifications();
+    setRefreshing(false);
+  }, [loadNotifications]);
 
   const handleToggle = (key: string) => {
-    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+    setNotificationPref(key, !notificationPrefs[key]);
   };
 
+  const markAllRead = async () => {
+    const unread = notifications.filter((n) => !n.read);
+    // Optimistic: mark everything read locally right away.
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await Promise.all(unread.map((n) => notificationService.markAsRead(n.id)));
+    } catch {
+      // Offline — optimistic state stays; will re-sync on next focus.
+    }
+  };
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   const renderToggleRow = (item: NotificationItem) => (
-    <View key={item.key} style={styles.toggleRow}>
-      <View style={styles.toggleIconContainer}>
-        <Ionicons name={item.icon} size={22} color="#15803d" />
+    <View key={item.key} className="flex-row items-center py-3.5 px-4">
+      <View className="w-[38px] h-[38px] rounded-[10px] bg-brand-emerald/10 justify-center items-center mr-3">
+        <Ionicons name={item.icon} size={22} color="#16A34A" />
       </View>
-      <View style={styles.toggleTextContainer}>
-        <Text style={styles.toggleTitle}>{item.title}</Text>
-        <Text style={styles.toggleDescription}>{item.description}</Text>
+      <View className="flex-1 mr-3">
+        <Text className="text-[15px] font-inter-semibold text-brand-dark">{item.title}</Text>
+        <Text className="text-xs text-brand-gray mt-0.5">{item.description}</Text>
       </View>
       <Switch
-        value={toggles[item.key]}
+        value={notificationPrefs[item.key] ?? item.defaultValue}
         onValueChange={() => handleToggle(item.key)}
-        trackColor={{ false: '#d1d5db', true: '#15803d' }}
+        trackColor={{ false: '#e2e8f0', true: '#16A34A' }}
         thumbColor="#ffffff"
       />
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
+      <View className="flex-row items-center px-5 pt-4 pb-3">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-white justify-center items-center border border-slate-100">
           <Ionicons name="arrow-back" size={24} color="#111827" />
         </Pressable>
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.headerTitle}>Notifications</Text>
-          <Text style={styles.headerSubtitle}>
+        <View className="ml-3 flex-1">
+          <Text className="text-[22px] font-inter-bold text-brand-dark">Notifications</Text>
+          <Text className="text-sm text-brand-gray mt-0.5">
             Manage how FinLit keeps you on track
           </Text>
         </View>
+        {unreadCount > 0 && (
+          <Pressable
+            onPress={markAllRead}
+            className="px-3 py-1.5 bg-brand-emerald/10 rounded-lg border border-brand-emerald/20"
+          >
+            <Text className="text-brand-emerald text-[10px] font-inter-bold uppercase tracking-wider">
+              Mark All Read
+            </Text>
+          </Pressable>
+        )}
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />}
       >
+        {/* Recent Notifications */}
+        <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-4 mb-2.5 ml-1">
+          RECENT {unreadCount > 0 ? `(${unreadCount} UNREAD)` : ""}
+        </Text>
+        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
+          {notifications.length > 0 ? (
+            notifications.map((notification, index) => (
+              <React.Fragment key={notification.id}>
+                <NotificationCard notification={notification} />
+                {index < notifications.length - 1 && (
+                  <View className="h-px bg-slate-100 ml-[72px]" />
+                )}
+              </React.Fragment>
+            ))
+          ) : (
+            <View className="py-10 items-center">
+              <Ionicons name="notifications-off-outline" size={32} color="#D1D5DB" />
+              <Text className="text-brand-gray text-sm mt-3 font-inter-medium">No notifications yet</Text>
+            </View>
+          )}
+        </View>
+
         {/* Learning Section */}
-        <Text style={styles.sectionLabel}>LEARNING</Text>
-        <View style={styles.card}>
+        <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-4 mb-2.5 ml-1">LEARNING</Text>
+        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
           {LEARNING_ITEMS.map((item, index) => (
             <React.Fragment key={item.key}>
               {renderToggleRow(item)}
               {index < LEARNING_ITEMS.length - 1 && (
-                <View style={styles.divider} />
+                <View className="h-px bg-slate-100 ml-[66px]" />
               )}
             </React.Fragment>
           ))}
         </View>
 
         {/* Social & News Section */}
-        <Text style={styles.sectionLabel}>SOCIAL {"&"} NEWS</Text>
-        <View style={styles.card}>
+        <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-6 mb-2.5 ml-1">SOCIAL {"&"} NEWS</Text>
+        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
           {SOCIAL_ITEMS.map((item, index) => (
             <React.Fragment key={item.key}>
               {renderToggleRow(item)}
               {index < SOCIAL_ITEMS.length - 1 && (
-                <View style={styles.divider} />
+                <View className="h-px bg-slate-100 ml-[66px]" />
               )}
             </React.Fragment>
           ))}
         </View>
 
         {/* Info Banner */}
-        <View style={styles.infoBanner}>
+        <View className="flex-row items-start bg-slate-100 rounded-xl p-3.5 mt-6 gap-2.5">
           <Ionicons
             name="information-circle-outline"
             size={20}
             color="#6b7280"
           />
-          <Text style={styles.infoBannerText}>
+          <Text className="flex-1 text-[13px] text-brand-gray leading-[18px]">
             Push notifications require app permissions. You can manage these in
             your device settings.
           </Text>
@@ -168,109 +284,3 @@ export default function NotificationsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#f3f4f6',
-  },
-  headerTextContainer: {
-    marginLeft: 12,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#9ca3af',
-    letterSpacing: 1,
-    marginTop: 24,
-    marginBottom: 10,
-    marginLeft: 4,
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#f3f4f6',
-    overflow: 'hidden',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-  },
-  toggleIconContainer: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    backgroundColor: '#f0fdf4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  toggleTextContainer: {
-    flex: 1,
-    marginRight: 12,
-  },
-  toggleTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  toggleDescription: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#f3f4f6',
-    marginLeft: 66,
-  },
-  infoBanner: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#f3f4f6',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 24,
-    gap: 10,
-  },
-  infoBannerText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#6b7280',
-    lineHeight: 18,
-  },
-});
