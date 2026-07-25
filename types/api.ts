@@ -21,6 +21,19 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+// Strict verification: register issues no tokens — the user must confirm the
+// emailed 6-digit code (POST /auth/verify-email) before logging in.
+export interface RegisterResponse {
+  email: string;
+  message: string;
+  requiresVerification: boolean;
+}
+
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;

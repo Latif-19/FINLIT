@@ -34,6 +34,10 @@ yarn-error.*
 .env
 .env*.local
 
+# Claude Code local settings & temp files (can hold secrets from command history)
+.claude/settings.local.json
+.claude/*.tmp*
+
 # typescript
 *.tsbuildinfo
 

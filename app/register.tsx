@@ -2,9 +2,7 @@ import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
 import { Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, ScrollView, Image, Keyboard, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useUserStore } from "../store/useUserStore";
 import { authService } from "../services/auth";
-import { tokenStorage } from "../services/tokenStorage";
 import "@/types/navigation";
 
 export default function RegisterScreen() {
@@ -58,16 +56,17 @@ export default function RegisterScreen() {
     // Create the account on the backend.
     setIsLoading(true);
     try {
-      const res = await authService.register({
+      await authService.register({
         name: name.trim(),
         email: email.trim(),
         password,
       });
-      const { user, token, refreshToken } = res.data;
-      await tokenStorage.setTokens(token, refreshToken);
-      useUserStore.getState().setAuthenticatedUser(user);
-      // New users go to the assessment first.
-      router.replace("/assessment");
+      // Strict verification: no tokens yet. Send the user to confirm the code
+      // emailed to them; the assessment starts after they verify.
+      router.replace({
+        pathname: "/verify-email",
+        params: { email: email.trim(), flow: "register" },
+      });
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||

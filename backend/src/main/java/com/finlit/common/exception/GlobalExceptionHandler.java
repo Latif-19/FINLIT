@@ -46,6 +46,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage(), req);
     }
 
+    /** Correct password but the email isn't confirmed yet — app shows verify screen. */
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<ApiError> handleEmailNotVerified(EmailNotVerifiedException ex, HttpServletRequest req) {
+        return build(HttpStatus.FORBIDDEN, ex.getMessage(), req);
+    }
+
     /**
      * Triggered when @Valid on a request body fails. Collects every field error
      * into a map so the app can show messages next to the right input.

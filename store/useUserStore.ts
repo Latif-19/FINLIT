@@ -170,12 +170,14 @@ const DEFAULT_STATE: UserState = {
   goal: "",
   savings: 0,
   targetGoal: 500,
-  xp: 450,
+  xp: 0,
   lessonsCompleted: 0,
   hasDoneDailyQuiz: false,
   isPremium: false,
   streak: 0,
   lastActiveDate: null,
+  // Start new users at 0 XP; the backend progress dashboard is the source of
+  // truth and syncs the real value on first load.
   badges: DEFAULT_BADGES,
   quizScores: {},
   colorBlindMode: 'none',
@@ -241,16 +243,45 @@ export const useUserStore = create<UserState & UserActions>()(
 
       // Applies the backend's user profile to the store after login/register.
       setAuthenticatedUser: (user) =>
-        set((state) => ({
-          isAuthenticated: true,
-          name: user.name?.trim() || state.name,
-          email: user.email || state.email,
-          avatar: user.avatar || state.avatar,
-          age: user.age ?? state.age,
-          phone: user.phone ?? state.phone,
-          isPremium: user.subscriptionTier === "premium",
-          createdAt: user.createdAt || state.createdAt || new Date().toISOString(),
-        })),
+        set((state) => {
+          // On a shared device the store is persisted to disk, so if a DIFFERENT
+          // account signs in we must wipe the previous user's progress first —
+          // otherwise account B inherits account A's XP/savings/badges/streak.
+          // The backend re-syncs the real values immediately after (applyProgress).
+          const isDifferentAccount =
+            !!state.email && !!user.email && state.email !== user.email;
+          const progressReset = isDifferentAccount
+            ? {
+                score: 0,
+                goal: "",
+                savings: 0,
+                targetGoal: 500,
+                xp: 0,
+                lessonsCompleted: 0,
+                hasDoneDailyQuiz: false,
+                streak: 0,
+                lastActiveDate: null,
+                badges: DEFAULT_BADGES,
+                quizScores: {},
+                simulationHistory: [],
+                lastAssessedAt: null,
+              }
+            : {};
+          return {
+            ...progressReset,
+            isAuthenticated: true,
+            name: user.name?.trim() || state.name,
+            email: user.email || state.email,
+            avatar: user.avatar || state.avatar,
+            age: user.age ?? state.age,
+            phone: user.phone ?? state.phone,
+            isPremium: user.subscriptionTier === "premium",
+            createdAt:
+              user.createdAt ||
+              (isDifferentAccount ? new Date().toISOString() : state.createdAt) ||
+              new Date().toISOString(),
+          };
+        }),
 
       // Syncs the backend progress dashboard into the store (source of truth).
       applyProgress: (progress) =>
