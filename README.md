@@ -91,7 +91,7 @@ EXPO_PUBLIC_API_URL=http://<your-PC-LAN-IP>:3000/api   # e.g. http://10.84.189.5
 EXPO_PUBLIC_PAYSTACK_KEY=pk_test_xxx
 ```
 
-> On a physical phone, use your PC's LAN IP (not `localhost`), and ensure port 3000 is allowed through your firewall. On the iOS simulator, `localhost` work.
+> On a physical phone, use your PC's LAN IP (not `localhost`), and ensure port 3000 is allowed through your firewall. On the iOS simulator, `localhost` works.
 
 ---
 
