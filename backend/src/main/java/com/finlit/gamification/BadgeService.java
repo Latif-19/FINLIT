@@ -18,12 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Owns badges: evaluates which ones a user has earned from their current stats,
- * persists newly-unlocked ones, and returns the full catalog with unlock state.
- *
- * Used by the gamification "badges" endpoint and by the progress dashboard.
- */
+
 @Service
 public class BadgeService {
 
