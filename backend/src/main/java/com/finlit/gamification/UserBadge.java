@@ -14,11 +14,7 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.UUID;
 
-/**
- * Records that a user unlocked a specific badge (by its catalog id) and when.
- * The unique (user_id, badge_id) constraint means a badge is only ever awarded
- * once per user.
- */
+
 @Entity
 @Table(name = "user_badges",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "badge_id"}))

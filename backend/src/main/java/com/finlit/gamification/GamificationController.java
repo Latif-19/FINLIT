@@ -15,12 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Gamification endpoints (require a token):
- *   GET  /api/gamification/leaderboard
- *   GET  /api/gamification/badges
- *   POST /api/gamification/quiz-score
- */
 @RestController
 @RequestMapping("/gamification")
 public class GamificationController {

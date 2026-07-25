@@ -2,12 +2,7 @@ package com.finlit.gamification;
 
 import java.util.List;
 
-/**
- * The fixed catalog of badges a user can earn. These definitions never change
- * at runtime, so they live in code (ported from the frontend) rather than the
- * database. Whether a given user has *unlocked* each one is tracked separately
- * in the user_badges table.
- */
+
 public final class BadgeCatalog {
 
     public record BadgeDefinition(String id, String name, String description, String emoji) {}
