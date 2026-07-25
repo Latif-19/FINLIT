@@ -141,10 +141,10 @@ export default function LeaderboardScreen() {
             <View className="items-center py-8 px-6">
               <Ionicons name="people-outline" size={30} color="#94A3B8" />
               <Text className="text-brand-navy text-sm font-inter-bold mt-3 text-center">
-                You're leading the pack!
+                You&apos;re leading the pack!
               </Text>
               <Text className="text-brand-gray text-xs mt-1 text-center leading-4">
-                As more learners join and earn XP, they'll show up here.
+                As more learners join and earn XP, they&apos;ll show up here.
               </Text>
             </View>
           )}

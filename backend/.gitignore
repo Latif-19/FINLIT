@@ -1,5 +1,8 @@
 HELP.md
 target/
+
+### Local secrets — real credentials live here, never commit ###
+secrets.properties
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

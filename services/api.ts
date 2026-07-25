@@ -4,10 +4,46 @@
 // once before giving up and logging the user out.
 
 import axios from "axios";
+import Constants from "expo-constants";
 import { tokenStorage } from "./tokenStorage";
 import { useUserStore } from "../store/useUserStore";
 
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api";
+/**
+ * Works out which backend URL to talk to — WITHOUT needing to hand-edit .env
+ * every time your Wi-Fi IP changes.
+ *
+ * Priority:
+ *   1. EXPO_PUBLIC_API_URL, if set — use this to point at a DEPLOYED backend
+ *      (e.g. https://finlit.onrender.com/api). Always wins when present.
+ *   2. Otherwise (local dev): reuse the LAN IP that the Expo dev server served
+ *      this bundle from, and talk to the backend on that same machine at :3000.
+ *      So you can scan the QR on any Wi-Fi and it just works — no .env edits.
+ *   3. Fallback to localhost (iOS simulator / web).
+ */
+function resolveBaseUrl(): string {
+  const explicit = process.env.EXPO_PUBLIC_API_URL;
+  if (explicit && explicit.trim()) {
+    return explicit.trim();
+  }
+
+  // The host Expo downloaded the JS bundle from, e.g. "10.132.37.6:8081".
+  const hostUri =
+    Constants.expoConfig?.hostUri ||
+    (Constants as any).expoGoConfig?.debuggerHost ||
+    (Constants as any).manifest2?.extra?.expoGo?.debuggerHost ||
+    (Constants as any).manifest?.debuggerHost;
+
+  if (typeof hostUri === "string" && hostUri.length > 0) {
+    const host = hostUri.split(":")[0]; // strip Metro's :8081 port
+    if (host) {
+      return `http://${host}:3000/api`;
+    }
+  }
+
+  return "http://localhost:3000/api";
+}
+
+const BASE_URL = resolveBaseUrl();
 
 export const api = axios.create({
   baseURL: BASE_URL,

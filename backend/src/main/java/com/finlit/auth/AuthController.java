@@ -5,6 +5,9 @@ import com.finlit.auth.dto.ForgotPasswordRequest;
 import com.finlit.auth.dto.LoginRequest;
 import com.finlit.auth.dto.RefreshRequest;
 import com.finlit.auth.dto.RegisterRequest;
+import com.finlit.auth.dto.RegisterResponse;
+import com.finlit.auth.dto.ResendCodeRequest;
+import com.finlit.auth.dto.VerifyEmailRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +40,20 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+    public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         return authService.register(request);
+    }
+
+    @PostMapping("/verify-email")
+    public AuthResponse verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        return authService.verifyEmail(request);
+    }
+
+    @PostMapping("/resend-code")
+    public Map<String, String> resendCode(@Valid @RequestBody ResendCodeRequest request) {
+        authService.resendCode(request.email());
+        return Map.of("message",
+                "If an unverified account exists for that email, a new code has been sent.");
     }
 
     @PostMapping("/login")

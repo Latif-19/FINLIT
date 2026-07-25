@@ -46,6 +46,15 @@ export default function LoginScreen() {
       useUserStore.getState().setAuthenticatedUser(user);
       router.replace("/(tabs)/home");
     } catch (err: any) {
+      // 403 = correct password but email not verified. The backend has just
+      // re-sent a fresh code, so take the user straight to the verify screen.
+      if (err?.response?.status === 403) {
+        router.replace({
+          pathname: "/verify-email",
+          params: { email: email.trim(), flow: "login" },
+        });
+        return;
+      }
       const message =
         err?.response?.data?.message ||
         (err?.message === "Network Error"

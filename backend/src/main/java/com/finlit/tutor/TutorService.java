@@ -53,7 +53,7 @@ public class TutorService {
             - Premium upgrade options for advanced features.
 
             Guidelines:
-            - Keep answers short, warm, and highly engaging — aim for 2-4 short paragraphs or a clean, bulleted list. This is read on a mobile phone screen.
+            - Keep answers short, warm, and engaging — aim for 1-2 short paragraphs or a few tight bullet points, and stay under about 110 words unless the user explicitly asks for more detail. This is read on a mobile phone, so be concise and skip filler and long preambles.
             - Use Ghanaian context and the cedi (GH₵) in financial examples.
             - Be encouraging and plain-spoken; explain any technical term or jargon you use.
             - Answer all questions about yourself, your sources of financial knowledge, and the FinLit app directly and warmly.
@@ -64,15 +64,18 @@ public class TutorService {
     private final RestClient restClient = RestClient.create();
     private final String apiKey;
     private final String model;
+    private final int thinkingBudget;
     private final UserRepository userRepository;
     private final BadgeService badgeService;
 
     public TutorService(@Value("${app.gemini.api-key:}") String apiKey,
                         @Value("${app.gemini.model:gemini-2.5-flash}") String model,
+                        @Value("${app.gemini.thinking-budget:128}") int thinkingBudget,
                         UserRepository userRepository,
                         BadgeService badgeService) {
         this.apiKey = apiKey;
         this.model = model;
+        this.thinkingBudget = thinkingBudget;
         this.userRepository = userRepository;
         this.badgeService = badgeService;
     }
@@ -98,10 +101,21 @@ public class TutorService {
         }
         contents.add(Map.of("role", "user", "parts", List.of(Map.of("text", message))));
 
+        // Cap "thinking" to keep replies fast. Newer Gemini flash models reason
+        // silently before answering, which adds several seconds of latency; a low
+        // budget trims that while keeping answer quality. Tunable via
+        // app.gemini.thinking-budget (set negative to omit and use model default).
+        Map<String, Object> generationConfig = new java.util.HashMap<>();
+        generationConfig.put("temperature", 0.7);
+        generationConfig.put("maxOutputTokens", 800);
+        if (thinkingBudget >= 0) {
+            generationConfig.put("thinkingConfig", Map.of("thinkingBudget", thinkingBudget));
+        }
+
         Map<String, Object> requestBody = Map.of(
                 "systemInstruction", Map.of("parts", List.of(Map.of("text", SYSTEM_PROMPT))),
                 "contents", contents,
-                "generationConfig", Map.of("temperature", 0.7, "maxOutputTokens", 800)
+                "generationConfig", generationConfig
         );
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/"

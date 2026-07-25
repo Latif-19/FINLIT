@@ -43,6 +43,7 @@ function NavigationGuard() {
       segments[0] === "auth" ||
       segments[0] === "login" ||
       segments[0] === "register" ||
+      segments[0] === "verify-email" ||
       segments[0] === "forgot-password" ||
       segments[0] === "onboarding" ||
       segments[0] === "index" ||
@@ -111,6 +112,7 @@ export default function RootLayout() {
         <Stack.Screen name="auth" />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
+        <Stack.Screen name="verify-email" />
         <Stack.Screen name="forgot-password" />
         <Stack.Screen name="assessment" />
         <Stack.Screen name="assessment-result" />

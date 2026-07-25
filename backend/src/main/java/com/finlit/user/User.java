@@ -47,6 +47,17 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
+    // ─── Email verification ─────────────────────────────────────────────────
+    /** False until the user confirms the 6-digit code emailed at sign-up. */
+    @Column(nullable = false, columnDefinition = "boolean not null default false")
+    private boolean emailVerified = false;
+
+    /** The current 6-digit verification code (null once verified). */
+    private String verificationCode;
+
+    /** When the current verification code stops being valid. */
+    private Instant verificationCodeExpiresAt;
+
     /** Emoji avatar shown across the app. Defaults to the FinLit owl. */
     @Column(nullable = false)
     private String avatar = "🦉"; // 🦉
