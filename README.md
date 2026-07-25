@@ -21,14 +21,14 @@ Built for **KNUST CodeQuest 2026**.
 
 ## 🧱 Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
+| Layer        | Technology                                                                           |
+| ------------ | ------------------------------------------------------------------------------------ |
 | **Frontend** | React Native (Expo SDK 54) + TypeScript, Expo Router, NativeWind (Tailwind), Zustand |
-| **Backend** | Spring Boot 4 (Java 21+), Spring Web, Spring Security, Spring Data JPA |
-| **Database** | PostgreSQL |
-| **Auth** | JWT (access + refresh) with bcrypt password hashing |
-| **AI** | Google Gemini (`gemini-flash-latest`), proxied server-side |
-| **Payments** | Paystack |
+| **Backend**  | Spring Boot 4 (Java 21+), Spring Web, Spring Security, Spring Data JPA               |
+| **Database** | PostgreSQL                                                                           |
+| **Auth**     | JWT (access + refresh) with bcrypt password hashing                                  |
+| **AI**       | Google Gemini (`gemini-flash-latest`), proxied server-side                           |
+| **Payments** | Paystack                                                                             |
 
 ---
 
@@ -53,11 +53,13 @@ The app talks to the backend over a shared API client (`services/api.ts`) that a
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - **Node.js** + npm and the **Expo Go** app on your phone
 - **Java 21+** (the backend uses the Maven wrapper, so no separate Maven install)
 - **PostgreSQL 16** (create an empty database named `finlit`)
 
 ### 1. Backend (Spring Boot)
+
 See **[`backend/SETUP.md`](backend/SETUP.md)** for full details. In short:
 
 ```bash
@@ -68,9 +70,9 @@ cd backend
 
 Required environment variables (set them in your IntelliJ run config):
 
-| Variable | Purpose |
-|----------|---------|
-| `DB_PASSWORD` | your local PostgreSQL password |
+| Variable         | Purpose                                                                              |
+| ---------------- | ------------------------------------------------------------------------------------ |
+| `DB_PASSWORD`    | your local PostgreSQL password                                                       |
 | `GEMINI_API_KEY` | Google AI Studio key — enables the AI Tutor (optional; falls back to canned answers) |
 
 The API runs on **`http://localhost:3000/api`**.
@@ -89,7 +91,7 @@ EXPO_PUBLIC_API_URL=http://<your-PC-LAN-IP>:3000/api   # e.g. http://10.84.189.5
 EXPO_PUBLIC_PAYSTACK_KEY=pk_test_xxx
 ```
 
-> On a physical phone, use your PC's LAN IP (not `localhost`), and ensure port 3000 is allowed through your firewall. On the iOS simulator, `localhost` works.
+> On a physical phone, use your PC's LAN IP (not `localhost`), and ensure port 3000 is allowed through your firewall. On the iOS simulator, `localhost` work.
 
 ---
 
