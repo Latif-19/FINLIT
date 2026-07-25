@@ -1,7 +1,7 @@
 
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View, Pressable } from "react-native";
+import { Appearance, ScrollView, Text, View, Pressable, useColorScheme } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../../store/useUserStore";
 import { useThemeColors } from "../../hooks/useThemeColors";
@@ -71,6 +71,7 @@ export default function ProfileScreen() {
   const setColorBlindMode = useUserStore((s) => s.setColorBlindMode);
   const setAppThemeColor = useUserStore((s) => s.setAppThemeColor);
   const colors = useThemeColors();
+  const colorScheme = useColorScheme();
 
   const handleLogout = () => {
     useUserStore.getState().logout();
@@ -209,6 +210,10 @@ export default function ProfileScreen() {
         {/* Accessibility & Theming */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">ACCESSIBILITY & THEMING</Text>
         <View className="bg-white rounded-2xl border border-slate-100 p-5 shadow-md shadow-slate-100/40">
+          <Pressable onPress={() => Appearance.setColorScheme(colorScheme === "dark" ? "light" : "dark")} accessibilityRole="button" accessibilityLabel={`Switch to ${colorScheme === "dark" ? "light" : "dark"} mode`} className="flex-row items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 mb-6 active:bg-slate-100">
+            <Text className="text-brand-navy text-sm font-inter-bold">{colorScheme === "dark" ? "Light Mode" : "Dark Mode"}</Text>
+            <Ionicons name={colorScheme === "dark" ? "sunny-outline" : "moon-outline"} size={20} color={colors.navy} />
+          </Pressable>
           <Text className="text-brand-navy text-sm font-inter-bold mb-1">Color Blindness Mode</Text>
           <Text className="text-brand-gray text-xs mb-3 font-inter">
             Select a contrast profile optimized for different color vision needs:
