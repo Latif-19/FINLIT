@@ -11,12 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * The logged-in user's own profile (require a token):
- *   GET  /api/profile          → current profile
- *   PUT  /api/profile          → update name/avatar/age/phone
- *   POST /api/profile/premium  → activate premium after payment
- */
+
 @RestController
 @RequestMapping("/profile")
 public class UserController {

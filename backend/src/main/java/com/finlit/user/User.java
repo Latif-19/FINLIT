@@ -14,16 +14,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/**
- * The User entity — the heart of the app.
- *
- * This one Java class becomes the "users" table in PostgreSQL automatically:
- * each field below turns into a column. Everything else (progress, XP, badges,
- * posts) will link back to a user by their id.
- *
- * The fields mirror the frontend's `UserProfile` in types/api.ts, plus the
- * gamification/progress values the app tracks per user.
- */
+
 @Entity
 @Table(name = "users")
 @Getter
