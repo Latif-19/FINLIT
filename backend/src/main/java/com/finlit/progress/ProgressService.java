@@ -36,10 +36,10 @@ public class ProgressService {
     private final BadgeService badgeService;
 
     public ProgressService(UserRepository userRepository,
-                           LessonRepository lessonRepository,
-                           LessonCompletionRepository lessonCompletionRepository,
-                           QuizAttemptRepository quizAttemptRepository,
-                           BadgeService badgeService) {
+                            LessonRepository lessonRepository,
+                            LessonCompletionRepository lessonCompletionRepository,
+                            QuizAttemptRepository quizAttemptRepository,
+                            BadgeService badgeService) {
         this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.lessonCompletionRepository = lessonCompletionRepository;
