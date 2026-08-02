@@ -32,6 +32,7 @@ function NavigationGuard() {
   const router = useRouter();
   const segments = useSegments() as unknown as string[];
   const isAuthenticated = useUserStore((s) => s.isAuthenticated);
+  const lastAssessedAt = useUserStore((s) => s.lastAssessedAt);
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
@@ -49,14 +50,25 @@ function NavigationGuard() {
       segments[0] === "index" ||
       segments.length === 0;
 
+    // The one-time onboarding assessment — backend-verified via lastAssessedAt,
+    // not a one-shot redirect that's easy to fall out of (e.g. by later logging
+    // in instead of registering fresh).
+    const inAssessmentFlow =
+      segments[0] === "assessment" || segments[0] === "assessment-result";
+    const needsAssessment = isAuthenticated && !lastAssessedAt;
+
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect unauthenticated user
       router.replace("/auth");
     } else if (isAuthenticated && inAuthGroup && segments[0] !== "index") {
       // Prevent authenticated user from accessing auth screens
-      router.replace("/(tabs)/home");
+      router.replace(needsAssessment ? "/assessment" : "/(tabs)/home");
+    } else if (needsAssessment && !inAuthGroup && !inAssessmentFlow) {
+      // Never let an authenticated-but-unassessed user reach the rest of the
+      // app, regardless of how they got authenticated.
+      router.replace("/assessment");
     }
-  }, [isAuthenticated, segments, router, rootNavigationState?.key]);
+  }, [isAuthenticated, lastAssessedAt, segments, router, rootNavigationState?.key]);
 
   return null;
 }

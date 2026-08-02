@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ScrollView,
   Text,
@@ -30,6 +30,7 @@ const LESSON_ICONS: Record<number, React.ComponentProps<typeof Ionicons>["name"]
   4: "shield-checkmark-outline", // Pensions & Provident Funds
   5: "school-outline",           // Student Loans & Bursaries
   6: "briefcase-outline",        // Side Hustles & Business Finance
+  7: "id-card-outline",          // Credit Scores & Digital Credit History
 };
 
 function lessonIcon(id: number): React.ComponentProps<typeof Ionicons>["name"] {
@@ -57,6 +58,7 @@ export default function LearnScreen() {
   const userXp = useUserStore((s) => s.xp);
   const streak = useUserStore((s) => s.streak);
   const userGoal = useUserStore((s) => s.goal);
+  const completedLessonIds = useUserStore((s) => s.completedLessonIds);
 
   // Main UI States
   const [selectedModule, setSelectedModule] = useState<LessonModule | null>(null);
@@ -89,8 +91,11 @@ export default function LearnScreen() {
     setSelectedModule(mod);
   };
 
+  const sessionStartRef = useRef<number | null>(null);
+
   // Starts the interactive slide-by-slide session
   const startSession = (lesson: LessonModule) => {
+    sessionStartRef.current = Date.now();
     setSelectedModule(null);
     setSessionLesson(lesson);
     setSessionStep(0);
@@ -174,6 +179,10 @@ export default function LearnScreen() {
       const lessonId = sessionLesson.id;
       const xpVal = sessionLesson.xpVal;
       const answers = quizAnswers;
+      const timeSpentSeconds = sessionStartRef.current
+        ? Math.round((Date.now() - sessionStartRef.current) / 1000)
+        : undefined;
+      sessionStartRef.current = null;
 
       Speech.stop();
       setIsSpeaking(false);
@@ -188,7 +197,7 @@ export default function LearnScreen() {
 
       const store = useUserStore.getState();
       try {
-        await progressService.completeLesson(lessonId);
+        await progressService.completeLesson(lessonId, timeSpentSeconds);
         if (answers.length > 0) {
           await gamificationService.submitQuizScore({ moduleId: lessonId, answers });
         }
@@ -319,6 +328,7 @@ export default function LearnScreen() {
     "🦉: Tier 3 pensions are voluntary, tax-free, and let you withdraw early in emergencies.",
     "🦉: Student loans (SLTF) are now guarantor-free with a Ghana Card. Use them strictly for educational expenses!",
     "🦉: Keep side hustle funds separate from daily money. Separating accounts is key to campus business success!",
+    "🦉: A single late Fido or Qwikloan repayment can quietly shrink your future borrowing limit. Digital lenders are watching your MoMo activity!",
   ];
   const activeTip = mascotTips[lessonsCompleted % mascotTips.length] || mascotTips[0];
 
@@ -331,6 +341,16 @@ export default function LearnScreen() {
     "Save for Education":      { id: 5, title: "Student Loans & Bursaries", emoji: "🎓" },
   };
   const recommendedLesson = userGoal ? GOAL_LESSON[userGoal] : null;
+
+  // Goal-relevant lesson first, same six lessons otherwise — nothing hidden,
+  // just resequenced. LESSON_MODULES itself is left untouched since
+  // data/recommendations.ts indexes it in its original order.
+  const orderedModules: LessonModule[] = recommendedLesson
+    ? [
+        ...LESSON_MODULES.filter((m) => m.id === recommendedLesson.id),
+        ...LESSON_MODULES.filter((m) => m.id !== recommendedLesson.id),
+      ]
+    : LESSON_MODULES;
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
@@ -364,8 +384,9 @@ export default function LearnScreen() {
         contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Personalized Path Banner — shown only after assessment is done */}
-        {userGoal && recommendedLesson && (
+        {/* Personalized Path Banner — shown only after assessment is done, and
+            hidden once that lesson is actually completed */}
+        {userGoal && recommendedLesson && !completedLessonIds.includes(recommendedLesson.id) && (
           <View className="bg-brand-emerald/5 border border-brand-emerald/20 rounded-2xl p-4 mb-5 flex-row items-center gap-3">
             <View className="w-10 h-10 bg-brand-emerald/10 rounded-xl items-center justify-center">
               <Ionicons name={lessonIcon(recommendedLesson.id)} size={20} color="#16A34A" />
@@ -421,10 +442,15 @@ export default function LearnScreen() {
           {/* Vertical connecting line */}
           <View className="absolute top-[30px] bottom-[30px] left-1/2 w-1.5 bg-slate-200 -translate-x-[3px] z-[-1]" />
 
-          {LESSON_MODULES.map((mod, index) => {
-            const isCompleted = lessonsCompleted >= mod.id;
-            const isUnlocked = lessonsCompleted >= index;
-            const isCurrent = lessonsCompleted === index;
+          {orderedModules.map((mod, index) => {
+            const isCompleted = completedLessonIds.includes(mod.id);
+            // Unlocked once every lesson before it IN THE DISPLAYED ORDER is
+            // done — not a raw completed-count check, since the goal-priority
+            // lesson may now sit at a different position than its id implies.
+            const isUnlocked =
+              index === 0 ||
+              orderedModules.slice(0, index).every((m) => completedLessonIds.includes(m.id));
+            const isCurrent = isUnlocked && !isCompleted;
 
             let layoutClass = "justify-center";
             if (index % 2 === 0) {
@@ -592,7 +618,7 @@ export default function LearnScreen() {
                   className="bg-green-500 border-b-[5px] border-b-green-600 h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
                 >
                   <Text className="text-white text-base font-inter-bold tracking-wider">
-                    {lessonsCompleted >= selectedModule.id
+                    {completedLessonIds.includes(selectedModule.id)
                       ? "REVIEW LESSON"
                       : "START +100 XP"}
                   </Text>
@@ -715,6 +741,8 @@ export default function LearnScreen() {
                         "SLTF student loans are now guarantor-free with a Ghana Card. Use them strictly for educational expenses to avoid long-term debt."}
                       {sessionLesson.id === 6 &&
                         "Always separate personal and business finances. A dedicated MoMo merchant wallet helps track true profit and prevents overspending."}
+                      {sessionLesson.id === 7 &&
+                        "Your MoMo history IS your credit file in Ghana. Consistent activity and on-time digital loan repayments build the score lenders check before approving you."}
                     </Text>
                   </View>
 

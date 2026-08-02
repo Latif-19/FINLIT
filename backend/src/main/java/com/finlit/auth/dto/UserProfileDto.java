@@ -14,7 +14,8 @@ public record UserProfileDto(
         String age,
         String phone,
         String subscriptionTier,
-        String createdAt
+        String createdAt,
+        String lastAssessedAt
 ) {
     /** Converts a User entity into this DTO. */
     public static UserProfileDto from(User u) {
@@ -26,7 +27,8 @@ public record UserProfileDto(
                 u.getAge() == null ? "" : u.getAge(),
                 u.getPhone() == null ? "" : u.getPhone(),
                 u.getSubscriptionTier(),
-                u.getCreatedAt().toString()
+                u.getCreatedAt().toString(),
+                u.getLastAssessedAt() == null ? null : u.getLastAssessedAt().toString()
         );
     }
 }

@@ -62,6 +62,7 @@ export default function PersonalDetailsScreen() {
         avatar: useUserStore.getState().avatar,
         age,
         phone,
+        goal: selectedGoal || undefined,
       });
       useUserStore.getState().setAuthenticatedUser(res.data);
     } catch {

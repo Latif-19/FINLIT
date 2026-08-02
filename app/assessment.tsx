@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, Text, View, ActivityIndicator, Modal } from "react-native";
+import { Pressable, ScrollView, Text, View, ActivityIndicator, Modal, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../store/useUserStore";
@@ -44,7 +44,20 @@ export default function AssessmentScreen() {
       score = res.data.score;
       goal = res.data.goal;
     } catch {
-      // keep the locally-computed score/goal
+      // A 401 that couldn't be refreshed logs the user out entirely (see the
+      // response interceptor in services/api.ts). Don't silently pretend this
+      // succeeded — NavigationGuard would just bounce them off
+      // assessment-result with no explanation a moment later.
+      if (!useUserStore.getState().isAuthenticated) {
+        setIsAnalyzing(false);
+        Alert.alert(
+          "Session Expired",
+          "You've been signed out. Please sign in again to finish your assessment.",
+          [{ text: "OK", onPress: () => router.replace("/auth") }]
+        );
+        return;
+      }
+      // Otherwise — offline / network error — keep the locally-computed score/goal.
     }
 
     const store = useUserStore.getState();

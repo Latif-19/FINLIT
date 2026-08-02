@@ -15,6 +15,14 @@ import { AVATAR_OPTIONS } from "@/data/avatars";
 import { getSmartRecommendations, SmartRecommendation } from "@/data/recommendations";
 import { useThemeColors } from "../../hooks/useThemeColors";
 
+function formatDuration(totalSeconds: number): string {
+  const totalMinutes = Math.round(totalSeconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes}m`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+}
+
 const HOME_NEWS_PREVIEW = [
   {
     id: 1,
@@ -62,6 +70,7 @@ export default function HomeScreen() {
   const avatar = useUserStore((s) => s.avatar);
   const xp = useUserStore((s) => s.xp);
   const lessonsCompleted = useUserStore((s) => s.lessonsCompleted);
+  const totalTimeSpentSeconds = useUserStore((s) => s.totalTimeSpentSeconds);
   const userGoal = useUserStore((s) => s.goal);
   const streak = useUserStore((s) => s.streak);
 
@@ -243,6 +252,20 @@ export default function HomeScreen() {
             </View>
             <Text className="text-brand-navy text-2xl font-inter-bold mt-2">
               {xp} <Text className="text-xs text-brand-gold font-inter-bold">XP</Text>
+            </Text>
+          </View>
+
+          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
+                Learning
+              </Text>
+              <View className="w-6 h-6 bg-brand-navy/10 rounded-lg items-center justify-center">
+                <Ionicons name="time" size={12} color={colors.navy} />
+              </View>
+            </View>
+            <Text className="text-brand-navy text-2xl font-inter-bold mt-2">
+              {formatDuration(totalTimeSpentSeconds)}
             </Text>
           </View>
         </View>

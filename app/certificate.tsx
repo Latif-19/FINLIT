@@ -1,14 +1,16 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
   Pressable,
   ScrollView,
-  Share,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 import { useUserStore } from "../store/useUserStore";
 import { LESSON_MODULES } from "@/data/lessons";
 
@@ -19,6 +21,8 @@ export default function CertificateScreen() {
   const lessonsCompleted = useUserStore((s) => s.lessonsCompleted);
   const createdAt = useUserStore((s) => s.createdAt);
   const xp = useUserStore((s) => s.xp);
+  const certificateRef = useRef<ViewShot>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isUnlocked = lessonsCompleted >= LESSON_MODULES.length;
   const completedDate = new Date().toLocaleDateString("en-US", {
@@ -36,13 +40,27 @@ export default function CertificateScreen() {
     return "Financial Novice";
   };
 
-  const handleShare = async () => {
+  // Captures the certificate card as a real PNG file and opens the OS share
+  // sheet, which includes "Save Image" / "Save to Files" — an actual
+  // downloadable certificate, not just a text message about one.
+  const handleDownload = async () => {
+    if (!certificateRef.current?.capture) return;
+    setIsDownloading(true);
     try {
-      await Share.share({
-        message: `I just completed the FinLit Financial Literacy Course and earned my certificate as a "${getLevelLabel()}"! 🏆\n\n${lessonsCompleted} lessons completed • ${xp} XP earned\n\nLearn personal finance with FinLit — built for Ghanaians.`,
+      const uri = await certificateRef.current.capture();
+      const canShare = await Sharing.isAvailableAsync();
+      if (!canShare) {
+        Alert.alert("Not Available", "Saving/sharing isn't available on this device.");
+        return;
+      }
+      await Sharing.shareAsync(uri, {
+        mimeType: "image/png",
+        dialogTitle: "Save or share your FinLit certificate",
       });
     } catch {
-      Alert.alert("Error", "Could not share certificate.");
+      Alert.alert("Error", "Could not generate your certificate. Please try again.");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -64,7 +82,8 @@ export default function CertificateScreen() {
 
       {isUnlocked ? (
         <View className="px-5">
-          {/* Certificate Card */}
+          {/* Certificate Card — wrapped so it can be captured as a real image */}
+          <ViewShot ref={certificateRef} options={{ format: "png", quality: 1 }}>
           <View className="bg-white rounded-3xl border-2 border-brand-gold/30 shadow-xl overflow-hidden mb-6">
             {/* Gold banner */}
             <View className="bg-brand-navy py-6 items-center">
@@ -126,18 +145,26 @@ export default function CertificateScreen() {
               </View>
             </View>
           </View>
+          </ViewShot>
 
           {/* Actions */}
           <View className="flex-row gap-3 mb-6">
             <Pressable
-              onPress={handleShare}
-              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.98 : 1 }] })}
+              onPress={handleDownload}
+              disabled={isDownloading}
+              style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.98 : 1 }], opacity: isDownloading ? 0.7 : 1 })}
               className="flex-1 bg-brand-emerald h-12 rounded-2xl shadow-sm flex-row justify-center items-center"
             >
-              <Ionicons name="share-outline" size={18} color="white" />
-              <Text className="text-white font-inter-semibold text-sm ml-2 uppercase tracking-wider">
-                Share
-              </Text>
+              {isDownloading ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <>
+                  <Ionicons name="download-outline" size={18} color="white" />
+                  <Text className="text-white font-inter-semibold text-sm ml-2 uppercase tracking-wider">
+                    Download
+                  </Text>
+                </>
+              )}
             </Pressable>
             <Pressable
               onPress={() => router.back()}

@@ -77,18 +77,21 @@ export default function PaywallScreen() {
     }
 
     setIsLoading(true);
+    const reference = generateRef();
 
     popup.checkout({
       email: payerEmail,
       amount: plan.amount,
-      reference: generateRef(),
-      onSuccess: (res: any) => {
+      reference,
+      onSuccess: () => {
         setIsLoading(false);
         useUserStore.getState().setPremium(true); // optimistic
         setPaymentSuccess(true);
-        // Persist premium on the backend so it survives across sessions/devices.
+        // Persist premium on the backend — it re-verifies this reference with
+        // Paystack server-side before granting the tier, so this call alone
+        // can't be spoofed by hitting the endpoint directly.
         profileService
-          .activatePremium()
+          .activatePremium(reference)
           .then((r) => useUserStore.getState().setAuthenticatedUser(r.data))
           .catch(() => {
             // Offline — will reconcile on next login (backend reflects the tier).

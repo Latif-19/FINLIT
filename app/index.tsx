@@ -15,9 +15,9 @@ export default function SplashScreen() {
     }).start();
 
     const timer = setTimeout(() => {
-      const isAuthenticated = useUserStore.getState().isAuthenticated;
+      const { isAuthenticated, lastAssessedAt } = useUserStore.getState();
       if (isAuthenticated) {
-        router.replace("/(tabs)/home");
+        router.replace(lastAssessedAt ? "/(tabs)/home" : "/assessment");
       } else {
         router.replace("/onboarding");
       }

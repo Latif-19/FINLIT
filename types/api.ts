@@ -43,6 +43,7 @@ export interface UserProfile {
   phone: string;
   subscriptionTier: "free" | "premium";
   createdAt: string;
+  lastAssessedAt: string | null;
 }
 
 // ── Assessment & Personalisation (FR-2) ──────────────────────────────────────
@@ -178,6 +179,8 @@ export interface ProgressResponse {
   quizScores: Record<number, number[]>;
   savings: number;
   targetGoal: number;
+  completedLessonIds: number[];
+  totalTimeSpentSeconds: number;
 }
 
 // ── News (FR-6 proposed) ────────────────────────────────────────────────────

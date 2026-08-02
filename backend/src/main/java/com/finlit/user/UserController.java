@@ -1,6 +1,7 @@
 package com.finlit.user;
 
 import com.finlit.auth.dto.UserProfileDto;
+import com.finlit.user.dto.ActivatePremiumRequest;
 import com.finlit.user.dto.UpdateProfileRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,7 +40,8 @@ public class UserController {
     }
 
     @PostMapping("/premium")
-    public UserProfileDto activatePremium(@AuthenticationPrincipal User user) {
-        return userService.activatePremium(user.getId());
+    public UserProfileDto activatePremium(@AuthenticationPrincipal User user,
+                                          @Valid @RequestBody ActivatePremiumRequest request) {
+        return userService.activatePremium(user.getId(), request.reference());
     }
 }

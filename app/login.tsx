@@ -44,7 +44,9 @@ export default function LoginScreen() {
       const { user, token, refreshToken } = res.data;
       await tokenStorage.setTokens(token, refreshToken);
       useUserStore.getState().setAuthenticatedUser(user);
-      router.replace("/(tabs)/home");
+      // Accounts that verified but never finished the onboarding assessment
+      // (e.g. the app was closed mid-flow) go there instead of the dashboard.
+      router.replace(user.lastAssessedAt ? "/(tabs)/home" : "/assessment");
     } catch (err: any) {
       // 403 = correct password but email not verified. The backend has just
       // re-sent a fresh code, so take the user straight to the verify screen.

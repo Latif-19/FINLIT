@@ -24,13 +24,16 @@ function getQuizAverage(quizScores: Record<number, number[]>): number {
 
 export function getSmartRecommendations(): SmartRecommendation[] {
   const state = useUserStore.getState();
-  const { lessonsCompleted, score, goal, quizScores, xp, streak } = state;
+  const { score, goal, quizScores, xp, streak, completedLessonIds } = state;
   const quizAvg = getQuizAverage(quizScores);
   const recs: SmartRecommendation[] = [];
 
-  // 1. Next lesson recommendation (highest priority if not all complete)
-  if (lessonsCompleted < LESSON_MODULES.length) {
-    const nextLesson = LESSON_MODULES[lessonsCompleted];
+  // 1. Next lesson recommendation (highest priority if not all complete).
+  // Looks up the first not-yet-completed lesson by id rather than assuming
+  // lessons are always finished in array order — the Learn tab can now
+  // reorder lessons by goal, so completion order isn't guaranteed sequential.
+  const nextLesson = LESSON_MODULES.find((m) => !completedLessonIds.includes(m.id));
+  if (nextLesson) {
     recs.push({
       id: `lesson-${nextLesson.id}`,
       type: "lesson",

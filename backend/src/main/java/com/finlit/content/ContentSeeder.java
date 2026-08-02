@@ -28,15 +28,14 @@ public class ContentSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (lessonRepository.count() == 0) {
-            seedLessons();
-        }
-        // Idempotent per-article, so new articles are added on restart.
+        // Idempotent per-lesson, so new lessons are added on restart without
+        // touching (or duplicating) already-seeded ones.
+        seedLessons();
         seedNews();
     }
 
     private void seedLessons() {
-        lessonRepository.saveAll(List.of(
+        List<Lesson> lessons = List.of(
                 lesson(1L, "MoMo Budgeting & Saving",
                         "Learn to track daily expenses, plan for E-levy/MoMo transaction fees, and save in mobile wallets.",
                         "10 min", 100, "📱", List.of(
@@ -83,8 +82,22 @@ public class ContentSeeder implements CommandLineRunner {
                                 "Starting a micro-business on campus is a great way to build real-world financial skills and earn extra income.",
                                 "1. Start small and test. Do not dump all your savings into inventory. Validate your business idea with fellow students first (e.g., printing services, baking, digital design, tutoring).",
                                 "2. Separate personal and business funds. Set up a separate mobile money wallet or bank account for your side hustle. Never mix daily food money with business capital.",
-                                "3. Calculate net profit margins. Reinvest a portion of your profits back into growing the business rather than spending all the initial revenue on personal items."))
-        ));
+                                "3. Calculate net profit margins. Reinvest a portion of your profits back into growing the business rather than spending all the initial revenue on personal items.")),
+
+                lesson(7L, "Credit Scores & Digital Credit History",
+                        "Understand how your MoMo activity and loan repayment history build a digital credit score in Ghana, and how to protect it.",
+                        "12 min", 130, "🪪", List.of(
+                                "In Ghana, a growing digital credit scoring system now decides whether lenders trust you with a loan — and how much you can borrow.",
+                                "1. Your MoMo and airtime activity IS your credit file. Digital lenders like Fido, MTN Credit, and Zeepay score you using your mobile money transaction history, airtime top-up frequency, and repayment behavior — not a traditional bank credit file.",
+                                "2. Repay every digital loan on time. A single late Qwikloan or Fido repayment can lower your score and shrink your future borrowing limit, even if the loan itself was small.",
+                                "3. Know your rights. The Ghana Credit Reporting Act entitles you to one free credit report per year from bureaus like TransUnion Ghana and XDS Data — use it to check your score and dispute errors."))
+        );
+
+        for (Lesson lesson : lessons) {
+            if (!lessonRepository.existsById(lesson.getId())) {
+                lessonRepository.save(lesson);
+            }
+        }
     }
 
     private void seedNews() {

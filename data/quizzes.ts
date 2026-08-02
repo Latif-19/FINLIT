@@ -260,5 +260,47 @@ export const MODULE_QUIZZES: Record<number, QuizQuestion[]> = {
         { text: "Hide them under your mattress to avoid mobile money fees", isCorrect: false },
       ],
     }
+  ],
+  7: [
+    {
+      question: "What primarily determines your digital credit score with lenders like Fido or MTN Credit in Ghana?",
+      options: [
+        { text: "Your university degree and job title", isCorrect: false },
+        { text: "Your mobile money activity, airtime top-ups, and repayment history", isCorrect: true },
+        { text: "The amount of cash you keep at home", isCorrect: false },
+      ],
+    },
+    {
+      question: "What happens if you repay a Qwikloan or Fido loan late?",
+      options: [
+        { text: "Nothing, as long as you repay within a year", isCorrect: false },
+        { text: "It can lower your digital credit score and reduce your future borrowing limit", isCorrect: true },
+        { text: "Your MoMo wallet gets permanently frozen", isCorrect: false },
+      ],
+    },
+    {
+      question: "Under the Ghana Credit Reporting Act, how often can you request a free credit report?",
+      options: [
+        { text: "Once per year", isCorrect: true },
+        { text: "Once per month", isCorrect: false },
+        { text: "Never — it's always a paid service", isCorrect: false },
+      ],
+    },
+    {
+      question: "Which of these organizations acts as a credit bureau in Ghana?",
+      options: [
+        { text: "TransUnion Ghana", isCorrect: true },
+        { text: "Bank of Ghana Treasury Department", isCorrect: false },
+        { text: "Ghana Revenue Authority", isCorrect: false },
+      ],
+    },
+    {
+      question: "Why should you avoid applying for multiple digital loans at the same time?",
+      options: [
+        { text: "Each application can negatively signal risk and lower your score", isCorrect: true },
+        { text: "It is illegal in Ghana", isCorrect: false },
+        { text: "A MoMo wallet can only hold one loan type at a time", isCorrect: false },
+      ],
+    },
   ]
 };

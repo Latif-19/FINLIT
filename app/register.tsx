@@ -169,6 +169,7 @@ export default function RegisterScreen() {
                 autoCapitalize="none"
                 autoComplete="off"
                 textContentType="none"
+                importantForAutofill="no"
                 className="flex-1 py-3.5 text-base text-brand-dark font-inter"
               />
               <Pressable onPress={() => setPasswordVisible(!passwordVisible)} className="p-1">
@@ -194,6 +195,7 @@ export default function RegisterScreen() {
                 autoCapitalize="none"
                 autoComplete="off"
                 textContentType="none"
+                importantForAutofill="no"
                 className="flex-1 py-3.5 text-base text-brand-dark font-inter"
               />
               <Pressable onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="p-1">
@@ -204,6 +206,22 @@ export default function RegisterScreen() {
                 />
               </Pressable>
             </View>
+            {confirmPassword.length > 0 && (
+              <View className="flex-row items-center mt-1.5">
+                <Ionicons
+                  name={password === confirmPassword ? "checkmark-circle" : "close-circle"}
+                  size={14}
+                  color={password === confirmPassword ? "#16A34A" : "#dc2626"}
+                />
+                <Text
+                  className={`text-xs font-inter-medium ml-1.5 ${
+                    password === confirmPassword ? "text-brand-emerald" : "text-red-600"
+                  }`}
+                >
+                  {password === confirmPassword ? "Passwords match" : "Passwords don't match yet"}
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Error Message */}

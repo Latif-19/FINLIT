@@ -52,8 +52,9 @@ export default function VerifyEmailScreen() {
       const { user, token, refreshToken } = res.data;
       await tokenStorage.setTokens(token, refreshToken);
       useUserStore.getState().setAuthenticatedUser(user);
-      // Newly registered users start the assessment; returning users go home.
-      if (flow === "register") {
+      // Newly registered users always need the assessment. Returning users
+      // (flow === "login") only skip it if they'd actually completed it before.
+      if (flow === "register" || !user.lastAssessedAt) {
         router.replace("/assessment");
       } else {
         router.replace("/(tabs)/home");

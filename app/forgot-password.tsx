@@ -418,6 +418,9 @@ export default function ForgotPasswordScreen() {
                     placeholder="Enter new password"
                     secureTextEntry={!passwordVisible}
                     autoCapitalize="none"
+                    autoComplete="off"
+                    textContentType="none"
+                    importantForAutofill="no"
                     className="flex-1 py-3.5 text-base text-brand-dark font-inter"
                     editable={!isLoading}
                   />
@@ -442,6 +445,9 @@ export default function ForgotPasswordScreen() {
                     placeholder="Confirm new password"
                     secureTextEntry={!confirmPasswordVisible}
                     autoCapitalize="none"
+                    autoComplete="off"
+                    textContentType="none"
+                    importantForAutofill="no"
                     className="flex-1 py-3.5 text-base text-brand-dark font-inter"
                     editable={!isLoading}
                   />
@@ -453,6 +459,22 @@ export default function ForgotPasswordScreen() {
                     />
                   </Pressable>
                 </View>
+                {confirmPassword.length > 0 && (
+                  <View className="flex-row items-center mt-1.5">
+                    <Ionicons
+                      name={password === confirmPassword ? "checkmark-circle" : "close-circle"}
+                      size={14}
+                      color={password === confirmPassword ? "#16A34A" : "#dc2626"}
+                    />
+                    <Text
+                      className={`text-xs font-inter-medium ml-1.5 ${
+                        password === confirmPassword ? "text-brand-emerald" : "text-red-600"
+                      }`}
+                    >
+                      {password === confirmPassword ? "Passwords match" : "Passwords don't match yet"}
+                    </Text>
+                  </View>
+                )}
               </View>
 
               {error ? (
