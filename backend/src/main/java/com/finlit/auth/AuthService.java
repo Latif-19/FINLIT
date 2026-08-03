@@ -97,11 +97,20 @@ public class AuthService {
         // Correct credentials but unverified: send a fresh code and tell the app
         // to show the verification screen (403, distinct from a wrong password).
         if (!user.isEmailVerified()) {
-            assignNewCode(user);
-            userRepository.save(user);
-            emailService.sendVerificationCode(email, user.getName(), user.getVerificationCode());
+            // Only mint a new code if there isn't already a usable one. Otherwise a
+            // second login attempt would silently invalidate the code the user is
+            // already reading in their inbox.
+            boolean needsNewCode = user.getVerificationCode() == null
+                    || user.getVerificationCodeExpiresAt() == null
+                    || Instant.now().isAfter(user.getVerificationCodeExpiresAt());
+            if (needsNewCode) {
+                assignNewCode(user);
+                userRepository.save(user);
+                emailService.sendVerificationCode(email, user.getName(), user.getVerificationCode());
+            }
             throw new EmailNotVerifiedException(
-                    "Your email isn't verified yet. We've sent you a new code.");
+                    "Your email isn't verified yet. Enter the code we emailed you, "
+                            + "or tap Resend for a new one.");
         }
 
         return buildAuthResponse(user);
