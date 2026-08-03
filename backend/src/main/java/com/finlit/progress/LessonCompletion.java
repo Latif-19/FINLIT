@@ -37,6 +37,10 @@ public class LessonCompletion {
     @Column(name = "lesson_id", nullable = false)
     private Long lessonId;
 
+    /** Wall-clock time the user spent in the lesson session, in seconds. */
+    @Column(nullable = false, columnDefinition = "integer not null default 0")
+    private int timeSpentSeconds;
+
     @Column(nullable = false)
     private Instant completedAt = Instant.now();
 }

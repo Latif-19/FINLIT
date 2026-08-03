@@ -15,6 +15,14 @@ import { AVATAR_OPTIONS } from "@/data/avatars";
 import { getSmartRecommendations, SmartRecommendation } from "@/data/recommendations";
 import { useThemeColors } from "../../hooks/useThemeColors";
 
+function formatDuration(totalSeconds: number): string {
+  const totalMinutes = Math.round(totalSeconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes}m`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+}
+
 const HOME_NEWS_PREVIEW = [
   {
     id: 1,
@@ -62,6 +70,7 @@ export default function HomeScreen() {
   const avatar = useUserStore((s) => s.avatar);
   const xp = useUserStore((s) => s.xp);
   const lessonsCompleted = useUserStore((s) => s.lessonsCompleted);
+  const totalTimeSpentSeconds = useUserStore((s) => s.totalTimeSpentSeconds);
   const userGoal = useUserStore((s) => s.goal);
   const streak = useUserStore((s) => s.streak);
 
@@ -163,7 +172,11 @@ export default function HomeScreen() {
       <View className="px-5 -mt-5">
 
         {/* ── STREAK & DAILY TRACKER ── */}
+<<<<<<< HEAD
         <View className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg shadow-slate-100/40 dark:bg-slate-900 dark:border-slate-800">
+=======
+        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border shadow-lg shadow-slate-100/40">
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
           <View className="flex-row justify-between items-start mb-4">
             <View>
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest dark:text-slate-400">
@@ -198,8 +211,13 @@ export default function HomeScreen() {
                       isToday
                         ? "bg-brand-emerald border-2 border-brand-emerald"
                         : isActive
+<<<<<<< HEAD
                         ? "bg-brand-emerald/15 border border-brand-emerald/30 dark:bg-brand-emerald/20"
                         : "bg-slate-50 border border-slate-100 dark:bg-slate-800 dark:border-slate-800"
+=======
+                        ? "bg-brand-emerald/15 border border-brand-emerald/30"
+                        : "bg-brand-slateBg border border-brand-border"
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
                     }`}
                   >
                     {isActive || isToday ? (
@@ -209,7 +227,7 @@ export default function HomeScreen() {
                         color={isToday ? "white" : colors.emerald}
                       />
                     ) : (
-                      <View className="w-2 h-2 bg-slate-200 rounded-full" />
+                      <View className="w-2 h-2 bg-brand-slateBg rounded-full" />
                     )}
                   </View>
                 </View>
@@ -220,7 +238,11 @@ export default function HomeScreen() {
 
         {/* ── QUICK PROGRESS STATS ── */}
         <View className="flex-row mt-4 gap-3">
+<<<<<<< HEAD
           <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
+=======
+          <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             <View className="flex-row justify-between items-center">
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 Lessons
@@ -232,7 +254,11 @@ export default function HomeScreen() {
             <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">{lessonsCompleted}</Text>
           </View>
 
+<<<<<<< HEAD
           <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
+=======
+          <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             <View className="flex-row justify-between items-center">
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 XP Score
@@ -243,6 +269,20 @@ export default function HomeScreen() {
             </View>
             <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">
               {xp} <Text className="text-xs text-brand-gold font-inter-bold dark:text-amber-400">XP</Text>
+            </Text>
+          </View>
+
+          <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
+                Learning
+              </Text>
+              <View className="w-6 h-6 bg-brand-navy/10 rounded-lg items-center justify-center">
+                <Ionicons name="time" size={12} color={colors.navy} />
+              </View>
+            </View>
+            <Text className="text-brand-navy text-2xl font-inter-bold mt-2">
+              {formatDuration(totalTimeSpentSeconds)}
             </Text>
           </View>
         </View>
@@ -256,8 +296,13 @@ export default function HomeScreen() {
               style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
               className="flex-row items-center gap-1"
             >
+<<<<<<< HEAD
               <Text className="text-brand-emerald text-[13px] font-inter-bold dark:text-emerald-400">See All</Text>
               <Ionicons name="arrow-forward" size={14} color="#16A34A" />
+=======
+              <Text className="text-brand-emerald text-[13px] font-inter-bold">See All</Text>
+              <Ionicons name="arrow-forward" size={14} color={colors.emerald} />
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             </Pressable>
           </View>
 
@@ -274,7 +319,11 @@ export default function HomeScreen() {
                   width: 240,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
+<<<<<<< HEAD
                 className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"
+=======
+                className="bg-brand-bg rounded-2xl overflow-hidden border border-brand-border shadow-sm"
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
               >
                 {/* Card image */}
                 <Image
@@ -312,17 +361,17 @@ export default function HomeScreen() {
                     {item.title}
                   </Text>
                   <Text
-                    className="text-[11px] text-slate-500 font-inter mt-1 leading-[15px]"
+                    className="text-[11px] text-brand-gray font-inter mt-1 leading-[15px]"
                     numberOfLines={2}
                   >
                     {item.summary}
                   </Text>
                   <View className="flex-row items-center mt-2 gap-1">
-                    <Text className="text-[10px] text-slate-400 font-inter-semibold">
+                    <Text className="text-[10px] text-brand-gray font-inter-semibold">
                       {item.source}
                     </Text>
-                    <Text className="text-slate-300 text-[10px]">·</Text>
-                    <Text className="text-[10px] text-slate-400 font-inter">{item.time}</Text>
+                    <Text className="text-brand-gray text-[10px]">·</Text>
+                    <Text className="text-[10px] text-brand-gray font-inter">{item.time}</Text>
                   </View>
                 </View>
               </Pressable>
@@ -335,7 +384,7 @@ export default function HomeScreen() {
                 width: 100,
                 transform: [{ scale: pressed ? 0.97 : 1 }],
               })}
-              className="bg-brand-navy/5 border border-slate-200 rounded-2xl items-center justify-center gap-2"
+              className="bg-brand-navy/5 border border-brand-border rounded-2xl items-center justify-center gap-2"
             >
               <View className="w-10 h-10 bg-brand-navy rounded-full items-center justify-center">
                 <Ionicons name="arrow-forward" size={18} color="white" />
@@ -356,7 +405,7 @@ export default function HomeScreen() {
             key={rec.id}
             onPress={() => router.push(rec.route as any)}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.99 : 1 }] })}
-            className="bg-white p-4 rounded-2xl border border-slate-100 shadow-lg shadow-slate-100/40 flex-row items-center justify-between mb-3"
+            className="bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-lg shadow-slate-100/40 flex-row items-center justify-between mb-3"
           >
             <View className="flex-row items-center flex-1 mr-3">
               <View className="w-11 h-11 bg-brand-slateBg rounded-xl items-center justify-center mr-3">
@@ -396,7 +445,7 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => router.push("/simulations")}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-            className="flex-1 bg-white p-5 rounded-2xl border border-slate-100 shadow-md items-center justify-center"
+            className="flex-1 bg-brand-bg p-5 rounded-2xl border border-brand-border shadow-md items-center justify-center"
           >
             <View className="w-12 h-12 bg-brand-emerald/10 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="calculator-outline" size={22} color={colors.emerald} />
@@ -410,7 +459,7 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => router.push("/ai-tutor")}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-            className="flex-1 bg-white p-5 rounded-2xl border border-slate-100 shadow-md items-center justify-center"
+            className="flex-1 bg-brand-bg p-5 rounded-2xl border border-brand-border shadow-md items-center justify-center"
           >
             <View className="w-12 h-12 bg-brand-navy/5 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="chatbubbles-outline" size={22} color={colors.navy} />
@@ -424,7 +473,7 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => router.push("/badges")}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.97 : 1 }] })}
-            className="flex-1 bg-white p-5 rounded-2xl border border-slate-100 shadow-md items-center justify-center"
+            className="flex-1 bg-brand-bg p-5 rounded-2xl border border-brand-border shadow-md items-center justify-center"
           >
             <View className="w-12 h-12 bg-brand-gold/10 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="trophy-outline" size={22} color={colors.gold} />
@@ -441,14 +490,14 @@ export default function HomeScreen() {
       {/* ── AVATAR CHOOSER MODAL ── */}
       <Modal visible={avatarModalOpen} transparent animationType="fade">
         <View className="flex-1 bg-brand-navy/60 justify-center items-center px-6">
-          <View className="bg-white w-full rounded-2xl p-6 max-w-sm shadow-2xl border border-slate-100">
-            <View className="flex-row justify-between items-center border-b border-slate-100 pb-4">
+          <View className="bg-brand-bg w-full rounded-2xl p-6 max-w-sm shadow-2xl border border-brand-border">
+            <View className="flex-row justify-between items-center border-b border-brand-border pb-4">
               <Text className="text-brand-navy text-lg font-inter-bold">Choose Character</Text>
               <Pressable
                 onPress={() => setAvatarModalOpen(false)}
                 className="p-1 active:opacity-75"
               >
-                <Ionicons name="close" size={24} color="#6B7280" />
+                <Ionicons name="close" size={24} color={colors.gray} />
               </Pressable>
             </View>
 
@@ -461,7 +510,7 @@ export default function HomeScreen() {
                 <Pressable
                   key={idx}
                   onPress={() => handleAvatarSelect(item.char)}
-                  className="w-[72] h-[72] rounded-2xl bg-brand-slateBg active:bg-brand-emerald/10 border border-slate-100 items-center justify-center active:border-brand-emerald"
+                  className="w-[72] h-[72] rounded-2xl bg-brand-slateBg active:bg-brand-emerald/10 border border-brand-border items-center justify-center active:border-brand-emerald"
                 >
                   <Text className="text-3xl">{item.char}</Text>
                   <Text className="text-[8px] text-brand-gray font-inter-bold mt-1 uppercase tracking-wide">

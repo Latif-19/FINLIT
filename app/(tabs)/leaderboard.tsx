@@ -51,9 +51,9 @@ export default function LeaderboardScreen() {
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return { emoji: "🥇", bg: "bg-yellow-50", border: "border-yellow-200" };
-    if (rank === 2) return { emoji: "🥈", bg: "bg-slate-50", border: "border-slate-200" };
+    if (rank === 2) return { emoji: "🥈", bg: "bg-brand-slateBg", border: "border-brand-border" };
     if (rank === 3) return { emoji: "🥉", bg: "bg-orange-50", border: "border-orange-200" };
-    return { emoji: "", bg: "bg-white", border: "border-slate-100" };
+    return { emoji: "", bg: "bg-brand-bg", border: "border-brand-border" };
   };
 
   return (
@@ -136,10 +136,10 @@ export default function LeaderboardScreen() {
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
           ALL RANKINGS
         </Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-slate-100/40">
           {rest.length === 0 && (
             <View className="items-center py-8 px-6">
-              <Ionicons name="people-outline" size={30} color="#94A3B8" />
+              <Ionicons name="people-outline" size={30} color={colors.gray} />
               <Text className="text-brand-navy text-sm font-inter-bold mt-3 text-center">
                 You&apos;re leading the pack!
               </Text>
@@ -154,7 +154,7 @@ export default function LeaderboardScreen() {
               <View
                 key={entry.userId}
                 className={`flex-row items-center p-4 ${
-                  index < rest.length - 1 ? "border-b border-slate-50" : ""
+                  index < rest.length - 1 ? "border-b border-brand-border" : ""
                 } ${isCurrentUser ? "bg-brand-emerald/5" : ""}`}
               >
                 <Text className="text-brand-gray font-inter-bold text-sm w-8 text-center">

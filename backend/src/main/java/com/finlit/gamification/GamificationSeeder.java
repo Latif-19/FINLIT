@@ -7,11 +7,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Seeds the full quiz bank (all 6 modules). Each module is guarded independently
- * by a count check, so re-running never duplicates. (The leaderboard shows real
- * users only — no seeded competitors.)
- */
 @Component
 @Order(2)
 public class GamificationSeeder implements CommandLineRunner {

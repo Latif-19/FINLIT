@@ -37,7 +37,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-brand-bg">
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 pt-14">
         <Text className="text-[20px] font-inter-semibold text-brand-navy">FinLit</Text>
@@ -84,7 +84,7 @@ export default function OnboardingScreen() {
           <View
             key={index}
             className={`h-2 rounded-full mx-1 ${
-              currentIndex === index ? "bg-brand-emerald w-6" : "bg-slate-200 w-2"
+              currentIndex === index ? "bg-brand-emerald w-6" : "bg-brand-slateBg w-2"
             }`}
           />
         ))}

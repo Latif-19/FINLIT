@@ -19,5 +19,7 @@ public record ProgressResponse(
         List<UserBadgeDto> badges,
         Map<Long, List<Integer>> quizScores,
         double savings,
-        double targetGoal
+        double targetGoal,
+        List<Long> completedLessonIds,
+        int totalTimeSpentSeconds
 ) {}

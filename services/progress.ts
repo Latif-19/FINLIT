@@ -8,8 +8,8 @@ export const progressService = {
   getProgress: () =>
     api.get<ProgressResponse>("/progress"),
 
-  completeLesson: (lessonId: number) =>
-    api.post("/progress/lesson", { lessonId }),
+  completeLesson: (lessonId: number, timeSpentSeconds?: number) =>
+    api.post("/progress/lesson", { lessonId, timeSpentSeconds }),
 
   logSavings: (amount: number) =>
     api.post("/progress/savings", { amount }),

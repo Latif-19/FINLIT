@@ -7,9 +7,11 @@ import type { UserProfile } from "@/types/api";
 export const profileService = {
   getProfile: () => api.get<UserProfile>("/profile"),
 
-  updateProfile: (data: { name: string; avatar?: string; age?: string; phone?: string }) =>
+  updateProfile: (data: { name: string; avatar?: string; age?: string; phone?: string; goal?: string }) =>
     api.put<UserProfile>("/profile", data),
 
-  // Marks the user premium on the backend after a confirmed payment.
-  activatePremium: () => api.post<UserProfile>("/profile/premium"),
+  // Backend re-verifies this Paystack reference directly with Paystack before
+  // granting premium — it isn't just trusting the client's word.
+  activatePremium: (reference: string) =>
+    api.post<UserProfile>("/profile/premium", { reference }),
 };

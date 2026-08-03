@@ -145,11 +145,11 @@ export default function AiTutorScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* ── HEADER ── */}
-      <View className="flex-row items-center px-5 pt-2 pb-4 bg-white border-b border-slate-100">
+      <View className="flex-row items-center px-5 pt-2 pb-4 bg-brand-bg border-b border-brand-border">
         <Pressable
           onPress={() => router.back()}
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-          className="w-10 h-10 bg-brand-slateBg rounded-full border border-slate-100 items-center justify-center"
+          className="w-10 h-10 bg-brand-slateBg rounded-full border border-brand-border items-center justify-center"
         >
           <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
@@ -206,7 +206,7 @@ export default function AiTutorScreen() {
                     isAi
                       ? isLock
                         ? "bg-amber-50 border border-amber-200"
-                        : "bg-white border border-slate-100 shadow-sm"
+                        : "bg-brand-bg border border-brand-border shadow-sm"
                       : "bg-brand-emerald"
                   }`}
                 >
@@ -243,7 +243,7 @@ export default function AiTutorScreen() {
               <View className="w-8 h-8 rounded-full bg-brand-emerald/10 items-center justify-center mr-2 mt-1">
                 <Text className="text-sm">🤖</Text>
               </View>
-              <View className="bg-white border border-slate-100 rounded-2xl p-4 flex-row items-center shadow-sm">
+              <View className="bg-brand-bg border border-brand-border rounded-2xl p-4 flex-row items-center shadow-sm">
                 <ActivityIndicator size="small" color={colors.emerald} />
                 <Text className="text-brand-gray text-xs font-inter-semibold ml-2">
                   Tutor is thinking...
@@ -265,7 +265,7 @@ export default function AiTutorScreen() {
                   key={q}
                   onPress={() => handleSend(q)}
                   style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
-                  className="bg-white border border-slate-200 rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
+                  className="bg-brand-bg border border-brand-border rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
                 >
                   <Text className="text-xs text-brand-navy font-inter-semibold">{q}</Text>
                 </Pressable>
@@ -275,13 +275,13 @@ export default function AiTutorScreen() {
         )}
 
         {/* ── INPUT BAR ── */}
-        <View className="bg-white border-t border-slate-100 p-4 flex-row items-center gap-3">
+        <View className="bg-brand-bg border-t border-brand-border p-4 flex-row items-center gap-3">
           <TextInput
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask a financial question..."
             placeholderTextColor="#94a3b8"
-            className="flex-1 bg-brand-slateBg border border-slate-200 rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
+            className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
             onSubmitEditing={() => handleSend(inputText)}
             onFocus={() => {
               setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
@@ -294,7 +294,7 @@ export default function AiTutorScreen() {
               transform: [{ scale: pressed && inputText.trim() ? 0.95 : 1 }],
             })}
             className={`w-12 h-12 rounded-2xl items-center justify-center ${
-              inputText.trim() ? "bg-brand-emerald" : "bg-slate-200"
+              inputText.trim() ? "bg-brand-emerald" : "bg-brand-slateBg"
             }`}
           >
             <Ionicons

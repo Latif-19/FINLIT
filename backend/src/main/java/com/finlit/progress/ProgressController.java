@@ -42,7 +42,7 @@ public class ProgressController {
     @PostMapping("/lesson")
     public ProgressResponse completeLesson(@AuthenticationPrincipal User user,
                                            @Valid @RequestBody CompleteLessonRequest request) {
-        return progressService.completeLesson(user.getId(), request.lessonId());
+        return progressService.completeLesson(user.getId(), request.lessonId(), request.timeSpentSeconds());
     }
 
     @PostMapping("/savings")

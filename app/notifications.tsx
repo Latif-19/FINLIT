@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { notificationService } from '../services/notifications';
 import { AppNotification } from '../types/api';
 import { useUserStore } from '../store/useUserStore';
@@ -127,6 +128,7 @@ function NotificationCard({ notification }: { notification: AppNotification }) {
 }
 
 export default function NotificationsScreen() {
+  const colors = useThemeColors();
   const notificationPrefs = useUserStore((s) => s.notificationPrefs);
   const setNotificationPref = useUserStore((s) => s.setNotificationPref);
 
@@ -175,7 +177,7 @@ export default function NotificationsScreen() {
   const renderToggleRow = (item: NotificationItem) => (
     <View key={item.key} className="flex-row items-center py-3.5 px-4">
       <View className="w-[38px] h-[38px] rounded-[10px] bg-brand-emerald/10 justify-center items-center mr-3">
-        <Ionicons name={item.icon} size={22} color="#16A34A" />
+        <Ionicons name={item.icon} size={22} color={colors.emerald} />
       </View>
       <View className="flex-1 mr-3">
         <Text className="text-[15px] font-inter-semibold text-brand-dark">{item.title}</Text>
@@ -194,8 +196,8 @@ export default function NotificationsScreen() {
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
       <View className="flex-row items-center px-5 pt-4 pb-3">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-white justify-center items-center border border-slate-100">
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-bg justify-center items-center border border-brand-border">
+          <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3 flex-1">
           <Text className="text-[22px] font-inter-bold text-brand-dark">Notifications</Text>
@@ -224,19 +226,19 @@ export default function NotificationsScreen() {
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-4 mb-2.5 ml-1">
           RECENT {unreadCount > 0 ? `(${unreadCount} UNREAD)` : ""}
         </Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-4">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden mb-4">
           {notifications.length > 0 ? (
             notifications.map((notification, index) => (
               <React.Fragment key={notification.id}>
                 <NotificationCard notification={notification} />
                 {index < notifications.length - 1 && (
-                  <View className="h-px bg-slate-100 ml-[72px]" />
+                  <View className="h-px bg-brand-slateBg ml-[72px]" />
                 )}
               </React.Fragment>
             ))
           ) : (
             <View className="py-10 items-center">
-              <Ionicons name="notifications-off-outline" size={32} color="#D1D5DB" />
+              <Ionicons name="notifications-off-outline" size={32} color={colors.gray} />
               <Text className="text-brand-gray text-sm mt-3 font-inter-medium">No notifications yet</Text>
             </View>
           )}
@@ -244,12 +246,12 @@ export default function NotificationsScreen() {
 
         {/* Learning Section */}
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-4 mb-2.5 ml-1">LEARNING</Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
           {LEARNING_ITEMS.map((item, index) => (
             <React.Fragment key={item.key}>
               {renderToggleRow(item)}
               {index < LEARNING_ITEMS.length - 1 && (
-                <View className="h-px bg-slate-100 ml-[66px]" />
+                <View className="h-px bg-brand-slateBg ml-[66px]" />
               )}
             </React.Fragment>
           ))}
@@ -257,23 +259,23 @@ export default function NotificationsScreen() {
 
         {/* Social & News Section */}
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-6 mb-2.5 ml-1">SOCIAL {"&"} NEWS</Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
           {SOCIAL_ITEMS.map((item, index) => (
             <React.Fragment key={item.key}>
               {renderToggleRow(item)}
               {index < SOCIAL_ITEMS.length - 1 && (
-                <View className="h-px bg-slate-100 ml-[66px]" />
+                <View className="h-px bg-brand-slateBg ml-[66px]" />
               )}
             </React.Fragment>
           ))}
         </View>
 
         {/* Info Banner */}
-        <View className="flex-row items-start bg-slate-100 rounded-xl p-3.5 mt-6 gap-2.5">
+        <View className="flex-row items-start bg-brand-slateBg rounded-xl p-3.5 mt-6 gap-2.5">
           <Ionicons
             name="information-circle-outline"
             size={20}
-            color="#6b7280"
+            color={colors.gray}
           />
           <Text className="flex-1 text-[13px] text-brand-gray leading-[18px]">
             Push notifications require app permissions. You can manage these in

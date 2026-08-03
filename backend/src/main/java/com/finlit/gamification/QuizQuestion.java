@@ -19,11 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * A single quiz question belonging to a lesson module, with its ordered answer
- * options. The correct option is stored here (server-side only) so scoring is
- * authoritative and can't be tampered with from the app.
- */
+
 @Entity
 @Table(name = "quiz_questions")
 @Getter

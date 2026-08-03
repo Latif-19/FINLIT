@@ -13,6 +13,7 @@ export interface AuthUserProfile {
   phone?: string;
   subscriptionTier?: string;
   createdAt?: string;
+  lastAssessedAt?: string | null;
 }
 
 // The progress dashboard payload returned by GET /progress.
@@ -27,6 +28,8 @@ export interface BackendProgress {
   targetGoal: number;
   quizScores: Record<number, number[]>;
   badges: { id: string; name: string; description: string; emoji: string; unlockedAt: string | null }[];
+  completedLessonIds?: number[];
+  totalTimeSpentSeconds?: number;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -82,6 +85,8 @@ export interface UserState {
   lastActiveDate: string | null; // ISO date string
   badges: Badge[];
   quizScores: Record<number, number[]>; // moduleId -> array of scores
+  completedLessonIds: number[]; // specific lesson ids finished — lets the Learn tab unlock out of natural order
+  totalTimeSpentSeconds: number; // cumulative time spent across all completed lesson sessions
 
   // Dates
   createdAt: string | null; // ISO date string
@@ -91,7 +96,13 @@ export interface UserState {
   simulationHistory: SimulationResult[];
 
   // Theming & Accessibility
+<<<<<<< HEAD
   themeMode: 'system' | 'light' | 'dark';
+=======
+  colorBlindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome';
+  appThemeColor: 'emerald' | 'blue' | 'purple';
+  isDarkMode: boolean;
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
   // Notification Preferences
   notificationPrefs: Record<string, boolean>;
@@ -128,7 +139,13 @@ export interface UserActions {
   saveQuizScore: (moduleId: number, score: number) => void;
 
   // Theming & Accessibility
+<<<<<<< HEAD
   setThemeMode: (mode: 'system' | 'light' | 'dark') => void;
+=======
+  setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
+  setAppThemeColor: (color: 'emerald' | 'blue' | 'purple') => void;
+  setDarkMode: (isDark: boolean) => void;
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
   // Notification Preferences
   setNotificationPref: (key: string, value: boolean) => void;
@@ -147,7 +164,7 @@ export interface UserActions {
 const DEFAULT_BADGES: Badge[] = [
   { id: "first-lesson", name: "First Steps", description: "Complete your first lesson", emoji: "🎯", unlockedAt: null },
   { id: "three-lessons", name: "Getting Smart", description: "Complete 3 lessons", emoji: "📚", unlockedAt: null },
-  { id: "all-lessons", name: "Financial Guru", description: "Complete all 6 lessons", emoji: "🏆", unlockedAt: null },
+  { id: "all-lessons", name: "Financial Guru", description: "Complete every lesson", emoji: "🏆", unlockedAt: null },
   { id: "quiz-perfect", name: "Perfect Score", description: "Get 100% on any quiz", emoji: "💯", unlockedAt: null },
   { id: "streak-3", name: "On Fire", description: "Maintain a 3-day streak", emoji: "🔥", unlockedAt: null },
   { id: "streak-7", name: "Unstoppable", description: "Maintain a 7-day streak", emoji: "⚡", unlockedAt: null },
@@ -178,7 +195,15 @@ const DEFAULT_STATE: UserState = {
   // truth and syncs the real value on first load.
   badges: DEFAULT_BADGES,
   quizScores: {},
+<<<<<<< HEAD
   themeMode: 'system',
+=======
+  completedLessonIds: [],
+  totalTimeSpentSeconds: 0,
+  colorBlindMode: 'none',
+  appThemeColor: 'emerald',
+  isDarkMode: false,
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
   notificationPrefs: {
     dailyReminders: true,
     streakAlerts: true,
@@ -262,6 +287,8 @@ export const useUserStore = create<UserState & UserActions>()(
                 quizScores: {},
                 simulationHistory: [],
                 lastAssessedAt: null,
+                completedLessonIds: [],
+                totalTimeSpentSeconds: 0,
               }
             : {};
           return {
@@ -277,6 +304,10 @@ export const useUserStore = create<UserState & UserActions>()(
               user.createdAt ||
               (isDifferentAccount ? new Date().toISOString() : state.createdAt) ||
               new Date().toISOString(),
+            // Explicit null from the backend means "never assessed" and must win —
+            // only fall back to local state when the field is truly absent.
+            lastAssessedAt:
+              user.lastAssessedAt !== undefined ? user.lastAssessedAt : state.lastAssessedAt,
           };
         }),
 
@@ -308,6 +339,8 @@ export const useUserStore = create<UserState & UserActions>()(
                   unlockedAt: b.unlockedAt ? Date.parse(b.unlockedAt) : null,
                 }))
               : state.badges,
+          completedLessonIds: progress.completedLessonIds ?? state.completedLessonIds,
+          totalTimeSpentSeconds: progress.totalTimeSpentSeconds ?? state.totalTimeSpentSeconds,
         })),
 
       // Syncs just the badge list from the backend (used by the Badges screen).
@@ -435,7 +468,13 @@ export const useUserStore = create<UserState & UserActions>()(
       clearSimulationHistory: () => set({ simulationHistory: [] }),
 
       // ── Theming & Accessibility ─────────────────────────────────────────
+<<<<<<< HEAD
       setThemeMode: (mode) => set({ themeMode: mode }),
+=======
+      setColorBlindMode: (mode) => set({ colorBlindMode: mode }),
+      setAppThemeColor: (color) => set({ appThemeColor: color }),
+      setDarkMode: (isDark) => set({ isDarkMode: isDark }),
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
       // ── Notification Preferences ─────────────────────────────────────────
       setNotificationPref: (key, value) =>
@@ -468,7 +507,15 @@ export const useUserStore = create<UserState & UserActions>()(
         lastActiveDate: state.lastActiveDate,
         badges: state.badges,
         quizScores: state.quizScores,
+<<<<<<< HEAD
         themeMode: state.themeMode,
+=======
+        completedLessonIds: state.completedLessonIds,
+        totalTimeSpentSeconds: state.totalTimeSpentSeconds,
+        colorBlindMode: state.colorBlindMode,
+        appThemeColor: state.appThemeColor,
+        isDarkMode: state.isDarkMode,
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
         notificationPrefs: state.notificationPrefs,
         createdAt: state.createdAt,
         lastAssessedAt: state.lastAssessedAt,

@@ -16,6 +16,7 @@ module.exports = {
           slateBg: 'var(--color-brand-slateBg)',
           dark: 'var(--color-brand-dark)',
           gray: 'var(--color-brand-gray)',
+          border: 'var(--color-brand-border)',
         }
       },
       fontFamily: {

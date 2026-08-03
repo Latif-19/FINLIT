@@ -15,10 +15,12 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { authService } from "../services/auth";
 import "@/types/navigation";
 
 export default function RegisterScreen() {
+  const colors = useThemeColors();
   const [name, setName] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -98,6 +100,7 @@ export default function RegisterScreen() {
       keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
       className="flex-1 bg-white dark:bg-slate-950"
     >
+<<<<<<< HEAD
       {/* Top Money Image Banner */}
       <View className="h-60 w-full relative">
         <ImageBackground
@@ -107,6 +110,156 @@ export default function RegisterScreen() {
         >
           <View className="absolute inset-0 bg-black/20" />
           {/* Back Button over Image */}
+=======
+      {/* Decorative Accent Background */}
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
+
+      <ScrollView
+        contentContainerStyle={{ 
+          flexGrow: 1, 
+          justifyContent: keyboardVisible ? "flex-start" : "center", 
+          paddingVertical: 40 
+        }}
+        className="px-6"
+        automaticallyAdjustKeyboardInsets={true}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Back Button */}
+        <Pressable
+          onPress={() => router.back()}
+          className="absolute top-14 left-6 z-10 p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
+        >
+          <Ionicons name="arrow-back" size={22} color={colors.navy} />
+        </Pressable>
+
+        {/* Branding header */}
+        <View className="items-center mt-12">
+          <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
+            <Image
+              source={require("../assets/images/finlit-logo.jpeg")}
+              className="w-14 h-14"
+              resizeMode="contain"
+            />
+          </View>
+          <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+            Create Account
+          </Text>
+          <Text className="text-brand-gray font-inter text-sm mt-1 text-center">
+            Start your journey to financial literacy.
+          </Text>
+        </View>
+
+        {/* Form Card */}
+        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-brand-border mt-8">
+          {/* Full Name */}
+          <View>
+            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Full Name</Text>
+            <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+              <Ionicons name="person-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your full name"
+                autoCapitalize="words"
+                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+              />
+            </View>
+          </View>
+
+          {/* Email Address */}
+          <View className="mt-4">
+            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Email Address</Text>
+            <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+              <Ionicons name="mail-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+              />
+            </View>
+          </View>
+
+          {/* Password */}
+          <View className="mt-4">
+            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Password</Text>
+            <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+              <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
+              <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Create a password"
+                secureTextEntry={!passwordVisible}
+                autoCapitalize="none"
+                autoComplete="off"
+                textContentType="none"
+                importantForAutofill="no"
+                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+              />
+              <Pressable onPress={() => setPasswordVisible(!passwordVisible)} className="p-1">
+                <Ionicons
+                  name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color={colors.gray}
+                />
+              </Pressable>
+            </View>
+          </View>
+
+          {/* Confirm Password */}
+          <View className="mt-4">
+            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Confirm Password</Text>
+            <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+              <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
+              <TextInput
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                placeholder="Confirm your password"
+                secureTextEntry={!confirmPasswordVisible}
+                autoCapitalize="none"
+                autoComplete="off"
+                textContentType="none"
+                importantForAutofill="no"
+                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+              />
+              <Pressable onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="p-1">
+                <Ionicons
+                  name={confirmPasswordVisible ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color={colors.gray}
+                />
+              </Pressable>
+            </View>
+            {confirmPassword.length > 0 && (
+              <View className="flex-row items-center mt-1.5">
+                <Ionicons
+                  name={password === confirmPassword ? "checkmark-circle" : "close-circle"}
+                  size={14}
+                  color={password === confirmPassword ? "#16A34A" : "#dc2626"}
+                />
+                <Text
+                  className={`text-xs font-inter-medium ml-1.5 ${
+                    password === confirmPassword ? "text-brand-emerald" : "text-red-600"
+                  }`}
+                >
+                  {password === confirmPassword ? "Passwords match" : "Passwords don't match yet"}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {/* Error Message */}
+          {error ? (
+            <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
+              <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+              <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
+            </View>
+          ) : null}
+
+          {/* Register Button */}
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
           <Pressable
             onPress={() => router.back()}
             className="z-20 w-10 h-10 bg-white/90 rounded-full justify-center items-center shadow-md active:opacity-80 dark:bg-slate-900/90"
@@ -116,6 +269,7 @@ export default function RegisterScreen() {
         </ImageBackground>
       </View>
 
+<<<<<<< HEAD
       {/* Main Content White Card overlapping the top banner */}
       <View className="flex-1 -mt-12 bg-white rounded-t-[36px] px-6 pt-4 dark:bg-slate-950">
         <ScrollView
@@ -128,6 +282,24 @@ export default function RegisterScreen() {
         >
           {/* Logo placed directly on top of Create Account title */}
           <View className="items-center mt-2 mb-6">
+=======
+          {/* Divider */}
+          <View className="flex-row items-center my-6">
+            <View className="flex-1 h-px bg-brand-slateBg" />
+            <Text className="mx-4 text-brand-gray font-inter-semibold text-xs uppercase tracking-wider">OR</Text>
+            <View className="flex-1 h-px bg-brand-slateBg" />
+          </View>
+
+          {/* Google */}
+          <Pressable
+            onPress={() => Alert.alert("Coming Soon", "Google sign-up will be available in the next update.")}
+            style={({ pressed }) => ({
+              transform: [{ scale: pressed ? 0.98 : 1 }],
+              opacity: pressed ? 0.95 : 1,
+            })}
+            className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center shadow-sm active:bg-brand-slateBg"
+          >
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             <Image
               source={require("../assets/images/finlit-logo.png")}
               className="w-20 h-20"
@@ -136,8 +308,29 @@ export default function RegisterScreen() {
             <Text className="text-[32px] font-inter-bold text-brand-navy mt-2 tracking-tight dark:text-slate-100">
               Create Account
             </Text>
+<<<<<<< HEAD
             <Text className="text-brand-gray font-inter text-sm mt-1 text-center dark:text-slate-400">
               Start your journey to financial literacy.
+=======
+          </Pressable>
+
+          {/* Facebook */}
+          <Pressable
+            onPress={() => Alert.alert("Coming Soon", "Facebook sign-up will be available in the next update.")}
+            style={({ pressed }) => ({
+              transform: [{ scale: pressed ? 0.98 : 1 }],
+              opacity: pressed ? 0.95 : 1,
+            })}
+            className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center mt-3 shadow-sm active:bg-brand-slateBg"
+          >
+            <Image
+              source={require("../assets/images/facebook-logo.jpg")}
+              className="w-6 h-6 rounded-full"
+              resizeMode="contain"
+            />
+            <Text className="ml-3 font-inter-semibold text-brand-dark text-base">
+              Sign up with Facebook
+>>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             </Text>
           </View>
 

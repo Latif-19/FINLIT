@@ -17,10 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Gamification logic: building the ranked leaderboard and scoring quizzes
- * server-side (the source of truth for what's correct).
- */
+
 @Service
 public class GamificationService {
 

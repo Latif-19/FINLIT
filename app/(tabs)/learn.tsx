@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   ScrollView,
   Text,
@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../../store/useUserStore";
 import * as Haptics from "expo-haptics";
 import * as Speech from "expo-speech";
@@ -30,6 +31,7 @@ const LESSON_ICONS: Record<number, React.ComponentProps<typeof Ionicons>["name"]
   4: "shield-checkmark-outline", // Pensions & Provident Funds
   5: "school-outline",           // Student Loans & Bursaries
   6: "briefcase-outline",        // Side Hustles & Business Finance
+  7: "id-card-outline",          // Credit Scores & Digital Credit History
 };
 
 function lessonIcon(id: number): React.ComponentProps<typeof Ionicons>["name"] {
@@ -53,10 +55,12 @@ interface LessonModule {
 const { width } = Dimensions.get("window");
 
 export default function LearnScreen() {
+  const colors = useThemeColors();
   const lessonsCompleted = useUserStore((s) => s.lessonsCompleted);
   const userXp = useUserStore((s) => s.xp);
   const streak = useUserStore((s) => s.streak);
   const userGoal = useUserStore((s) => s.goal);
+  const completedLessonIds = useUserStore((s) => s.completedLessonIds);
 
   // Main UI States
   const [selectedModule, setSelectedModule] = useState<LessonModule | null>(null);
@@ -89,8 +93,11 @@ export default function LearnScreen() {
     setSelectedModule(mod);
   };
 
+  const sessionStartRef = useRef<number | null>(null);
+
   // Starts the interactive slide-by-slide session
   const startSession = (lesson: LessonModule) => {
+    sessionStartRef.current = Date.now();
     setSelectedModule(null);
     setSessionLesson(lesson);
     setSessionStep(0);
@@ -174,6 +181,10 @@ export default function LearnScreen() {
       const lessonId = sessionLesson.id;
       const xpVal = sessionLesson.xpVal;
       const answers = quizAnswers;
+      const timeSpentSeconds = sessionStartRef.current
+        ? Math.round((Date.now() - sessionStartRef.current) / 1000)
+        : undefined;
+      sessionStartRef.current = null;
 
       Speech.stop();
       setIsSpeaking(false);
@@ -188,7 +199,7 @@ export default function LearnScreen() {
 
       const store = useUserStore.getState();
       try {
-        await progressService.completeLesson(lessonId);
+        await progressService.completeLesson(lessonId, timeSpentSeconds);
         if (answers.length > 0) {
           await gamificationService.submitQuizScore({ moduleId: lessonId, answers });
         }
@@ -319,6 +330,7 @@ export default function LearnScreen() {
     "🦉: Tier 3 pensions are voluntary, tax-free, and let you withdraw early in emergencies.",
     "🦉: Student loans (SLTF) are now guarantor-free with a Ghana Card. Use them strictly for educational expenses!",
     "🦉: Keep side hustle funds separate from daily money. Separating accounts is key to campus business success!",
+    "🦉: A single late Fido or Qwikloan repayment can quietly shrink your future borrowing limit. Digital lenders are watching your MoMo activity!",
   ];
   const activeTip = mascotTips[lessonsCompleted % mascotTips.length] || mascotTips[0];
 
@@ -332,28 +344,38 @@ export default function LearnScreen() {
   };
   const recommendedLesson = userGoal ? GOAL_LESSON[userGoal] : null;
 
+  // Goal-relevant lesson first, same six lessons otherwise — nothing hidden,
+  // just resequenced. LESSON_MODULES itself is left untouched since
+  // data/recommendations.ts indexes it in its original order.
+  const orderedModules: LessonModule[] = recommendedLesson
+    ? [
+        ...LESSON_MODULES.filter((m) => m.id === recommendedLesson.id),
+        ...LESSON_MODULES.filter((m) => m.id !== recommendedLesson.id),
+      ]
+    : LESSON_MODULES;
+
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* DUOLINGO STYLE HEADER STATS */}
-      <View className="flex-row justify-between items-center bg-white px-5 pt-3.5 pb-3.5 border-b-2 border-slate-200">
+      <View className="flex-row justify-between items-center bg-brand-bg px-5 pt-3.5 pb-3.5 border-b-2 border-brand-border">
         <View className="flex-1">
-          <Text className="text-[10px] font-inter-bold text-slate-500 tracking-widest">
+          <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest">
             UNIT {Math.floor(lessonsCompleted / 4) + 1}
           </Text>
-          <Text className="text-[15px] font-inter-bold text-slate-900">
+          <Text className="text-[15px] font-inter-bold text-brand-dark">
             Ghana Personal Finance
           </Text>
         </View>
         <View className="flex-row gap-3">
-          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+          <View className="flex-row items-center bg-brand-slateBg px-2 py-1 rounded-xl gap-[3px]">
             <Text className="text-[13px]">🔥</Text>
-            <Text className="text-xs font-inter-bold text-slate-600">{streak}</Text>
+            <Text className="text-xs font-inter-bold text-brand-gray">{streak}</Text>
           </View>
-          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+          <View className="flex-row items-center bg-brand-slateBg px-2 py-1 rounded-xl gap-[3px]">
             <Text className="text-[13px]">⚡</Text>
-            <Text className="text-xs font-inter-bold text-slate-600">{userXp}</Text>
+            <Text className="text-xs font-inter-bold text-brand-gray">{userXp}</Text>
           </View>
-          <View className="flex-row items-center bg-slate-100 px-2 py-1 rounded-xl gap-[3px]">
+          <View className="flex-row items-center bg-brand-slateBg px-2 py-1 rounded-xl gap-[3px]">
             <Text className="text-[13px]">❤️</Text>
             <Text className="text-xs font-inter-bold text-red-500">{hearts}</Text>
           </View>
@@ -364,11 +386,12 @@ export default function LearnScreen() {
         contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Personalized Path Banner — shown only after assessment is done */}
-        {userGoal && recommendedLesson && (
+        {/* Personalized Path Banner — shown only after assessment is done, and
+            hidden once that lesson is actually completed */}
+        {userGoal && recommendedLesson && !completedLessonIds.includes(recommendedLesson.id) && (
           <View className="bg-brand-emerald/5 border border-brand-emerald/20 rounded-2xl p-4 mb-5 flex-row items-center gap-3">
             <View className="w-10 h-10 bg-brand-emerald/10 rounded-xl items-center justify-center">
-              <Ionicons name={lessonIcon(recommendedLesson.id)} size={20} color="#16A34A" />
+              <Ionicons name={lessonIcon(recommendedLesson.id)} size={20} color={colors.emerald} />
             </View>
             <View className="flex-1">
               <Text className="text-[9px] font-inter-bold text-brand-emerald tracking-widest uppercase">
@@ -385,28 +408,28 @@ export default function LearnScreen() {
         )}
 
         {/* Certificate Progress Card */}
-        <View className="bg-white rounded-2xl p-4 border-2 border-slate-200 shadow-sm mb-5">
+        <View className="bg-brand-bg rounded-2xl p-4 border-2 border-brand-border shadow-sm mb-5">
           <View className="flex-row justify-between items-center">
             <View className="flex-row items-center bg-[#16A34A12] px-2 py-1 rounded-md gap-[3px]">
-              <Ionicons name="ribbon-outline" size={15} color="#16a34a" />
+              <Ionicons name="ribbon-outline" size={15} color={colors.emerald} />
               <Text className="text-[9px] font-inter-bold text-green-600">
                 ACCREDITED PATHWAY
               </Text>
             </View>
-            <Text className="text-[11px] font-inter-semibold text-slate-500">
+            <Text className="text-[11px] font-inter-semibold text-brand-gray">
               {lessonsCompleted}/{LESSON_MODULES.length} Completed
             </Text>
           </View>
-          <Text className="text-base font-inter-bold text-slate-900 mt-2.5">
+          <Text className="text-base font-inter-bold text-brand-dark mt-2.5">
             Financial Literacy Certificate
           </Text>
-          <Text className="text-xs text-slate-500 mt-1 leading-4">
+          <Text className="text-xs text-brand-gray mt-1 leading-4">
             Walk down the learning path and complete all {LESSON_MODULES.length} lessons to earn
             your official FinLit certificate.
           </Text>
 
           {/* Progress bar */}
-          <View className="h-2 bg-slate-100 rounded mt-3 overflow-hidden">
+          <View className="h-2 bg-brand-slateBg rounded mt-3 overflow-hidden">
             <View
               className="h-full bg-brand-emerald rounded"
               style={{
@@ -419,12 +442,17 @@ export default function LearnScreen() {
         {/* THE DUOLINGO WINDING PATH */}
         <View className="items-center relative my-6 w-full">
           {/* Vertical connecting line */}
-          <View className="absolute top-[30px] bottom-[30px] left-1/2 w-1.5 bg-slate-200 -translate-x-[3px] z-[-1]" />
+          <View className="absolute top-[30px] bottom-[30px] left-1/2 w-1.5 bg-brand-slateBg -translate-x-[3px] z-[-1]" />
 
-          {LESSON_MODULES.map((mod, index) => {
-            const isCompleted = lessonsCompleted >= mod.id;
-            const isUnlocked = lessonsCompleted >= index;
-            const isCurrent = lessonsCompleted === index;
+          {orderedModules.map((mod, index) => {
+            const isCompleted = completedLessonIds.includes(mod.id);
+            // Unlocked once every lesson before it IN THE DISPLAYED ORDER is
+            // done — not a raw completed-count check, since the goal-priority
+            // lesson may now sit at a different position than its id implies.
+            const isUnlocked =
+              index === 0 ||
+              orderedModules.slice(0, index).every((m) => completedLessonIds.includes(m.id));
+            const isCurrent = isUnlocked && !isCompleted;
 
             let layoutClass = "justify-center";
             if (index % 2 === 0) {
@@ -481,17 +509,17 @@ export default function LearnScreen() {
 
                 {/* Node Label Card — right side for left-offset nodes, left side for right-offset nodes */}
                 <View
-                  className="absolute w-[140px] bg-white border-[1.5px] border-slate-200 rounded-[10px] py-1.5 px-2.5 shadow-sm"
+                  className="absolute w-[140px] bg-brand-bg border-[1.5px] border-brand-border rounded-[10px] py-1.5 px-2.5 shadow-sm"
                   style={
                     index % 2 === 0
                       ? { left: width * 0.5 + 45 }
                       : { right: width * 0.5 + 45 }
                   }
                 >
-                  <Text className="text-[11px] font-inter-bold text-slate-800">
+                  <Text className="text-[11px] font-inter-bold text-brand-dark">
                     {mod.title}
                   </Text>
-                  <Text className="text-[9px] text-slate-500 mt-0.5">
+                  <Text className="text-[9px] text-brand-gray mt-0.5">
                     Lesson {mod.id} • {mod.xp}
                   </Text>
                 </View>
@@ -514,13 +542,13 @@ export default function LearnScreen() {
             </Pressable>
 
             <View
-              className="absolute w-[140px] bg-white border-[1.5px] border-slate-200 rounded-[10px] py-1.5 px-2.5 shadow-sm"
+              className="absolute w-[140px] bg-brand-bg border-[1.5px] border-brand-border rounded-[10px] py-1.5 px-2.5 shadow-sm"
               style={{ left: width * 0.5 + 45 }}
             >
-              <Text className="text-[11px] font-inter-bold text-slate-800">
+              <Text className="text-[11px] font-inter-bold text-brand-dark">
                 Accredited Certificate
               </Text>
-              <Text className="text-[9px] text-slate-500 mt-0.5">
+              <Text className="text-[9px] text-brand-gray mt-0.5">
                 {lessonsCompleted >= LESSON_MODULES.length
                   ? "Unlocked! Claim now"
                   : `Locked (Complete ${LESSON_MODULES.length} lessons)`}
@@ -530,12 +558,12 @@ export default function LearnScreen() {
         </View>
 
         {/* MASCOT SUPPORT TIP BANNER */}
-        <View className="flex-row bg-white border-2 border-slate-200 rounded-2xl p-4 mt-8 items-center gap-3">
-          <View className="w-[50px] h-[50px] rounded-full bg-slate-100 items-center justify-center">
+        <View className="flex-row bg-brand-bg border-2 border-brand-border rounded-2xl p-4 mt-8 items-center gap-3">
+          <View className="w-[50px] h-[50px] rounded-full bg-brand-slateBg items-center justify-center">
             <Text className="text-[28px]">🦉</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-[13px] font-inter-semibold text-slate-700 leading-[18px]">
+            <Text className="text-[13px] font-inter-semibold text-brand-dark leading-[18px]">
               {activeTip}
             </Text>
           </View>
@@ -551,13 +579,13 @@ export default function LearnScreen() {
       >
         <View className="flex-1 bg-slate-900/40 justify-end">
           <Pressable className="flex-1" onPress={() => setSelectedModule(null)} />
-          <View className="bg-white rounded-t-3xl p-6 border-2 border-slate-200 border-b-0 shadow-xl">
+          <View className="bg-brand-bg rounded-t-3xl p-6 border-2 border-brand-border border-b-0 shadow-xl">
             {selectedModule && (
               <View>
                 {/* Header */}
                 <View className="flex-row justify-between items-center mb-4">
-                  <View className="bg-slate-100 px-2 py-1 rounded-md">
-                    <Text className="text-[9px] font-inter-bold text-slate-600">
+                  <View className="bg-brand-slateBg px-2 py-1 rounded-md">
+                    <Text className="text-[9px] font-inter-bold text-brand-gray">
                       LESSON {selectedModule.id} OF {LESSON_MODULES.length}
                     </Text>
                   </View>
@@ -565,25 +593,25 @@ export default function LearnScreen() {
                     onPress={() => setSelectedModule(null)}
                     className="p-1 active:opacity-80"
                   >
-                    <Ionicons name="close" size={22} color="#94a3b8" />
+                    <Ionicons name="close" size={22} color={colors.gray} />
                   </Pressable>
                 </View>
 
                 {/* Content */}
-                <Text className="text-xl font-inter-bold text-slate-900 mb-2">
+                <Text className="text-xl font-inter-bold text-brand-dark mb-2">
                   {selectedModule.title}
                 </Text>
-                <Text className="text-sm text-slate-600 leading-5 mb-[18px]">
+                <Text className="text-sm text-brand-gray leading-5 mb-[18px]">
                   {selectedModule.desc}
                 </Text>
 
                 <View className="flex-row items-center mb-5">
-                  <Text className="text-[13px] text-slate-500">Rewards: </Text>
-                  <Ionicons name="flash" size={14} color="#d97706" />
+                  <Text className="text-[13px] text-brand-gray">Rewards: </Text>
+                  <Ionicons name="flash" size={14} color={colors.gold} />
                   <Text className="text-sm font-inter-bold text-amber-600 ml-1">
                     {selectedModule.xp}{" "}
                   </Text>
-                  <Text className="text-[13px] text-slate-500">• {selectedModule.duration}</Text>
+                  <Text className="text-[13px] text-brand-gray">• {selectedModule.duration}</Text>
                 </View>
 
                 {/* Primary Button */}
@@ -592,7 +620,7 @@ export default function LearnScreen() {
                   className="bg-green-500 border-b-[5px] border-b-green-600 h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
                 >
                   <Text className="text-white text-base font-inter-bold tracking-wider">
-                    {lessonsCompleted >= selectedModule.id
+                    {completedLessonIds.includes(selectedModule.id)
                       ? "REVIEW LESSON"
                       : "START +100 XP"}
                   </Text>
@@ -609,17 +637,17 @@ export default function LearnScreen() {
         animationType="slide"
         onRequestClose={confirmQuitSession}
       >
-        <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+        <SafeAreaView edges={["top"]} className="flex-1 bg-brand-bg">
           {sessionLesson && (
             <View className="flex-1">
               {/* Header: Close / Progress / Hearts */}
-              <View className="flex-row items-center px-4 py-3 gap-[14px] border-b-[1.5px] border-slate-200">
+              <View className="flex-row items-center px-4 py-3 gap-[14px] border-b-[1.5px] border-brand-border">
                 <Pressable onPress={confirmQuitSession} className="p-1 active:opacity-80">
-                  <Ionicons name="close" size={26} color="#94a3b8" />
+                  <Ionicons name="close" size={26} color={colors.gray} />
                 </Pressable>
 
                 {/* Progress bar */}
-                <View className="flex-1 h-4 bg-slate-200 rounded-lg overflow-hidden relative">
+                <View className="flex-1 h-4 bg-brand-slateBg rounded-lg overflow-hidden relative">
                   {(() => {
                     const quizList = MODULE_QUIZZES[sessionLesson.id] || [];
                     const totalSteps = sessionLesson.content.length + quizList.length;
@@ -658,7 +686,7 @@ export default function LearnScreen() {
                 <View className="flex-1 p-6 justify-center items-center">
                   {/* Mascot Dialogue */}
                   <View className="flex-row items-start mb-7 w-full">
-                    <View className="w-[60px] h-[60px] rounded-full bg-slate-100 border-2 border-slate-200 justify-center items-center">
+                    <View className="w-[60px] h-[60px] rounded-full bg-brand-slateBg border-2 border-brand-border justify-center items-center">
                       <Text className="text-[36px]">🦉</Text>
                     </View>
                     <View
@@ -676,8 +704,8 @@ export default function LearnScreen() {
                         zIndex: 2,
                       }}
                     />
-                    <View className="flex-1 bg-slate-100 border-[1.5px] border-slate-200 rounded-[18px] p-4 shadow-sm">
-                      <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                    <View className="flex-1 bg-brand-slateBg border-[1.5px] border-brand-border rounded-[18px] p-4 shadow-sm">
+                      <Text className="text-base text-brand-dark leading-6 font-inter-medium">
                         {sessionLesson.content[sessionStep]}
                       </Text>
                     </View>
@@ -685,7 +713,7 @@ export default function LearnScreen() {
 
                   {/* Slide image (if provided) */}
                   {sessionLesson.images && sessionLesson.images[sessionStep] && (
-                    <View className="w-full mb-4 rounded-2xl overflow-hidden border border-slate-200">
+                    <View className="w-full mb-4 rounded-2xl overflow-hidden border border-brand-border">
                       <Image
                         source={sessionLesson.images[sessionStep]}
                         className="w-full h-[180px]"
@@ -697,7 +725,7 @@ export default function LearnScreen() {
                   {/* Interactive key takeaway illustration */}
                   <View className="bg-amber-50 border-[1.5px] border-amber-200 rounded-2xl p-4 w-full mt-3">
                     <View className="flex-row items-center gap-2 mb-2">
-                      <Ionicons name="bulb" size={20} color="#eab308" />
+                      <Ionicons name="bulb" size={20} color={colors.gold} />
                       <Text className="text-[11px] font-inter-bold text-amber-700 tracking-wider">
                         KEY LITERACY CONCEPT
                       </Text>
@@ -715,20 +743,22 @@ export default function LearnScreen() {
                         "SLTF student loans are now guarantor-free with a Ghana Card. Use them strictly for educational expenses to avoid long-term debt."}
                       {sessionLesson.id === 6 &&
                         "Always separate personal and business finances. A dedicated MoMo merchant wallet helps track true profit and prevents overspending."}
+                      {sessionLesson.id === 7 &&
+                        "Your MoMo history IS your credit file in Ghana. Consistent activity and on-time digital loan repayments build the score lenders check before approving you."}
                     </Text>
                   </View>
 
                   {/* Listen / Audio button */}
                   <Pressable
                     onPress={toggleSpeech}
-                    className="flex-row items-center justify-center mt-4 bg-slate-100 rounded-xl py-3 px-5 active:bg-slate-200 gap-2"
+                    className="flex-row items-center justify-center mt-4 bg-brand-slateBg rounded-xl py-3 px-5 active:bg-brand-slateBg gap-2"
                   >
                     <Ionicons
                       name={isSpeaking || isPlaying ? "pause-circle" : "play-circle"}
                       size={20}
-                      color="#475569"
+                      color={colors.gray}
                     />
-                    <Text className="text-sm font-inter-semibold text-slate-600">
+                    <Text className="text-sm font-inter-semibold text-brand-gray">
                       {isSpeaking || isPlaying
                         ? "Stop Listening"
                         : sessionLesson.audioLocalPath
@@ -751,7 +781,7 @@ export default function LearnScreen() {
                     <Text className="text-[26px] font-inter-bold text-red-500 mb-2.5">
                       No Hearts Left!
                     </Text>
-                    <Text className="text-[15px] text-slate-600 text-center leading-[22px] mb-8">
+                    <Text className="text-[15px] text-brand-gray text-center leading-[22px] mb-8">
                       You made too many mistakes in this quiz. You can spend 50 XP to refill your
                       hearts, or exit the lesson.
                     </Text>
@@ -769,9 +799,9 @@ export default function LearnScreen() {
                       onPress={() => {
                         setSessionLesson(null);
                       }}
-                      className="w-full h-[52px] rounded-2xl border-2 border-slate-200 justify-center items-center active:opacity-80"
+                      className="w-full h-[52px] rounded-2xl border-2 border-brand-border justify-center items-center active:opacity-80"
                     >
-                      <Text className="text-slate-500 text-base font-inter-bold">
+                      <Text className="text-brand-gray text-base font-inter-bold">
                         Quit Lesson
                       </Text>
                     </Pressable>
@@ -780,7 +810,7 @@ export default function LearnScreen() {
                   /* Live Quiz Question */
                   <ScrollView className="flex-1 p-6">
                     <View className="flex-row items-start mb-7 w-full">
-                      <View className="w-[60px] h-[60px] rounded-full bg-slate-100 border-2 border-slate-200 justify-center items-center">
+                      <View className="w-[60px] h-[60px] rounded-full bg-brand-slateBg border-2 border-brand-border justify-center items-center">
                         <Text className="text-[36px]">🦉</Text>
                       </View>
                       <View
@@ -798,8 +828,8 @@ export default function LearnScreen() {
                           zIndex: 2,
                         }}
                       />
-                      <View className="flex-1 bg-slate-100 border-[1.5px] border-slate-200 rounded-[18px] p-4 shadow-sm">
-                        <Text className="text-base text-slate-700 leading-6 font-inter-bold">
+                      <View className="flex-1 bg-brand-slateBg border-[1.5px] border-brand-border rounded-[18px] p-4 shadow-sm">
+                        <Text className="text-base text-brand-dark leading-6 font-inter-bold">
                           {"Let's verify what you've learned! Answer the question below:"}
                         </Text>
                       </View>
@@ -809,7 +839,7 @@ export default function LearnScreen() {
                       const quizList = MODULE_QUIZZES[sessionLesson.id];
                       if (!quizList || quizList.length === 0) {
                         return (
-                          <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                          <Text className="text-base text-brand-dark leading-6 font-inter-medium">
                             No quiz configured for this lesson.
                           </Text>
                         );
@@ -817,7 +847,7 @@ export default function LearnScreen() {
                       const currentQuestion = quizList[currentQuestionIndex];
                       if (!currentQuestion) {
                         return (
-                          <Text className="text-base text-slate-700 leading-6 font-inter-medium">
+                          <Text className="text-base text-brand-dark leading-6 font-inter-medium">
                             No question found for this quiz stage.
                           </Text>
                         );
@@ -825,10 +855,10 @@ export default function LearnScreen() {
 
                       return (
                         <View className="mt-6 pb-10">
-                          <Text className="text-[10px] font-inter-bold text-slate-500 tracking-widest mb-1.5">
+                          <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest mb-1.5">
                             QUESTION {currentQuestionIndex + 1} OF {quizList.length}
                           </Text>
-                          <Text className="text-[22px] font-inter-bold text-slate-900 leading-[30px] mb-[22px]">
+                          <Text className="text-[22px] font-inter-bold text-brand-dark leading-[30px] mb-[22px]">
                             {currentQuestion.question}
                           </Text>
 
@@ -837,9 +867,9 @@ export default function LearnScreen() {
                               const isSelected = selectedOptionIndex === i;
 
                               let optBtnClass =
-                                "p-4 rounded-2xl border-2 border-slate-200 border-b-[6px] bg-white flex-row items-center justify-between active:opacity-80";
+                                "p-4 rounded-2xl border-2 border-brand-border border-b-[6px] bg-brand-bg flex-row items-center justify-between active:opacity-80";
                               let optTextClass =
-                                "text-[17px] font-inter-semibold text-slate-700 flex-1 mr-2.5 leading-6";
+                                "text-[17px] font-inter-semibold text-brand-dark flex-1 mr-2.5 leading-6";
                               let optionIcon = "ellipse-outline";
                               let optionIconColor = "#94a3b8";
 
@@ -890,20 +920,20 @@ export default function LearnScreen() {
                   <Text className="text-[26px] font-inter-bold text-green-600 mb-2">
                     Lesson Complete!
                   </Text>
-                  <Text className="text-sm text-slate-600 text-center leading-5 mb-8">
+                  <Text className="text-sm text-brand-gray text-center leading-5 mb-8">
                     You successfully finished the course and demonstrated master-level understanding.
                   </Text>
 
-                  <View className="flex-row bg-brand-slateBg border-2 border-slate-200 rounded-[20px] p-5 w-full gap-4">
-                    <View className="flex-1 items-center bg-white border-[1.5px] border-slate-200 rounded-[14px] py-3.5">
+                  <View className="flex-row bg-brand-slateBg border-2 border-brand-border rounded-[20px] p-5 w-full gap-4">
+                    <View className="flex-1 items-center bg-brand-bg border-[1.5px] border-brand-border rounded-[14px] py-3.5">
                       <Text className="text-base mb-1">⚡</Text>
-                      <Text className="text-base font-inter-bold text-slate-900">+{sessionLesson.xpVal} XP</Text>
-                      <Text className="text-[9px] font-inter-bold text-slate-500 mt-0.5">BONUS POINTS</Text>
+                      <Text className="text-base font-inter-bold text-brand-dark">+{sessionLesson.xpVal} XP</Text>
+                      <Text className="text-[9px] font-inter-bold text-brand-gray mt-0.5">BONUS POINTS</Text>
                     </View>
-                    <View className="flex-1 items-center bg-white border-[1.5px] border-slate-200 rounded-[14px] py-3.5">
+                    <View className="flex-1 items-center bg-brand-bg border-[1.5px] border-brand-border rounded-[14px] py-3.5">
                       <Text className="text-base mb-1">❤️</Text>
-                      <Text className="text-base font-inter-bold text-slate-900">{hearts}/5</Text>
-                      <Text className="text-[9px] font-inter-bold text-slate-500 mt-0.5">HEARTS LEFT</Text>
+                      <Text className="text-base font-inter-bold text-brand-dark">{hearts}/5</Text>
+                      <Text className="text-[9px] font-inter-bold text-brand-gray mt-0.5">HEARTS LEFT</Text>
                     </View>
                   </View>
                 </View>
@@ -917,7 +947,7 @@ export default function LearnScreen() {
                       ? "bg-green-100 border-t-green-200"
                       : isAnswerChecked && isAnswerCorrect === false
                       ? "bg-red-100 border-t-red-200"
-                      : "bg-white border-t-slate-200"
+                      : "bg-brand-bg border-t-slate-200"
                   }`}
                 >
                   {isAnswerChecked && (
@@ -956,7 +986,7 @@ export default function LearnScreen() {
                         ? "bg-red-500 border-b-[5px] border-b-red-700"
                         : sessionStep === sessionLesson.content.length &&
                           selectedOptionIndex === null
-                        ? "bg-slate-200 border-b-[5px] border-b-slate-300"
+                        ? "bg-brand-slateBg border-b-[5px] border-b-slate-300"
                         : "bg-green-500 border-b-[5px] border-b-green-600"
                     }`}
                   >

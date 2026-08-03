@@ -36,10 +36,10 @@ public class ProgressService {
     private final BadgeService badgeService;
 
     public ProgressService(UserRepository userRepository,
-                           LessonRepository lessonRepository,
-                           LessonCompletionRepository lessonCompletionRepository,
-                           QuizAttemptRepository quizAttemptRepository,
-                           BadgeService badgeService) {
+                            LessonRepository lessonRepository,
+                            LessonCompletionRepository lessonCompletionRepository,
+                            QuizAttemptRepository quizAttemptRepository,
+                            BadgeService badgeService) {
         this.userRepository = userRepository;
         this.lessonRepository = lessonRepository;
         this.lessonCompletionRepository = lessonCompletionRepository;
@@ -57,6 +57,18 @@ public class ProgressService {
         long completed = lessonCompletionRepository.countByUserId(userId);
         long total = lessonRepository.count();
 
+        // Which specific lessons are done — lets the frontend unlock lessons by
+        // ID rather than assuming completion always happens in a fixed order
+        // (needed once the Learn tab can reorder lessons by goal). Also gives
+        // us total time spent learning for free from the same query.
+        List<LessonCompletion> completions = lessonCompletionRepository.findByUserId(userId);
+        List<Long> completedLessonIds = completions.stream()
+                .map(LessonCompletion::getLessonId)
+                .toList();
+        int totalTimeSpentSeconds = completions.stream()
+                .mapToInt(LessonCompletion::getTimeSpentSeconds)
+                .sum();
+
         // Group quiz attempts into a per-module list of scores, in order.
         Map<Long, List<Integer>> quizScores = new LinkedHashMap<>();
         quizAttemptRepository.findByUserIdOrderByTakenAtAsc(userId).forEach(attempt ->
@@ -69,12 +81,13 @@ public class ProgressService {
         return new ProgressResponse(
                 completed, total, user.getXp(), user.getStreak(),
                 user.getScore(), user.getGoal() == null ? "" : user.getGoal(),
-                badges, quizScores, user.getSavings(), user.getTargetGoal());
+                badges, quizScores, user.getSavings(), user.getTargetGoal(),
+                completedLessonIds, totalTimeSpentSeconds);
     }
 
     // ─── Complete a lesson ──────────────────────────────────────────────────
     @Transactional
-    public ProgressResponse completeLesson(UUID userId, Long lessonId) {
+    public ProgressResponse completeLesson(UUID userId, Long lessonId, Integer timeSpentSeconds) {
         User user = requireUser(userId);
 
         Lesson lesson = lessonRepository.findById(lessonId)
@@ -85,6 +98,7 @@ public class ProgressService {
             LessonCompletion completion = new LessonCompletion();
             completion.setUserId(userId);
             completion.setLessonId(lessonId);
+            completion.setTimeSpentSeconds(timeSpentSeconds != null && timeSpentSeconds > 0 ? timeSpentSeconds : 0);
             lessonCompletionRepository.save(completion);
 
             user.setXp(user.getXp() + lesson.getXpVal());
