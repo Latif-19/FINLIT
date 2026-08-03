@@ -13,10 +13,12 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 type Step = "email" | "code" | "password" | "success";
 
 export default function ForgotPasswordScreen() {
+  const colors = useThemeColors();
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [keyboardVisible, setKeyboardVisible] = useState(false);
@@ -228,15 +230,15 @@ export default function ForgotPasswordScreen() {
         {step !== "success" && (
           <Pressable
             onPress={handleBack}
-            className="absolute top-14 left-6 z-10 p-2.5 bg-white rounded-full shadow-md border border-slate-100 active:opacity-80"
+            className="absolute top-14 left-6 z-10 p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
           >
-            <Ionicons name="arrow-back" size={22} color="#0A2540" />
+            <Ionicons name="arrow-back" size={22} color={colors.navy} />
           </Pressable>
         )}
 
         {/* Branding header */}
         <View className="items-center mt-12">
-          <View className="w-16 h-16 bg-white rounded-2xl items-center justify-center shadow-md border border-slate-100 overflow-hidden">
+          <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
             <Image
               source={require("../assets/images/finlit-logo.jpeg")}
               className="w-14 h-14"
@@ -291,14 +293,14 @@ export default function ForgotPasswordScreen() {
         </View>
 
         {/* Form Card */}
-        <View className="bg-white rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-slate-100 mt-8">
+        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-brand-border mt-8">
           
           {/* STEP 1: EMAIL INPUT */}
           {step === "email" && (
             <View>
               <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Email Address</Text>
-              <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
-                <Ionicons name="mail-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
+              <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                <Ionicons name="mail-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
@@ -355,7 +357,7 @@ export default function ForgotPasswordScreen() {
                     placeholderTextColor="#d1d5db"
                     keyboardType="number-pad"
                     maxLength={1}
-                    className="w-12 h-14 border border-slate-200 rounded-2xl text-center text-2xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
+                    className="w-12 h-14 border border-brand-border rounded-2xl text-center text-2xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
                     editable={!isLoading}
                   />
                 ))}
@@ -379,7 +381,7 @@ export default function ForgotPasswordScreen() {
                   onPress={handleResendCode}
                   disabled={!canResend || isLoading}
                 >
-                  <Text className={`text-xs font-inter-bold ${canResend ? "text-brand-emerald" : "text-slate-400"}`}>
+                  <Text className={`text-xs font-inter-bold ${canResend ? "text-brand-emerald" : "text-brand-gray"}`}>
                     {canResend ? "Resend Code" : `Resend in ${timer}s`}
                   </Text>
                 </Pressable>
@@ -410,8 +412,8 @@ export default function ForgotPasswordScreen() {
               {/* Password */}
               <View>
                 <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">New Password</Text>
-                <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
-                  <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
+                <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                  <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                   <TextInput
                     value={password}
                     onChangeText={setPassword}
@@ -428,7 +430,7 @@ export default function ForgotPasswordScreen() {
                     <Ionicons
                       name={passwordVisible ? "eye-off-outline" : "eye-outline"}
                       size={20}
-                      color="#6B7280"
+                      color={colors.gray}
                     />
                   </Pressable>
                 </View>
@@ -437,8 +439,8 @@ export default function ForgotPasswordScreen() {
               {/* Confirm Password */}
               <View className="mt-4">
                 <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Confirm Password</Text>
-                <View className="border border-slate-200 rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
-                  <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={{ marginRight: 10 }} />
+                <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
+                  <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                   <TextInput
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
@@ -455,7 +457,7 @@ export default function ForgotPasswordScreen() {
                     <Ionicons
                       name={confirmPasswordVisible ? "eye-off-outline" : "eye-outline"}
                       size={20}
-                      color="#6B7280"
+                      color={colors.gray}
                     />
                   </Pressable>
                 </View>
@@ -507,7 +509,7 @@ export default function ForgotPasswordScreen() {
           {step === "success" && (
             <View className="items-center py-4">
               <View className="w-20 h-20 bg-brand-emerald/10 rounded-full items-center justify-center border border-brand-emerald/20 mb-4">
-                <Ionicons name="checkmark-circle" size={54} color="#16A34A" />
+                <Ionicons name="checkmark-circle" size={54} color={colors.emerald} />
               </View>
               
               <Text className="text-brand-dark font-inter text-sm text-center leading-6 px-4">

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Pressable, ScrollView, Text, View, ActivityIndicator, Modal, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import { progressService } from "../services/progress";
 import { ASSESSMENT_QUESTIONS } from "@/data/assessment";
@@ -10,6 +11,7 @@ import { ASSESSMENT_QUESTIONS } from "@/data/assessment";
 const questions = ASSESSMENT_QUESTIONS;
 
 export default function AssessmentScreen() {
+  const colors = useThemeColors();
   const [answers, setAnswers] = useState<number[]>(
     Array(questions.length).fill(0),
   );
@@ -93,9 +95,9 @@ export default function AssessmentScreen() {
         {/* Back Button */}
         <Pressable
           onPress={() => router.back()}
-          className="p-2.5 bg-white rounded-full shadow-md border border-slate-100 active:opacity-80"
+          className="p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
         >
-          <Ionicons name="arrow-back" size={22} color="#0A2540" />
+          <Ionicons name="arrow-back" size={22} color={colors.navy} />
         </Pressable>
         <Text className="text-lg font-inter-semibold text-brand-navy ml-4 flex-1 text-center pr-10">
           Assessment
@@ -112,7 +114,7 @@ export default function AssessmentScreen() {
             {completedCount} / {totalQuestions} Questions
           </Text>
         </View>
-        <View className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+        <View className="w-full h-2.5 bg-brand-slateBg rounded-full overflow-hidden">
           <View
             style={{ width: `${progressPercentage}%` }}
             className="h-full bg-brand-emerald rounded-full"
@@ -139,7 +141,7 @@ export default function AssessmentScreen() {
         {questions.map((item, qIndex) => (
           <View
             key={qIndex}
-            className="bg-white rounded-2xl p-5 border border-slate-100 mb-6 shadow-md shadow-slate-100/40"
+            className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40"
           >
             <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
               Question {qIndex + 1}
@@ -158,7 +160,7 @@ export default function AssessmentScreen() {
                   className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                     isSelected
                       ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                      : "border-slate-200 bg-slate-50/20"
+                      : "border-brand-border bg-slate-50/20"
                   }`}
                 >
                   <Text
@@ -172,7 +174,7 @@ export default function AssessmentScreen() {
                     className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                       isSelected
                         ? "border-brand-emerald bg-brand-emerald"
-                        : "border-slate-300 bg-white"
+                        : "border-brand-border bg-brand-bg"
                     }`}
                   >
                     {isSelected && (
@@ -196,7 +198,7 @@ export default function AssessmentScreen() {
         </View>
 
         {/* Question 6 Card */}
-        <View className="bg-white rounded-2xl p-5 border border-slate-100 mb-6 shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40">
           <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
             Question 6
           </Text>
@@ -222,7 +224,7 @@ export default function AssessmentScreen() {
                 className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                   isSelected
                     ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                    : "border-slate-200 bg-slate-50/20"
+                    : "border-brand-border bg-slate-50/20"
                 }`}
               >
                 <Text
@@ -236,7 +238,7 @@ export default function AssessmentScreen() {
                   className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                     isSelected
                       ? "border-brand-emerald bg-brand-emerald"
-                      : "border-slate-300 bg-white"
+                      : "border-brand-border bg-brand-bg"
                   }`}
                 >
                   {isSelected && (
@@ -256,12 +258,12 @@ export default function AssessmentScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
           })}
           className={`h-14 rounded-2xl mt-4 shadow-md items-center justify-center ${
-            completed ? "bg-brand-navy shadow-brand-navy/10" : "bg-slate-200"
+            completed ? "bg-brand-navy shadow-brand-navy/10" : "bg-brand-slateBg"
           }`}
         >
           <Text
             className={`font-inter-semibold text-base ${
-              completed ? "text-white" : "text-slate-400"
+              completed ? "text-white" : "text-brand-gray"
             }`}
           >
             View Results
@@ -274,7 +276,7 @@ export default function AssessmentScreen() {
         <View className="flex-1 bg-brand-navy/95 items-center justify-center px-8">
           <View className="items-center mb-8">
             <View className="w-20 h-20 bg-white/10 rounded-full items-center justify-center mb-4">
-              <ActivityIndicator size="large" color="#16A34A" />
+              <ActivityIndicator size="large" color={colors.emerald} />
             </View>
             <Text className="text-white text-2xl font-inter-bold tracking-tight text-center">
               Personalizing Your Experience
@@ -330,7 +332,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name="checkmark-circle"
                 size={20}
-                color="#16A34A"
+                color={colors.emerald}
               />
               <Text className="text-brand-emerald font-inter-bold text-sm ml-3">
                 Done!

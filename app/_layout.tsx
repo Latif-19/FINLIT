@@ -77,6 +77,7 @@ export default function RootLayout() {
   const [isHydrated, setIsHydrated] = useState(false);
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);
   const appThemeColor = useUserStore((s) => s.appThemeColor);
+  const isDarkMode = useUserStore((s) => s.isDarkMode);
 
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -109,7 +110,7 @@ export default function RootLayout() {
   }
 
   // Resolve active theme variables style object
-  const activeThemeVars = getThemeVars(colorBlindMode, appThemeColor);
+  const activeThemeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
 
   return (
     <PaystackProvider publicKey={PAYSTACK_PUBLIC_KEY} currency="GHS" defaultChannels={["card", "mobile_money", "bank_transfer"]}>
@@ -140,7 +141,7 @@ export default function RootLayout() {
       </Stack>
 
       <NavigationGuard />
-      <StatusBar style="auto" />
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
     </View>
     </PaystackProvider>
   );

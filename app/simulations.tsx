@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import { simulationService } from "../services/simulations";
 import type { SimulationRecord } from "@/types/api";
@@ -33,6 +34,7 @@ function mapSimulationRecords(records: SimulationRecord[]): SimulationResult[] {
 }
 
 export default function SimulationsScreen() {
+  const colors = useThemeColors();
   const [activeTab, setActiveTab] = useState<SimulationTab>("momo");
   const isPremium = useUserStore((s) => s.isPremium);
 
@@ -253,9 +255,9 @@ export default function SimulationsScreen() {
   };
 
   const renderPremiumLock = (title: string, desc: string) => (
-    <View className="bg-white rounded-3xl p-8 border border-slate-200 shadow-md items-center mt-6 text-center">
+    <View className="bg-brand-bg rounded-3xl p-8 border border-brand-border shadow-md items-center mt-6 text-center">
       <View className="w-16 h-16 bg-amber-50 rounded-full items-center justify-center mb-4">
-        <Ionicons name="lock-closed" size={32} color="#d97706" />
+        <Ionicons name="lock-closed" size={32} color={colors.gold} />
       </View>
       <Text className="text-xl font-inter-bold text-brand-dark text-center">{title}</Text>
       <View className="bg-amber-100 px-3 py-1 rounded-full border border-amber-200 mt-2">
@@ -278,12 +280,12 @@ export default function SimulationsScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View className="flex-row items-center px-6 pt-4 pb-4 bg-white border-b border-slate-200">
+      <View className="flex-row items-center px-6 pt-4 pb-4 bg-brand-bg border-b border-brand-border">
         <Pressable
           onPress={() => router.back()}
-          className="p-2 bg-brand-slateBg rounded-full border border-slate-100 active:opacity-80"
+          className="p-2 bg-brand-slateBg rounded-full border border-brand-border active:opacity-80"
         >
-          <Ionicons name="arrow-back" size={20} color="#0A2540" />
+          <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
         <Text className="text-xl font-inter-bold text-brand-navy ml-4 flex-1 text-center pr-8">
           Financial Simulators
@@ -291,7 +293,7 @@ export default function SimulationsScreen() {
       </View>
 
       {/* Dynamic horizontal scrollable tabs */}
-      <View className="bg-white border-b border-slate-200">
+      <View className="bg-brand-bg border-b border-brand-border">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -300,7 +302,7 @@ export default function SimulationsScreen() {
           <Pressable
             onPress={() => setActiveTab("momo")}
             className={`px-4 py-2.5 rounded-full border flex-row items-center ${
-              activeTab === "momo" ? "bg-brand-emerald border-brand-emerald" : "bg-brand-slateBg border-slate-200"
+              activeTab === "momo" ? "bg-brand-emerald border-brand-emerald" : "bg-brand-slateBg border-brand-border"
             }`}
           >
             <Image
@@ -332,7 +334,7 @@ export default function SimulationsScreen() {
                 key={tab}
                 onPress={() => setActiveTab(tab as any)}
                 className={`px-4 py-2.5 rounded-full border flex-row items-center ${
-                  isActive ? "bg-brand-emerald border-brand-emerald" : "bg-brand-slateBg border-slate-200"
+                  isActive ? "bg-brand-emerald border-brand-emerald" : "bg-brand-slateBg border-brand-border"
                 }`}
               >
                 <Ionicons name={iconMap[tab] as any} size={14} color={isActive ? "white" : "#94a3b8"} />
@@ -354,7 +356,7 @@ export default function SimulationsScreen() {
           {/* ── TAB 1: MOMO FEES ── */}
           {activeTab === "momo" && (
             <View className="gap-4">
-              <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+              <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                 <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-3">Transaction Details</Text>
                 
                 <Text className="text-brand-dark font-inter-bold text-xs mb-1">Enter Amount (GH₵)</Text>
@@ -362,7 +364,7 @@ export default function SimulationsScreen() {
                   value={momoAmount}
                   onChangeText={setMomoAmount}
                   keyboardType="numeric"
-                  className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
+                  className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
                 />
 
                 <Text className="text-brand-dark font-inter-bold text-xs mb-2">Transaction Type</Text>
@@ -376,7 +378,7 @@ export default function SimulationsScreen() {
                       key={item.type}
                       onPress={() => setMomoType(item.type as any)}
                       className={`flex-1 p-3 rounded-xl border items-center justify-center ${
-                        momoType === item.type ? "bg-brand-emerald/10 border-brand-emerald" : "bg-white border-slate-200"
+                        momoType === item.type ? "bg-brand-emerald/10 border-brand-emerald" : "bg-brand-bg border-brand-border"
                       }`}
                     >
                       <Text className={`text-[10px] font-inter-bold text-center ${momoType === item.type ? "text-brand-emerald" : "text-brand-dark"}`}>
@@ -396,7 +398,7 @@ export default function SimulationsScreen() {
                       key={op.id}
                       onPress={() => setMomoOperator(op.id as any)}
                       className={`flex-1 p-2.5 rounded-xl border flex-row items-center justify-center ${
-                        momoOperator === op.id ? "bg-brand-emerald/10 border-brand-emerald" : "bg-white border-slate-200"
+                        momoOperator === op.id ? "bg-brand-emerald/10 border-brand-emerald" : "bg-brand-bg border-brand-border"
                       }`}
                     >
                       <Image
@@ -412,7 +414,7 @@ export default function SimulationsScreen() {
                 </View>
               </View>
 
-              <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+              <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                 <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-4">Fee Breakdown</Text>
                 <View className="flex-row justify-between items-center mb-3">
                   <Text className="text-brand-gray text-sm">Principal Amount</Text>
@@ -426,19 +428,19 @@ export default function SimulationsScreen() {
                   <Text className="text-brand-gray text-sm">E-Levy Charge (1%)</Text>
                   <Text className="text-brand-dark font-inter-bold text-sm">GH₵ {momoResults.elevy}</Text>
                 </View>
-                <View className="border-t border-slate-100 pt-3 flex-row justify-between items-center mb-3">
+                <View className="border-t border-brand-border pt-3 flex-row justify-between items-center mb-3">
                   <Text className="text-brand-emerald font-inter-bold text-sm">Total Fees Paid</Text>
                   <Text className="text-brand-emerald font-inter-bold text-sm">GH₵ {momoResults.totalCost}</Text>
                 </View>
-                <View className="border-t border-slate-200 pt-4 flex-row justify-between items-center">
+                <View className="border-t border-brand-border pt-4 flex-row justify-between items-center">
                   <Text className="text-brand-dark font-inter-bold text-base">Total Cost Deducted</Text>
                   <Text className="text-brand-dark font-inter-bold text-lg">GH₵ {momoResults.totalDeducted}</Text>
                 </View>
                 <Pressable
                   onPress={() => handleSaveResult("momo", "MoMo Fee Calculator", { amount: momoAmount, type: momoType, operator: momoOperator }, `Fee: GH₵${momoResults.totalCost}, Total: GH₵${momoResults.totalDeducted}`)}
-                  className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-slate-100"
+                  className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-brand-slateBg"
                 >
-                  <Ionicons name="bookmark-outline" size={14} color="#6b7280" />
+                  <Ionicons name="bookmark-outline" size={14} color={colors.gray} />
                   <Text className="text-brand-dark text-xs font-inter-bold">Save Result</Text>
                 </Pressable>
               </View>
@@ -452,14 +454,14 @@ export default function SimulationsScreen() {
                 renderPremiumLock("Ghana Treasury Bill Simulator", "Unlock advanced interactive yield estimators to project savings growth over standard 91, 182, and 364 days compound schedules.")
               ) : (
                 <View className="gap-4">
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-2">Investment Parameters</Text>
                     <Text className="text-brand-dark font-inter-bold text-xs mb-1">Principal (GH₵)</Text>
                     <TextInput
                       value={tbillAmount}
                       onChangeText={setTbillAmount}
                       keyboardType="numeric"
-                      className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
+                      className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
                     />
                     <Text className="text-brand-dark font-inter-bold text-xs mb-2">Select Tenure</Text>
                     <View className="flex-row gap-2">
@@ -468,7 +470,7 @@ export default function SimulationsScreen() {
                           key={days}
                           onPress={() => setTbillTenure(days as any)}
                           className={`flex-1 p-3 rounded-xl border items-center justify-center ${
-                            tbillTenure === days ? "bg-brand-emerald/10 border-brand-emerald" : "bg-white border-slate-200"
+                            tbillTenure === days ? "bg-brand-emerald/10 border-brand-emerald" : "bg-brand-bg border-brand-border"
                           }`}
                         >
                           <Text className={`text-xs font-inter-bold ${tbillTenure === days ? "text-brand-emerald" : "text-brand-dark"}`}>
@@ -479,7 +481,7 @@ export default function SimulationsScreen() {
                     </View>
                   </View>
 
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-4">Projected Earnings</Text>
                     <View className="flex-row justify-between items-center mb-3">
                       <Text className="text-brand-gray text-sm">Annual Interest Rate</Text>
@@ -489,15 +491,15 @@ export default function SimulationsScreen() {
                       <Text className="text-brand-gray text-sm">Interest Earned</Text>
                       <Text className="text-brand-emerald font-inter-bold text-sm">+GH₵ {tbillResults.interest}</Text>
                     </View>
-                    <View className="border-t border-slate-200 pt-4 flex-row justify-between items-center">
+                    <View className="border-t border-brand-border pt-4 flex-row justify-between items-center">
                       <Text className="text-brand-dark font-inter-bold text-base">Maturity Balance</Text>
                       <Text className="text-brand-dark font-inter-bold text-lg">GH₵ {tbillResults.finalAmount}</Text>
                     </View>
                     <Pressable
                       onPress={() => handleSaveResult("tbill", "T-Bill Yield Calculator", { amount: tbillAmount, tenure: `${tbillTenure} days` }, `Interest: GH₵${tbillResults.interest}, Maturity: GH₵${tbillResults.finalAmount}`)}
-                      className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-slate-100"
+                      className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-brand-slateBg"
                     >
-                      <Ionicons name="bookmark-outline" size={14} color="#6b7280" />
+                      <Ionicons name="bookmark-outline" size={14} color={colors.gray} />
                       <Text className="text-brand-dark text-xs font-inter-bold">Save Result</Text>
                     </Pressable>
                   </View>
@@ -513,14 +515,14 @@ export default function SimulationsScreen() {
                 renderPremiumLock("Loan Interest Simulator", "Compare the costs of high-interest mobile money loans (MTN Qwikloan at 6.9% monthly) against standard commercial bank personal loan rates.")
               ) : (
                 <View className="gap-4">
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-2">Borrowing Details</Text>
                     <Text className="text-brand-dark font-inter-bold text-xs mb-1">Loan Amount (GH₵)</Text>
                     <TextInput
                       value={loanAmount}
                       onChangeText={setLoanAmount}
                       keyboardType="numeric"
-                      className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
+                      className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
                     />
                     <Text className="text-brand-dark font-inter-bold text-xs mb-2">Loan Tenure (Months)</Text>
                     <View className="flex-row gap-2">
@@ -529,7 +531,7 @@ export default function SimulationsScreen() {
                           key={m}
                           onPress={() => setLoanDuration(m as any)}
                           className={`flex-1 p-3 rounded-xl border items-center justify-center ${
-                            loanDuration === m ? "bg-brand-emerald/10 border-brand-emerald" : "bg-white border-slate-200"
+                            loanDuration === m ? "bg-brand-emerald/10 border-brand-emerald" : "bg-brand-bg border-brand-border"
                           }`}
                         >
                           <Text className={`text-xs font-inter-bold ${loanDuration === m ? "text-brand-emerald" : "text-brand-dark"}`}>
@@ -559,9 +561,9 @@ export default function SimulationsScreen() {
                   </View>
                   <Pressable
                     onPress={() => handleSaveResult("loan", "Loan Interest Simulator", { amount: loanAmount, duration: `${loanDuration} months` }, `Qwikloan: GH₵${loanResults.qwikTotal}, Bank: GH₵${loanResults.bankTotal}`)}
-                    className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-slate-100"
+                    className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-brand-slateBg"
                   >
-                    <Ionicons name="bookmark-outline" size={14} color="#6b7280" />
+                    <Ionicons name="bookmark-outline" size={14} color={colors.gray} />
                     <Text className="text-brand-dark text-xs font-inter-bold">Save Result</Text>
                   </Pressable>
                 </View>
@@ -576,18 +578,18 @@ export default function SimulationsScreen() {
                 renderPremiumLock("Tax & Pension Planner", "Determine your exact take-home pay under Ghana Revenue Authority PAYE tax brackets and compute mandatory SSNIT Tier 1 & 2 pension contributions.")
               ) : (
                 <View className="gap-4">
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-2">Income Parameters</Text>
                     <Text className="text-brand-dark font-inter-bold text-xs mb-1">Gross Monthly Salary (GH₵)</Text>
                     <TextInput
                       value={salaryInput}
                       onChangeText={setSalaryInput}
                       keyboardType="numeric"
-                      className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-2 font-inter-semibold"
+                      className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-2 font-inter-semibold"
                     />
                   </View>
 
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-4">Salary Audit Breakdown</Text>
                     
                     <View className="flex-row justify-between items-center mb-3">
@@ -610,20 +612,20 @@ export default function SimulationsScreen() {
                       <Text className="text-red-600 font-inter-bold text-sm">-GH₵ {taxResults.paye}</Text>
                     </View>
 
-                    <View className="border-t border-slate-200 pt-4 flex-row justify-between items-center mb-3">
+                    <View className="border-t border-brand-border pt-4 flex-row justify-between items-center mb-3">
                       <Text className="text-brand-dark font-inter-bold text-base">Net Take-Home Pay</Text>
                       <Text className="text-brand-emerald font-inter-bold text-lg">GH₵ {taxResults.net}</Text>
                     </View>
 
-                    <View className="border-t border-slate-100 pt-3 flex-row justify-between items-center">
+                    <View className="border-t border-brand-border pt-3 flex-row justify-between items-center">
                       <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider">SSNIT Employer (Bonus 13%)</Text>
                       <Text className="text-blue-800 font-inter-bold text-xs">+GH₵ {taxResults.employerSsnit}</Text>
                     </View>
                     <Pressable
                       onPress={() => handleSaveResult("tax", "Tax & Pension Planner", { salary: salaryInput }, `Net: GH₵${taxResults.net}, PAYE: GH₵${taxResults.paye}`)}
-                      className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-slate-100"
+                      className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-brand-slateBg"
                     >
-                      <Ionicons name="bookmark-outline" size={14} color="#6b7280" />
+                      <Ionicons name="bookmark-outline" size={14} color={colors.gray} />
                       <Text className="text-brand-dark text-xs font-inter-bold">Save Result</Text>
                     </Pressable>
                   </View>
@@ -639,7 +641,7 @@ export default function SimulationsScreen() {
                 renderPremiumLock("Inflation & Purchasing Power Eroder", "Visualize how local inflation (e.g. 20%+) erodes cash savings over years and examine how Government Treasury Bills act as a shield.")
               ) : (
                 <View className="gap-4">
-                  <View className="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm">
+                  <View className="bg-brand-bg rounded-3xl p-5 border border-brand-border shadow-sm">
                     <Text className="text-brand-gray text-xs font-inter-bold uppercase tracking-wider mb-3">Inflation parameters</Text>
                     
                     <Text className="text-brand-dark font-inter-bold text-xs mb-1">Cash Principal (GH₵)</Text>
@@ -647,7 +649,7 @@ export default function SimulationsScreen() {
                       value={inflationPrincipal}
                       onChangeText={setInflationPrincipal}
                       keyboardType="numeric"
-                      className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-3 font-inter-semibold"
+                      className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-3 font-inter-semibold"
                     />
 
                     <Text className="text-brand-dark font-inter-bold text-xs mb-1">Annual Inflation Rate (%)</Text>
@@ -655,7 +657,7 @@ export default function SimulationsScreen() {
                       value={inflationRate}
                       onChangeText={setInflationRate}
                       keyboardType="numeric"
-                      className="border border-slate-200 rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
+                      className="border border-brand-border rounded-xl p-3 text-base text-brand-dark bg-brand-slateBg/50 mb-4 font-inter-semibold"
                     />
 
                     <Text className="text-brand-dark font-inter-bold text-xs mb-2">Time Horizon (Years)</Text>
@@ -665,7 +667,7 @@ export default function SimulationsScreen() {
                           key={y}
                           onPress={() => setInflationYears(y)}
                           className={`flex-1 p-2.5 rounded-xl border items-center justify-center ${
-                            inflationYears === y ? "bg-brand-emerald/10 border-brand-emerald" : "bg-white border-slate-200"
+                            inflationYears === y ? "bg-brand-emerald/10 border-brand-emerald" : "bg-brand-bg border-brand-border"
                           }`}
                         >
                           <Text className={`text-xs font-inter-bold ${inflationYears === y ? "text-brand-emerald" : "text-brand-dark"}`}>
@@ -696,9 +698,9 @@ export default function SimulationsScreen() {
                   </View>
                   <Pressable
                     onPress={() => handleSaveResult("inflation", "Inflation Eroder", { principal: inflationPrincipal, rate: `${inflationRate}%`, years: `${inflationYears}` }, `Eroded: GH₵${inflationResults.erodedLoss}, T-Bill hedge: GH₵${inflationResults.tbillValue}`)}
-                    className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-slate-100"
+                    className="mt-4 bg-brand-slateBg py-2.5 rounded-xl items-center flex-row justify-center gap-1.5 active:bg-brand-slateBg"
                   >
-                    <Ionicons name="bookmark-outline" size={14} color="#6b7280" />
+                    <Ionicons name="bookmark-outline" size={14} color={colors.gray} />
                     <Text className="text-brand-dark text-xs font-inter-bold">Save Result</Text>
                   </Pressable>
                 </View>
@@ -720,7 +722,7 @@ export default function SimulationsScreen() {
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {simulationHistory.map((sim) => (
-              <View key={sim.id} className="bg-white border border-slate-200 rounded-xl p-3 min-w-[160px]">
+              <View key={sim.id} className="bg-brand-bg border border-brand-border rounded-xl p-3 min-w-[160px]">
                 <Text className="text-brand-dark text-[11px] font-inter-bold" numberOfLines={1}>{sim.label}</Text>
                 <Text className="text-brand-gray text-[9px] mt-1" numberOfLines={1}>{sim.result}</Text>
                 <Text className="text-brand-gray text-[8px] mt-1">

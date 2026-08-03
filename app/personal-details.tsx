@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, Text, View, Pressable, TextInput } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { AVATAR_CHARACTERS } from '@/data/avatars';
 import { useUserStore } from '@/store/useUserStore';
 import { profileService } from '../services/profile';
@@ -19,6 +20,7 @@ const GOAL_OPTIONS = [
 ];
 
 export default function PersonalDetailsScreen() {
+  const colors = useThemeColors();
   const storeName = useUserStore((s) => s.name);
   const storeEmail = useUserStore((s) => s.email);
   const storeAge = useUserStore((s) => s.age);
@@ -81,13 +83,13 @@ export default function PersonalDetailsScreen() {
       )}
 
       {/* Header */}
-      <View className="bg-white px-5 pt-14 pb-5 border-b border-slate-100 flex-row items-center">
+      <View className="bg-brand-bg px-5 pt-14 pb-5 border-b border-brand-border flex-row items-center">
         <Pressable
           onPress={() => router.back()}
-          className="w-10 h-10 bg-brand-slateBg rounded-full items-center justify-center mr-3 border border-slate-100"
+          className="w-10 h-10 bg-brand-slateBg rounded-full items-center justify-center mr-3 border border-brand-border"
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
         >
-          <Ionicons name="arrow-back" size={20} color="#0A2540" />
+          <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
         <View className="flex-1">
           <Text className="text-xl font-inter-bold text-brand-navy">Personal Details</Text>
@@ -100,13 +102,13 @@ export default function PersonalDetailsScreen() {
         {/* ── PERSONAL INFORMATION ── */}
         <View className="px-5 mt-6">
           <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-widest mb-3">Personal Information</Text>
-          <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+          <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-sm">
 
             {/* Name */}
-            <View className="p-4 border-b border-slate-50">
+            <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Name</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-slate-200"
+                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={name}
                 onChangeText={setName}
                 onBlur={() => { if (name.trim()) useUserStore.getState().setName(name); }}
@@ -116,10 +118,10 @@ export default function PersonalDetailsScreen() {
             </View>
 
             {/* Email */}
-            <View className="p-4 border-b border-slate-50">
+            <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Email</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-slate-200"
+                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={email}
                 onChangeText={setEmail}
                 onBlur={() => useUserStore.getState().setEmail(email)}
@@ -131,10 +133,10 @@ export default function PersonalDetailsScreen() {
             </View>
 
             {/* Age */}
-            <View className="p-4 border-b border-slate-50">
+            <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Age</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-slate-200"
+                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={age}
                 onChangeText={setAge}
                 onBlur={() => useUserStore.getState().setAge(age)}
@@ -148,7 +150,7 @@ export default function PersonalDetailsScreen() {
             <View className="p-4">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Phone</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-slate-200"
+                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={phone}
                 onChangeText={setPhone}
                 onBlur={() => useUserStore.getState().setPhone(phone)}
@@ -163,7 +165,7 @@ export default function PersonalDetailsScreen() {
         {/* ── AVATAR ── */}
         <View className="px-5 mt-8">
           <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-widest mb-3">Avatar</Text>
-          <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm p-5">
+          <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-sm p-5">
 
             {/* Current avatar */}
             <View className="items-center mb-5">
@@ -183,7 +185,7 @@ export default function PersonalDetailsScreen() {
                   className={`w-14 h-14 rounded-2xl items-center justify-center ${
                     avatar === emoji
                       ? 'bg-brand-emerald/10 border-2 border-brand-emerald'
-                      : 'bg-brand-slateBg border border-slate-200'
+                      : 'bg-brand-slateBg border border-brand-border'
                   }`}
                 >
                   <Text className="text-2xl">{emoji}</Text>
@@ -196,7 +198,7 @@ export default function PersonalDetailsScreen() {
         {/* ── FINANCIAL PROFILE ── */}
         <View className="px-5 mt-8">
           <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-widest mb-3">Financial Profile</Text>
-          <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+          <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-sm">
 
             {/* Goal */}
             <View className="p-4">
@@ -211,7 +213,7 @@ export default function PersonalDetailsScreen() {
                       className={`px-3 py-2 rounded-full border ${
                         isSelected
                           ? 'bg-brand-emerald/10 border-brand-emerald'
-                          : 'bg-brand-slateBg border-slate-200'
+                          : 'bg-brand-slateBg border-brand-border'
                       }`}
                     >
                       <Text className={`text-xs font-inter-semibold ${
@@ -226,11 +228,11 @@ export default function PersonalDetailsScreen() {
             </View>
 
             {/* Subscription Tier */}
-            <View className="p-4 flex-row items-center justify-between border-t border-slate-50">
+            <View className="p-4 flex-row items-center justify-between border-t border-brand-border">
               <View className="flex-1">
                 <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1">Subscription</Text>
                 <View className={`px-3 py-1.5 rounded-full self-start mt-1 ${
-                  isPremium ? 'bg-purple-100 border border-purple-200' : 'bg-brand-slateBg border border-slate-200'
+                  isPremium ? 'bg-purple-100 border border-purple-200' : 'bg-brand-slateBg border border-brand-border'
                 }`}>
                   <Text className={`text-xs font-inter-bold uppercase tracking-wider ${
                     isPremium ? 'text-purple-800' : 'text-brand-gray'
@@ -239,7 +241,7 @@ export default function PersonalDetailsScreen() {
                   </Text>
                 </View>
               </View>
-              <Ionicons name="shield-checkmark-outline" size={16} color="#94A3B8" />
+              <Ionicons name="shield-checkmark-outline" size={16} color={colors.gray} />
             </View>
           </View>
         </View>

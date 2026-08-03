@@ -9,12 +9,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 import { useUserStore } from "../store/useUserStore";
 import { LESSON_MODULES } from "@/data/lessons";
 
 export default function CertificateScreen() {
+  const colors = useThemeColors();
   const userName = useUserStore((s) => s.name);
   const score = useUserStore((s) => s.score);
   const goal = useUserStore((s) => s.goal);
@@ -72,8 +74,8 @@ export default function CertificateScreen() {
     >
       {/* Header */}
       <View className="flex-row items-center px-5 pt-16 pb-4">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-white justify-center items-center border border-slate-100 shadow-sm">
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-bg justify-center items-center border border-brand-border shadow-sm">
+          <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3">
           <Text className="text-[22px] font-inter-bold text-brand-dark">Certificate</Text>
@@ -84,7 +86,7 @@ export default function CertificateScreen() {
         <View className="px-5">
           {/* Certificate Card — wrapped so it can be captured as a real image */}
           <ViewShot ref={certificateRef} options={{ format: "png", quality: 1 }}>
-          <View className="bg-white rounded-3xl border-2 border-brand-gold/30 shadow-xl overflow-hidden mb-6">
+          <View className="bg-brand-bg rounded-3xl border-2 border-brand-gold/30 shadow-xl overflow-hidden mb-6">
             {/* Gold banner */}
             <View className="bg-brand-navy py-6 items-center">
               <View className="w-20 h-20 bg-brand-gold/20 rounded-full items-center justify-center mb-3 border-2 border-brand-gold/40">
@@ -137,7 +139,7 @@ export default function CertificateScreen() {
               {/* Decorative seal */}
               <View className="mt-6 flex-row items-center gap-2">
                 <View className="w-8 h-8 rounded-full bg-brand-gold/15 items-center justify-center border border-brand-gold/30">
-                  <Ionicons name="shield-checkmark" size={14} color="#D4AF37" />
+                  <Ionicons name="shield-checkmark" size={14} color={colors.gold} />
                 </View>
                 <Text className="text-brand-gold text-[10px] font-inter-bold uppercase tracking-wider">
                   Verified by FinLit
@@ -181,7 +183,7 @@ export default function CertificateScreen() {
       ) : (
         /* Locked State */
         <View className="px-5">
-          <View className="bg-white rounded-2xl p-8 border border-slate-100 items-center shadow-sm">
+          <View className="bg-brand-bg rounded-2xl p-8 border border-brand-border items-center shadow-sm">
             <View className="w-20 h-20 bg-brand-slateBg rounded-full items-center justify-center mb-4">
               <Text className="text-4xl">🔒</Text>
             </View>
@@ -192,7 +194,7 @@ export default function CertificateScreen() {
               Complete all {LESSON_MODULES.length} lessons to earn your FinLit Financial Literacy Certificate.
             </Text>
 
-            <View className="h-3 bg-slate-100 rounded-full w-full overflow-hidden mb-2">
+            <View className="h-3 bg-brand-slateBg rounded-full w-full overflow-hidden mb-2">
               <View
                 className="h-full bg-brand-emerald rounded-full"
                 style={{ width: `${(lessonsCompleted / LESSON_MODULES.length) * 100}%` }}

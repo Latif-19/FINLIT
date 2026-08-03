@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { contentService } from "../../services/content";
 import type { NewsArticle as BackendNewsArticle } from "@/types/api";
 
@@ -320,6 +321,7 @@ function CategoryPill({ category, small = false }: { category: string; small?: b
 }
 
 export default function NewsScreen() {
+  const colors = useThemeColors();
   // Starts with the bundled articles, then replaced by the backend feed on focus.
   const [articles, setArticles] = useState<Article[]>(NEWS_ARTICLES);
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
@@ -379,20 +381,20 @@ export default function NewsScreen() {
   return (
     <SafeAreaView className="flex-1 bg-brand-slateBg" edges={["top"]}>
       {/* ── HEADER ── */}
-      <View className="px-5 pt-3 pb-4 bg-white border-b border-slate-100">
+      <View className="px-5 pt-3 pb-4 bg-brand-bg border-b border-brand-border">
         <View className="flex-row items-center justify-between">
           <View>
             <Text className="text-[24px] font-inter-bold text-brand-navy tracking-tight">
               Financial News
             </Text>
-            <Text className="text-[12px] text-slate-400 font-inter mt-0.5">
+            <Text className="text-[12px] text-brand-gray font-inter mt-0.5">
               Ghana finance & market updates
             </Text>
           </View>
           <View className="items-end gap-1">
-            <View className="flex-row items-center bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200 gap-1.5">
-              <Ionicons name="time-outline" size={12} color="#64748b" />
-              <Text className="text-[10px] font-inter-bold text-slate-500 uppercase tracking-wider">
+            <View className="flex-row items-center bg-brand-slateBg px-2.5 py-1.5 rounded-xl border border-brand-border gap-1.5">
+              <Ionicons name="time-outline" size={12} color={colors.gray} />
+              <Text className="text-[10px] font-inter-bold text-brand-gray uppercase tracking-wider">
                 {updatedLabel}
               </Text>
             </View>
@@ -401,7 +403,7 @@ export default function NewsScreen() {
       </View>
 
       {/* ── CATEGORY FILTER ── */}
-      <View className="bg-white border-b border-slate-100">
+      <View className="bg-brand-bg border-b border-brand-border">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -416,24 +418,24 @@ export default function NewsScreen() {
                 onPress={() => setActiveCategory(cat)}
                 style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.96 : 1 }] })}
                 className={`flex-row items-center px-3.5 py-2 rounded-full border gap-1.5 ${
-                  isActive ? "bg-brand-navy border-brand-navy" : "bg-white border-slate-200"
+                  isActive ? "bg-brand-navy border-brand-navy" : "bg-brand-bg border-brand-border"
                 }`}
               >
                 <Text
                   className={`text-[11px] font-inter-bold ${
-                    isActive ? "text-white" : "text-slate-600"
+                    isActive ? "text-white" : "text-brand-gray"
                   }`}
                 >
                   {cat}
                 </Text>
                 <View
                   className={`rounded-full px-1.5 py-0.5 ${
-                    isActive ? "bg-white/20" : "bg-slate-100"
+                    isActive ? "bg-white/20" : "bg-brand-slateBg"
                   }`}
                 >
                   <Text
                     className={`text-[9px] font-inter-bold ${
-                      isActive ? "text-white" : "text-slate-500"
+                      isActive ? "text-white" : "text-brand-gray"
                     }`}
                   >
                     {count}
@@ -461,13 +463,13 @@ export default function NewsScreen() {
         {featured ? (
           <>
             {/* ── FEATURED HERO CARD ── */}
-            <Text className="text-[10px] font-inter-bold text-slate-400 tracking-widest mb-3 ml-0.5 uppercase">
+            <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest mb-3 ml-0.5 uppercase">
               Featured Story
             </Text>
             <Pressable
               onPress={() => setSelectedArticle(featured)}
               style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.99 : 1 }] })}
-              className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm mb-5"
+              className="bg-brand-bg rounded-2xl overflow-hidden border border-brand-border shadow-sm mb-5"
             >
               <Image
                 source={{ uri: featured.image }}
@@ -480,31 +482,31 @@ export default function NewsScreen() {
 
               <View className="p-4">
                 <View className="flex-row items-center gap-1.5 mb-2">
-                  <Ionicons name="newspaper-outline" size={12} color="#94a3b8" />
-                  <Text className="text-[11px] text-slate-400 font-inter-semibold">
+                  <Ionicons name="newspaper-outline" size={12} color={colors.gray} />
+                  <Text className="text-[11px] text-brand-gray font-inter-semibold">
                     {featured.source}
                   </Text>
-                  <Text className="text-slate-300">·</Text>
-                  <Text className="text-[11px] text-slate-400 font-inter">{featured.time}</Text>
-                  <Text className="text-slate-300">·</Text>
-                  <Text className="text-[11px] text-slate-400 font-inter">{featured.readTime}</Text>
+                  <Text className="text-brand-gray">·</Text>
+                  <Text className="text-[11px] text-brand-gray font-inter">{featured.time}</Text>
+                  <Text className="text-brand-gray">·</Text>
+                  <Text className="text-[11px] text-brand-gray font-inter">{featured.readTime}</Text>
                 </View>
 
                 <Text className="text-[18px] font-inter-bold text-brand-navy leading-[25px]">
                   {featured.title}
                 </Text>
                 <Text
-                  className="text-[13px] text-slate-500 font-inter mt-2 leading-5"
+                  className="text-[13px] text-brand-gray font-inter mt-2 leading-5"
                   numberOfLines={2}
                 >
                   {featured.summary}
                 </Text>
 
-                <View className="flex-row items-center mt-3.5 pt-3.5 border-t border-slate-50 gap-1">
+                <View className="flex-row items-center mt-3.5 pt-3.5 border-t border-brand-border gap-1">
                   <Text className="text-brand-emerald text-[13px] font-inter-bold">
                     Read Article
                   </Text>
-                  <Ionicons name="arrow-forward" size={14} color="#16A34A" />
+                  <Ionicons name="arrow-forward" size={14} color={colors.emerald} />
                 </View>
               </View>
             </Pressable>
@@ -512,7 +514,7 @@ export default function NewsScreen() {
             {/* ── LIST CARDS ── */}
             {list.length > 0 && (
               <>
-                <Text className="text-[10px] font-inter-bold text-slate-400 tracking-widest mb-3 ml-0.5 uppercase">
+                <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest mb-3 ml-0.5 uppercase">
                   Recent Updates
                 </Text>
                 <View className="gap-3">
@@ -521,7 +523,7 @@ export default function NewsScreen() {
                       key={item.id}
                       onPress={() => setSelectedArticle(item)}
                       style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.99 : 1 }] })}
-                      className="bg-white rounded-2xl border border-slate-100 p-3.5 flex-row gap-3 shadow-sm"
+                      className="bg-brand-bg rounded-2xl border border-brand-border p-3.5 flex-row gap-3 shadow-sm"
                     >
                       <Image
                         source={{ uri: item.image }}
@@ -537,17 +539,17 @@ export default function NewsScreen() {
                           {item.title}
                         </Text>
                         <Text
-                          className="text-[11px] text-slate-500 font-inter mt-1 leading-[15px]"
+                          className="text-[11px] text-brand-gray font-inter mt-1 leading-[15px]"
                           numberOfLines={2}
                         >
                           {item.summary}
                         </Text>
                         <View className="flex-row items-center mt-2 gap-1">
-                          <Text className="text-[10px] text-slate-400 font-inter-semibold">
+                          <Text className="text-[10px] text-brand-gray font-inter-semibold">
                             {item.source}
                           </Text>
-                          <Text className="text-slate-300 text-[10px]">·</Text>
-                          <Text className="text-[10px] text-slate-400 font-inter">{item.time}</Text>
+                          <Text className="text-brand-gray text-[10px]">·</Text>
+                          <Text className="text-[10px] text-brand-gray font-inter">{item.time}</Text>
                         </View>
                       </View>
                     </Pressable>
@@ -560,8 +562,8 @@ export default function NewsScreen() {
 
         {filteredArticles.length === 0 && (
           <View className="py-20 items-center">
-            <Ionicons name="newspaper-outline" size={40} color="#D1D5DB" />
-            <Text className="text-slate-400 text-sm font-inter-medium mt-3">
+            <Ionicons name="newspaper-outline" size={40} color={colors.gray} />
+            <Text className="text-brand-gray text-sm font-inter-medium mt-3">
               No articles in this category
             </Text>
           </View>
@@ -574,27 +576,27 @@ export default function NewsScreen() {
         animationType="slide"
         onRequestClose={() => setSelectedArticle(null)}
       >
-        <SafeAreaView className="flex-1 bg-white" edges={["top"]}>
+        <SafeAreaView className="flex-1 bg-brand-bg" edges={["top"]}>
           {selectedArticle && (
             <View className="flex-1">
               {/* Modal Header */}
-              <View className="flex-row items-center justify-between px-4 py-3 border-b border-slate-100 bg-white">
+              <View className="flex-row items-center justify-between px-4 py-3 border-b border-brand-border bg-brand-bg">
                 <Pressable
                   onPress={() => setSelectedArticle(null)}
-                  className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-brand-slateBg items-center justify-center"
                   style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
                 >
-                  <Ionicons name="arrow-back" size={20} color="#0A2540" />
+                  <Ionicons name="arrow-back" size={20} color={colors.navy} />
                 </Pressable>
 
                 <CategoryPill category={selectedArticle.category} />
 
                 <Pressable
                   onPress={() => openInBrowser(selectedArticle.sourceUrl)}
-                  className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-brand-slateBg items-center justify-center"
                   style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
                 >
-                  <Ionicons name="open-outline" size={18} color="#0A2540" />
+                  <Ionicons name="open-outline" size={18} color={colors.navy} />
                 </Pressable>
               </View>
 
@@ -613,17 +615,17 @@ export default function NewsScreen() {
                   {/* Source meta */}
                   <View className="flex-row items-center gap-2 mb-3">
                     <View className="w-7 h-7 bg-brand-emerald/10 rounded-full items-center justify-center">
-                      <Ionicons name="newspaper-outline" size={14} color="#16A34A" />
+                      <Ionicons name="newspaper-outline" size={14} color={colors.emerald} />
                     </View>
                     <Text className="text-[13px] font-inter-bold text-brand-navy">
                       {selectedArticle.source}
                     </Text>
-                    <Text className="text-slate-300">·</Text>
-                    <Text className="text-[12px] text-slate-400 font-inter">
+                    <Text className="text-brand-gray">·</Text>
+                    <Text className="text-[12px] text-brand-gray font-inter">
                       {selectedArticle.time}
                     </Text>
-                    <Text className="text-slate-300">·</Text>
-                    <Text className="text-[12px] text-slate-400 font-inter">
+                    <Text className="text-brand-gray">·</Text>
+                    <Text className="text-[12px] text-brand-gray font-inter">
                       {selectedArticle.readTime}
                     </Text>
                   </View>
@@ -638,21 +640,21 @@ export default function NewsScreen() {
                     <Ionicons
                       name="bulb-outline"
                       size={18}
-                      color="#16A34A"
+                      color={colors.emerald}
                       style={{ marginTop: 1 }}
                     />
-                    <Text className="flex-1 text-[13px] text-slate-700 font-inter leading-[20px]">
+                    <Text className="flex-1 text-[13px] text-brand-dark font-inter leading-[20px]">
                       {selectedArticle.summary}
                     </Text>
                   </View>
 
-                  <View className="h-px bg-slate-100 my-5" />
+                  <View className="h-px bg-brand-slateBg my-5" />
 
                   {/* Article paragraphs */}
                   {selectedArticle.paragraphs.map((para, idx) => (
                     <Text
                       key={idx}
-                      className="text-[15px] text-slate-700 font-inter leading-7 mb-4"
+                      className="text-[15px] text-brand-dark font-inter leading-7 mb-4"
                     >
                       {para}
                     </Text>
@@ -662,16 +664,16 @@ export default function NewsScreen() {
                   <Pressable
                     onPress={() => openInBrowser(selectedArticle.sourceUrl)}
                     style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
-                    className="bg-white border border-slate-200 rounded-2xl p-4 mt-4 flex-row items-center gap-3 shadow-sm"
+                    className="bg-brand-bg border border-brand-border rounded-2xl p-4 mt-4 flex-row items-center gap-3 shadow-sm"
                   >
                     <View className="w-11 h-11 bg-brand-emerald/10 rounded-full items-center justify-center">
-                      <Ionicons name="globe-outline" size={20} color="#16A34A" />
+                      <Ionicons name="globe-outline" size={20} color={colors.emerald} />
                     </View>
                     <View className="flex-1">
                       <Text className="text-[13px] font-inter-bold text-brand-navy">
                         Read Full Article
                       </Text>
-                      <Text className="text-[11px] text-slate-400 font-inter mt-0.5">
+                      <Text className="text-[11px] text-brand-gray font-inter mt-0.5">
                         {selectedArticle.sourceUrl
                           .replace("https://", "")
                           .replace("www.", "")
@@ -686,7 +688,7 @@ export default function NewsScreen() {
               </ScrollView>
 
               {/* Sticky bottom CTA */}
-              <View className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-5 pt-3 pb-8">
+              <View className="absolute bottom-0 left-0 right-0 bg-brand-bg border-t border-brand-border px-5 pt-3 pb-8">
                 <Pressable
                   onPress={() => openInBrowser(selectedArticle.sourceUrl)}
                   style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.98 : 1 }] })}

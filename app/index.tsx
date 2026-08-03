@@ -32,9 +32,9 @@ export default function SplashScreen() {
   });
 
   return (
-    <View className="flex-1 bg-white items-center justify-center px-6">
+    <View className="flex-1 bg-brand-bg items-center justify-center px-6">
       <View className="items-center mb-8">
-        <View className="w-32 h-32 bg-white rounded-3xl items-center justify-center shadow-md border border-slate-100 overflow-hidden">
+        <View className="w-32 h-32 bg-brand-bg rounded-3xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
           <Image
             source={require("../assets/images/finlit-logo.jpeg")}
             className="w-28 h-28"
@@ -55,7 +55,7 @@ export default function SplashScreen() {
           Loading your financial growth...
         </Text>
 
-        <View className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-100">
+        <View className="w-full h-2 bg-brand-slateBg rounded-full overflow-hidden border border-brand-border">
           <Animated.View
             style={{
               width: widthInterpolated,

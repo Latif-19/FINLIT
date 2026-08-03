@@ -11,7 +11,7 @@ export default function AuthScreen() {
 
       {/* Top Branding Section */}
       <View className="items-center mt-6">
-        <View className="w-24 h-24 bg-white rounded-3xl items-center justify-center shadow-md border border-slate-100 overflow-hidden">
+        <View className="w-24 h-24 bg-brand-bg rounded-3xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
           <Image
             source={require("../assets/images/finlit-logo.jpeg")}
             className="w-20 h-20"
@@ -39,13 +39,13 @@ export default function AuthScreen() {
 
         {/* Core Value Proposition Pills */}
         <View className="flex-row flex-wrap justify-center gap-2 mt-6">
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
+          <View className="flex-row items-center bg-brand-bg border border-brand-border px-4 py-2 rounded-2xl shadow-sm">
             <Text className="text-sm font-inter-medium text-brand-dark">🎯 Goal-Driven</Text>
           </View>
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
+          <View className="flex-row items-center bg-brand-bg border border-brand-border px-4 py-2 rounded-2xl shadow-sm">
             <Text className="text-sm font-inter-medium text-brand-dark">🎓 Bite-sized Lessons</Text>
           </View>
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
+          <View className="flex-row items-center bg-brand-bg border border-brand-border px-4 py-2 rounded-2xl shadow-sm">
             <Text className="text-sm font-inter-medium text-brand-dark">👥 Smart Community</Text>
           </View>
         </View>
@@ -74,7 +74,7 @@ export default function AuthScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
             opacity: pressed ? 0.95 : 1,
           })}
-          className="border border-brand-navy/20 bg-white h-14 rounded-2xl justify-center items-center mt-4 active:bg-slate-50"
+          className="border border-brand-navy/20 bg-brand-bg h-14 rounded-2xl justify-center items-center mt-4 active:bg-brand-slateBg"
         >
           <Text className="text-brand-navy text-center font-inter-semibold text-base">
             Already have an account? Sign In

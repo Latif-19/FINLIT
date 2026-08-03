@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import { profileService } from "../services/profile";
 import { usePaystack } from "react-native-paystack-webview";
@@ -59,6 +60,7 @@ function generateRef(): string {
 }
 
 export default function PaywallScreen() {
+  const colors = useThemeColors();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("three_months");
   const [email, setEmail] = useState(useUserStore.getState().email || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -115,9 +117,9 @@ export default function PaywallScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-white">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center active:opacity-80">
-          <Ionicons name="close" size={24} color="#1f2937" />
+      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-brand-border bg-brand-bg">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-slateBg items-center justify-center active:opacity-80">
+          <Ionicons name="close" size={24} color={colors.dark} />
         </Pressable>
         <Text className="text-lg font-inter-bold text-brand-navy">FinLit Premium</Text>
         <View style={{ width: 40 }} />
@@ -126,7 +128,7 @@ export default function PaywallScreen() {
       {paymentSuccess ? (
         <View className="flex-1 items-center justify-center p-7">
           <View className="mb-6">
-            <Ionicons name="checkmark-circle" size={80} color="#16A34A" />
+            <Ionicons name="checkmark-circle" size={80} color={colors.emerald} />
           </View>
           <Text className="text-2xl font-inter-bold text-brand-navy text-center">Welcome to Premium!</Text>
           <Text className="text-sm text-brand-dark text-center mt-2.5 mb-8 px-3 leading-5">
@@ -150,10 +152,10 @@ export default function PaywallScreen() {
           </View>
 
           {/* Premium Value Props */}
-          <View className="bg-white rounded-3xl p-4 border border-slate-200 mt-5">
+          <View className="bg-brand-bg rounded-3xl p-4 border border-brand-border mt-5">
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="chatbubble-ellipses" size={20} color="#16A34A" />
+                <Ionicons name="chatbubble-ellipses" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
                 <Text className="text-[15px] font-inter-bold text-brand-dark">Unlimited AI Coach Pro</Text>
@@ -165,7 +167,7 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="ribbon" size={20} color="#16A34A" />
+                <Ionicons name="ribbon" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
                 <Text className="text-[15px] font-inter-bold text-brand-dark">Accredited Certificates</Text>
@@ -177,7 +179,7 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="calculator" size={20} color="#16A34A" />
+                <Ionicons name="calculator" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
                 <Text className="text-[15px] font-inter-bold text-brand-dark">Advanced Simulators</Text>
@@ -189,7 +191,7 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="volume-high" size={20} color="#16A34A" />
+                <Ionicons name="volume-high" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
                 <Text className="text-[15px] font-inter-bold text-brand-dark">Audio Lessons & Offline Mode</Text>
@@ -207,10 +209,10 @@ export default function PaywallScreen() {
               <Pressable
                 key={p.id}
                 onPress={() => setSelectedPlan(p.id)}
-                className={`bg-white rounded-[20px] p-4 border-2 relative active:opacity-80 ${
+                className={`bg-brand-bg rounded-[20px] p-4 border-2 relative active:opacity-80 ${
                   selectedPlan === p.id
                     ? "border-brand-emerald bg-brand-emerald/10"
-                    : "border-slate-200"
+                    : "border-brand-border"
                 }`}
               >
                 {p.badge && (
@@ -232,8 +234,8 @@ export default function PaywallScreen() {
 
           {/* Email Input */}
           <Text className="text-xs font-inter-extrabold text-brand-gray tracking-widest mt-7 mb-3 ml-0.5">YOUR EMAIL</Text>
-          <View className="flex-row items-center bg-white rounded-2xl border border-slate-200 px-3.5 py-3.5">
-            <Ionicons name="mail-outline" size={18} color="#9ca3af" style={{ marginRight: 10 }} />
+          <View className="flex-row items-center bg-brand-bg rounded-2xl border border-brand-border px-3.5 py-3.5">
+            <Ionicons name="mail-outline" size={18} color={colors.gray} style={{ marginRight: 10 }} />
             <TextInput
               className="flex-1 text-[15px] text-brand-navy"
               placeholder="you@example.com"

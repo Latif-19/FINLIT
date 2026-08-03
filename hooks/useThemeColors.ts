@@ -4,7 +4,8 @@ import { getThemeVars } from "../constants/theme";
 export function useThemeColors() {
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);
   const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const themeVars = getThemeVars(colorBlindMode, appThemeColor);
+  const isDarkMode = useUserStore((s) => s.isDarkMode);
+  const themeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
 
   return {
     navy: themeVars["--color-brand-navy"],
@@ -14,5 +15,6 @@ export function useThemeColors() {
     slateBg: themeVars["--color-brand-slateBg"],
     dark: themeVars["--color-brand-dark"],
     gray: themeVars["--color-brand-gray"],
+    border: themeVars["--color-brand-border"],
   };
 }

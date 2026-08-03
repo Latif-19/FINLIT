@@ -94,7 +94,7 @@ export default function BadgesScreen() {
                 {unlocked.map((badge) => (
                   <View
                     key={badge.id}
-                    className="bg-white rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
+                    className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
                   >
                     <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center">
                       <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
@@ -125,10 +125,10 @@ export default function BadgesScreen() {
             {locked.map((badge) => (
               <View
                 key={badge.id}
-                className="bg-white rounded-2xl border border-slate-100 p-4 w-[47%] shadow-sm opacity-60"
+                className="bg-brand-bg rounded-2xl border border-brand-border p-4 w-[47%] shadow-sm opacity-60"
               >
-                <View className="w-14 h-14 bg-slate-50 rounded-2xl items-center justify-center">
-                  <Ionicons name={badgeIcon(badge.id)} size={28} color="#cbd5e1" />
+                <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center">
+                  <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
                 </View>
                 <Text className="text-brand-navy text-sm font-inter-bold mt-3">
                   {badge.name}
@@ -137,7 +137,7 @@ export default function BadgesScreen() {
                   {badge.description}
                 </Text>
                 <View className="flex-row items-center mt-2">
-                  <Ionicons name="lock-closed" size={12} color="#94A3B8" />
+                  <Ionicons name="lock-closed" size={12} color={colors.gray} />
                   <Text className="text-brand-gray text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
                     Locked
                   </Text>

@@ -98,6 +98,7 @@ export interface UserState {
   // Theming & Accessibility
   colorBlindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome';
   appThemeColor: 'emerald' | 'blue' | 'purple';
+  isDarkMode: boolean;
 
   // Notification Preferences
   notificationPrefs: Record<string, boolean>;
@@ -136,6 +137,7 @@ export interface UserActions {
   // Theming & Accessibility
   setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
   setAppThemeColor: (color: 'emerald' | 'blue' | 'purple') => void;
+  setDarkMode: (isDark: boolean) => void;
 
   // Notification Preferences
   setNotificationPref: (key: string, value: boolean) => void;
@@ -189,6 +191,7 @@ const DEFAULT_STATE: UserState = {
   totalTimeSpentSeconds: 0,
   colorBlindMode: 'none',
   appThemeColor: 'emerald',
+  isDarkMode: false,
   notificationPrefs: {
     dailyReminders: true,
     streakAlerts: true,
@@ -455,6 +458,7 @@ export const useUserStore = create<UserState & UserActions>()(
       // ── Theming & Accessibility ─────────────────────────────────────────
       setColorBlindMode: (mode) => set({ colorBlindMode: mode }),
       setAppThemeColor: (color) => set({ appThemeColor: color }),
+      setDarkMode: (isDark) => set({ isDarkMode: isDark }),
 
       // ── Notification Preferences ─────────────────────────────────────────
       setNotificationPref: (key, value) =>
@@ -491,6 +495,7 @@ export const useUserStore = create<UserState & UserActions>()(
         totalTimeSpentSeconds: state.totalTimeSpentSeconds,
         colorBlindMode: state.colorBlindMode,
         appThemeColor: state.appThemeColor,
+        isDarkMode: state.isDarkMode,
         notificationPrefs: state.notificationPrefs,
         createdAt: state.createdAt,
         lastAssessedAt: state.lastAssessedAt,

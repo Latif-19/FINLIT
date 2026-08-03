@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../../store/useUserStore";
 import { useCommunityStore } from "../../store/useCommunityStore";
 import { communityService } from "../../services/community";
@@ -37,6 +38,7 @@ function timeAgo(value: string): string {
 }
 
 export default function CommunityScreen() {
+  const colors = useThemeColors();
   const userName = useUserStore((s) => s.name);
   const userAvatar = useUserStore((s) => s.avatar);
   const userScore = useUserStore((s) => s.score);
@@ -189,14 +191,14 @@ export default function CommunityScreen() {
       case "Debt Free":
         return "bg-amber-100 text-amber-800 border-amber-200";
       default:
-        return "bg-brand-slateBg text-brand-dark border-slate-200";
+        return "bg-brand-slateBg text-brand-dark border-brand-border";
     }
   };
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header Panel */}
-      <View className="bg-white pt-4 pb-5 px-6 border-b border-slate-200">
+      <View className="bg-brand-bg pt-4 pb-5 px-6 border-b border-brand-border">
         <View className="flex-row justify-between items-center">
           <View>
             <Text className="text-3xl font-inter-bold text-brand-navy">Community Hub</Text>
@@ -220,7 +222,7 @@ export default function CommunityScreen() {
               className={`px-4 py-2.5 rounded-full border ${
                 selectedCategory === cat
                   ? "bg-brand-emerald border-brand-emerald"
-                  : "bg-white border-slate-200 active:bg-brand-slateBg"
+                  : "bg-brand-bg border-brand-border active:bg-brand-slateBg"
               }`}
             >
               <Text
@@ -245,7 +247,7 @@ export default function CommunityScreen() {
         ListEmptyComponent={
           <View className="items-center justify-center py-16 px-6">
             <View className="w-20 h-20 bg-brand-emerald/10 rounded-3xl items-center justify-center mb-5">
-              <Ionicons name="chatbubbles-outline" size={38} color="#16A34A" />
+              <Ionicons name="chatbubbles-outline" size={38} color={colors.emerald} />
             </View>
             <Text className="text-brand-navy text-lg font-inter-bold text-center">
               {selectedCategory === "All"
@@ -266,7 +268,7 @@ export default function CommunityScreen() {
           </View>
         }
         renderItem={({ item: post }) => (
-          <View className="bg-white border border-slate-200 rounded-3xl p-5 mb-4 shadow-sm shadow-slate-200/40">
+          <View className="bg-brand-bg border border-brand-border rounded-3xl p-5 mb-4 shadow-sm shadow-slate-200/40">
             {/* Tapping the header/content opens the thread */}
             <Pressable
               onPress={() => {
@@ -313,7 +315,7 @@ export default function CommunityScreen() {
             </Pressable>
 
             {/* Feed Actions */}
-            <View className="flex-row items-center mt-4 pt-3.5 border-t border-slate-100 gap-2">
+            <View className="flex-row items-center mt-4 pt-3.5 border-t border-brand-border gap-2">
               <Pressable
                 onPress={() => handleLike(post.id)}
                 style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
@@ -343,7 +345,7 @@ export default function CommunityScreen() {
                 style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
                 className="flex-row items-center px-3 py-1.5 rounded-full bg-brand-slateBg"
               >
-                <Ionicons name="chatbubble-outline" size={16} color="#94a3b8" />
+                <Ionicons name="chatbubble-outline" size={16} color={colors.gray} />
                 <Text className="text-xs font-inter-bold text-brand-gray ml-1.5">
                   {post.replies.length} {post.replies.length === 1 ? "reply" : "replies"}
                 </Text>
@@ -380,14 +382,14 @@ export default function CommunityScreen() {
         transparent={false}
         onRequestClose={() => setCreateModalVisible(false)}
       >
-        <SafeAreaView edges={["top"]} className="flex-1 bg-white">
+        <SafeAreaView edges={["top"]} className="flex-1 bg-brand-bg">
           {/* Modal Header */}
-          <View className="px-5 pt-6 pb-4 border-b border-slate-200 flex-row justify-between items-center bg-white">
+          <View className="px-5 pt-6 pb-4 border-b border-brand-border flex-row justify-between items-center bg-brand-bg">
             <Pressable
               onPress={() => setCreateModalVisible(false)}
               className="w-10 h-10 bg-brand-slateBg rounded-full items-center justify-center"
             >
-              <Ionicons name="close" size={22} color="#0A2540" />
+              <Ionicons name="close" size={22} color={colors.navy} />
             </Pressable>
             <Text className="text-lg font-inter-bold text-brand-dark">Ask the Community</Text>
             <Pressable
@@ -437,7 +439,7 @@ export default function CommunityScreen() {
                     className={`px-3.5 py-2 rounded-xl border ${
                       newPostCategory === cat
                         ? "bg-brand-emerald/10 border-brand-emerald text-brand-emerald"
-                        : "bg-brand-slateBg border-slate-200"
+                        : "bg-brand-slateBg border-brand-border"
                     }`}
                   >
                     <Text
@@ -454,7 +456,7 @@ export default function CommunityScreen() {
               {/* Text Input */}
               <TextInput
                 textAlignVertical="top"
-                className="bg-brand-slateBg rounded-2xl p-4 text-base font-inter-semibold text-brand-dark border border-slate-200 min-h-[160]"
+                className="bg-brand-slateBg rounded-2xl p-4 text-base font-inter-semibold text-brand-dark border border-brand-border min-h-[160]"
                 multiline
                 placeholder="What is on your mind? Ask a question, share a victory, or give a tip..."
                 placeholderTextColor="#9ca3af"
@@ -475,7 +477,7 @@ export default function CommunityScreen() {
       >
         <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
           {/* Header */}
-          <View className="px-5 pt-6 pb-4 border-b border-slate-200 flex-row items-center bg-white justify-between">
+          <View className="px-5 pt-6 pb-4 border-b border-brand-border flex-row items-center bg-brand-bg justify-between">
             <Pressable
               onPress={() => {
                 setReplyModalVisible(false);
@@ -483,7 +485,7 @@ export default function CommunityScreen() {
               }}
               className="w-10 h-10 bg-brand-slateBg rounded-full items-center justify-center mr-3"
             >
-              <Ionicons name="arrow-back" size={22} color="#0A2540" />
+              <Ionicons name="arrow-back" size={22} color={colors.navy} />
             </Pressable>
             <Text className="text-lg font-inter-bold text-brand-dark">Thread Details</Text>
             <View style={{ width: 40 }} />
@@ -498,7 +500,7 @@ export default function CommunityScreen() {
               {/* Comments List */}
               <ScrollView className="flex-1 p-5" showsVerticalScrollIndicator={false}>
                 {/* Original Post Card */}
-                <View className="bg-white border border-slate-200 rounded-3xl p-5 mb-6 shadow-sm">
+                <View className="bg-brand-bg border border-brand-border rounded-3xl p-5 mb-6 shadow-sm">
                   <View className="flex-row justify-between items-start">
                     <View className="flex-row items-center mr-2 flex-1">
                       <View className="w-11 h-11 bg-brand-emerald/5 rounded-2xl items-center justify-center mr-3 border border-brand-emerald/20">
@@ -509,7 +511,7 @@ export default function CommunityScreen() {
                           <Text className="font-inter-bold text-brand-dark text-base" numberOfLines={1}>
                             {activePost.author}
                           </Text>
-                          <View className="px-2 py-0.5 rounded-full bg-brand-slateBg border border-slate-200">
+                          <View className="px-2 py-0.5 rounded-full bg-brand-slateBg border border-brand-border">
                             <Text className="text-[10px] text-brand-gray font-inter-bold uppercase tracking-wider">
                               {activePost.badge}
                             </Text>
@@ -531,7 +533,7 @@ export default function CommunityScreen() {
                     {activePost.content}
                   </Text>
 
-                  <View className="flex-row items-center mt-5 pt-4 border-t border-slate-100 gap-6">
+                  <View className="flex-row items-center mt-5 pt-4 border-t border-brand-border gap-6">
                     <Pressable
                       onPress={() => handleLike(activePost.id)}
                       className="flex-row items-center"
@@ -550,7 +552,7 @@ export default function CommunityScreen() {
                       </Text>
                     </Pressable>
                     <View className="flex-row items-center">
-                      <Ionicons name="chatbubble-outline" size={19} color="#9ca3af" />
+                      <Ionicons name="chatbubble-outline" size={19} color={colors.gray} />
                       <Text className="text-sm font-inter-bold text-brand-gray ml-2">
                         {activePost.replies.length} replies
                       </Text>
@@ -567,7 +569,7 @@ export default function CommunityScreen() {
                 {activePost.replies.length === 0 ? (
                   <View className="items-center py-10">
                     <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center mb-3">
-                      <Ionicons name="chatbubble-ellipses-outline" size={26} color="#94a3b8" />
+                      <Ionicons name="chatbubble-ellipses-outline" size={26} color={colors.gray} />
                     </View>
                     <Text className="text-brand-navy text-sm font-inter-bold">No replies yet</Text>
                     <Text className="text-brand-gray text-xs mt-1 font-inter">Be the first to answer this question.</Text>
@@ -576,7 +578,7 @@ export default function CommunityScreen() {
                   activePost.replies.map((rep) => (
                     <View
                       key={rep.id}
-                      className="bg-white border border-slate-200 rounded-2xl p-4 mb-3 shadow-sm shadow-slate-200/40"
+                      className="bg-brand-bg border border-brand-border rounded-2xl p-4 mb-3 shadow-sm shadow-slate-200/40"
                     >
                       <View className="flex-row items-center mb-2.5 justify-between">
                         <View className="flex-row items-center flex-1 mr-2">
@@ -606,9 +608,9 @@ export default function CommunityScreen() {
               </ScrollView>
 
               {/* Bottom Reply Input bar */}
-              <View className="p-4 bg-white border-t border-slate-200 flex-row items-center gap-3">
+              <View className="p-4 bg-brand-bg border-t border-brand-border flex-row items-center gap-3">
                 <TextInput
-                  className="flex-1 bg-brand-slateBg border border-slate-200 rounded-2xl px-4 py-3 text-sm font-inter-semibold text-brand-dark"
+                  className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-sm font-inter-semibold text-brand-dark"
                   placeholder={`Reply to ${activePost.author}...`}
                   placeholderTextColor="#9ca3af"
                   value={replyText}
