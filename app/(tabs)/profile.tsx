@@ -7,55 +7,11 @@ import { useUserStore } from "../../store/useUserStore";
 import { useThemeColors } from "../../hooks/useThemeColors";
 import "@/types/navigation";
 
-const colorBlindOptions = [
-  { id: "none", name: "Default", desc: "Standard colors", colors: ["#0A2540", "#16A34A", "#D4AF37"] },
-  { id: "deuteranopia", name: "Deuteranopia", desc: "Green blind safe", colors: ["#003A60", "#0072B2", "#E69F00"] },
-  { id: "protanopia", name: "Protanopia", desc: "Red blind safe", colors: ["#002C54", "#3D5AFE", "#FFC400"] },
-  { id: "tritanopia", name: "Tritanopia", desc: "Blue blind safe", colors: ["#5A0B2E", "#00796B", "#00E676"] },
-  { id: "high-contrast", name: "High Contrast", desc: "Maximum contrast", colors: ["#000000", "#0000FF", "#D97706"] },
-  { id: "monochrome", name: "Monochrome", desc: "Grayscale layout", colors: ["#111111", "#444444", "#888888"] },
+const appearanceOptions = [
+  { id: "system", name: "System Default", desc: "Automatically match your device", icon: "phone-portrait-outline" },
+  { id: "light", name: "Light", desc: "Always use a light appearance", icon: "sunny-outline" },
+  { id: "dark", name: "Dark", desc: "Always use a dark appearance", icon: "moon-outline" },
 ] as const;
-
-const getThemeColorOptions = (mode: string) => {
-  switch (mode) {
-    case 'deuteranopia':
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#009E73" },
-        { id: "blue", name: "Ocean Blue", color: "#0072B2" },
-        { id: "purple", name: "Noble Violet", color: "#CC79A7" },
-      ] as const;
-    case 'protanopia':
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#009E73" },
-        { id: "blue", name: "Ocean Blue", color: "#3D5AFE" },
-        { id: "purple", name: "Noble Violet", color: "#B800FF" },
-      ] as const;
-    case 'tritanopia':
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#00796B" },
-        { id: "blue", name: "Ocean Blue", color: "#00A5CF" },
-        { id: "purple", name: "Noble Violet", color: "#EC407A" },
-      ] as const;
-    case 'high-contrast':
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#008000" },
-        { id: "blue", name: "Ocean Blue", color: "#0000FF" },
-        { id: "purple", name: "Noble Violet", color: "#800080" },
-      ] as const;
-    case 'monochrome':
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#4B5563" },
-        { id: "blue", name: "Ocean Blue", color: "#374151" },
-        { id: "purple", name: "Noble Violet", color: "#1F2937" },
-      ] as const;
-    default:
-      return [
-        { id: "emerald", name: "Classic Emerald", color: "#10B981" },
-        { id: "blue", name: "Ocean Blue", color: "#2563EB" },
-        { id: "purple", name: "Noble Violet", color: "#7C3AED" },
-      ] as const;
-  }
-};
 
 export default function ProfileScreen() {
   const userName = useUserStore((s) => s.name);
@@ -66,10 +22,8 @@ export default function ProfileScreen() {
   const streak = useUserStore((s) => s.streak);
   const createdAt = useUserStore((s) => s.createdAt);
 
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const setColorBlindMode = useUserStore((s) => s.setColorBlindMode);
-  const setAppThemeColor = useUserStore((s) => s.setAppThemeColor);
+  const themeMode = useUserStore((s) => s.themeMode);
+  const setThemeMode = useUserStore((s) => s.setThemeMode);
   const colors = useThemeColors();
 
   const handleLogout = () => {
@@ -85,24 +39,24 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView 
-      className="flex-1 bg-brand-slateBg" 
+      className="flex-1 bg-brand-slateBg dark:bg-slate-950" 
       contentContainerStyle={{ paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
       {/* Profile Header */}
-      <View className="bg-white pt-16 pb-8 px-6 items-center border-b border-slate-100 shadow-sm">
-        <View className="w-24 h-24 bg-brand-emerald/10 rounded-full items-center justify-center border-4 border-brand-emerald shadow-sm">
+      <View className="bg-white dark:bg-slate-900 pt-16 pb-8 px-6 items-center border-b border-slate-100 dark:border-slate-800 shadow-sm">
+        <View className="w-24 h-24 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-full items-center justify-center border-4 border-brand-emerald shadow-sm">
           {avatar ? (
             <Text className="text-5xl">{avatar}</Text>
           ) : (
-            <Text className="text-brand-navy text-3xl font-inter-bold">
+            <Text className="text-brand-navy dark:text-slate-100 text-3xl font-inter-bold">
               {userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "FE"}
             </Text>
           )}
         </View>
 
-        <Text className="text-[24px] font-inter-semibold text-brand-navy mt-4">{userName}</Text>
-        <Text className="text-brand-gray font-inter text-sm mt-1">
+        <Text className="text-[24px] font-inter-semibold text-brand-navy dark:text-slate-100 mt-4">{userName}</Text>
+        <Text className="text-brand-gray dark:text-slate-400 font-inter text-sm mt-1">
           {createdAt
             ? `joined ${new Date(createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}`
             : "Just joined"}
@@ -117,8 +71,8 @@ export default function ProfileScreen() {
 
         {/* Goal badge */}
         {goal ? (
-          <View className="bg-brand-emerald/15 border border-brand-emerald/20 px-4 py-1.5 rounded-full mt-2.5 flex-row items-center">
-            <Text className="text-brand-emerald text-xs font-inter-bold uppercase tracking-wider">
+          <View className="bg-brand-emerald/15 dark:bg-brand-emerald/20 border border-brand-emerald/20 dark:border-brand-emerald/30 px-4 py-1.5 rounded-full mt-2.5 flex-row items-center">
+            <Text className="text-brand-emerald dark:text-emerald-400 text-xs font-inter-bold uppercase tracking-wider">
               🎯 Goal: {goal}
             </Text>
           </View>
@@ -126,8 +80,8 @@ export default function ProfileScreen() {
 
         {/* Streak badge */}
         {streak > 0 && (
-          <View className="bg-brand-gold/15 border border-brand-gold/20 px-4 py-1.5 rounded-full mt-2 flex-row items-center">
-            <Text className="text-brand-gold text-xs font-inter-bold uppercase tracking-wider">
+          <View className="bg-brand-gold/15 dark:bg-brand-gold/20 border border-brand-gold/20 dark:border-brand-gold/30 px-4 py-1.5 rounded-full mt-2 flex-row items-center">
+            <Text className="text-brand-gold dark:text-amber-400 text-xs font-inter-bold uppercase tracking-wider">
               🔥 {streak} Day Streak
             </Text>
           </View>
@@ -136,163 +90,123 @@ export default function ProfileScreen() {
 
       {/* Menu / Settings */}
       <View className="px-5 mt-8">
-        <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">ACCOUNT SETTINGS</Text>
+        <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">ACCOUNT SETTINGS</Text>
 
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-md shadow-slate-100/40">
           <Pressable 
             onPress={() => router.push("/personal-details")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-emerald/10 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
               <Ionicons name="person-outline" size={18} color={colors.emerald} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Personal Details</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Personal Details</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/(tabs)/home")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-navy/5 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-navy/5 dark:bg-slate-700/60 rounded-xl items-center justify-center mr-3">
               <Ionicons name="grid-outline" size={18} color={colors.navy} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Dashboard Overview</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Dashboard Overview</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/assessment-review")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-gold/10 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-gold/10 dark:bg-brand-gold/20 rounded-xl items-center justify-center mr-3">
               <Ionicons name="bar-chart-outline" size={18} color={colors.gold} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Financial Assessment</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Financial Assessment</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/badges")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-gold/10 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-gold/10 dark:bg-brand-gold/20 rounded-xl items-center justify-center mr-3">
               <Ionicons name="trophy-outline" size={18} color={colors.gold} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Badges & Achievements</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Badges & Achievements</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/(tabs)/news")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-emerald/10 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
               <Ionicons name="newspaper-outline" size={18} color={colors.emerald} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">News & Market Updates</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">News & Market Updates</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable 
             onPress={() => router.push("/notifications")}
-            className="p-4 flex-row items-center active:bg-slate-50"
+            className="p-4 flex-row items-center active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-brand-emerald/10 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
               <Ionicons name="notifications-outline" size={18} color={colors.emerald} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Notifications</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Notifications</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
         </View>
 
-        {/* Accessibility & Theming */}
-        <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">ACCESSIBILITY & THEMING</Text>
-        <View className="bg-white rounded-2xl border border-slate-100 p-5 shadow-md shadow-slate-100/40">
-          <Text className="text-brand-navy text-sm font-inter-bold mb-1">Color Blindness Mode</Text>
-          <Text className="text-brand-gray text-xs mb-3 font-inter">
-            Select a contrast profile optimized for different color vision needs:
-          </Text>
-
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            className="flex-row mb-6"
-            contentContainerStyle={{ paddingRight: 10 }}
-          >
-            {colorBlindOptions.map((opt) => {
-              const isSelected = colorBlindMode === opt.id;
-              return (
-                <Pressable
-                  key={opt.id}
-                  onPress={() => setColorBlindMode(opt.id)}
-                  style={{ width: 140 }}
-                  className={`p-3 mr-3 rounded-xl border ${
-                    isSelected 
-                      ? 'border-brand-emerald bg-brand-emerald/5' 
-                      : 'border-slate-100 bg-slate-50'
-                  }`}
-                >
-                  <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-brand-navy text-[13px] font-inter-semibold" numberOfLines={1}>
-                      {opt.name}
-                    </Text>
-                    {isSelected && (
-                      <Ionicons name="checkmark-circle" size={16} color={opt.colors[1]} />
-                    )}
-                  </View>
-                  <Text className="text-[10px] text-brand-gray mb-3 font-inter" numberOfLines={2}>
-                    {opt.desc}
-                  </Text>
-                  
-                  {/* Swatches */}
-                  <View className="flex-row gap-1">
-                    {opt.colors.map((c, i) => (
-                      <View 
-                        key={i} 
-                        style={{ backgroundColor: c, width: 14, height: 14, borderRadius: 7 }} 
-                      />
-                    ))}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View>
-            <Text className="text-brand-navy text-sm font-inter-bold mb-1">App Custom Color</Text>
-            <Text className="text-brand-gray text-xs mb-4 font-inter">
-              Choose a primary brand color theme optimized for your selected mode:
+        {/* Appearance */}
+        <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">APPEARANCE</Text>
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-md shadow-slate-100/40">
+          <View className="px-5 pt-5 pb-4">
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-bold mb-1">Color Appearance</Text>
+            <Text className="text-brand-gray dark:text-slate-400 text-xs font-inter">
+              Choose how the app looks — dark, light, or matching your system:
             </Text>
-
-            <View className="flex-row flex-wrap gap-3">
-              {getThemeColorOptions(colorBlindMode).map((opt) => {
-                const isSelected = appThemeColor === opt.id;
-                return (
-                  <Pressable
-                    key={opt.id}
-                    onPress={() => setAppThemeColor(opt.id)}
-                    style={({ pressed }) => [{ backgroundColor: opt.color }, { transform: [{ scale: pressed ? 0.95 : 1 }] }]}
-                    className="w-12 h-12 rounded-full items-center justify-center border-2 border-white shadow-sm"
-                  >
-                    {isSelected && (
-                      <Ionicons name="checkmark" size={24} color="#FFFFFF" />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
           </View>
+
+          {appearanceOptions.map((opt, idx) => {
+            const isSelected = themeMode === opt.id;
+            return (
+              <Pressable
+                key={opt.id}
+                onPress={() => setThemeMode(opt.id)}
+                className={`p-4 flex-row items-center ${
+                  idx < appearanceOptions.length - 1 ? "border-b border-slate-50 dark:border-slate-800" : ""
+                } active:bg-slate-50 dark:active:bg-slate-800`}
+              >
+                <View className={`w-9 h-9 rounded-xl items-center justify-center mr-3 ${
+                  isSelected ? "bg-brand-emerald/10 dark:bg-brand-emerald/20" : "bg-slate-100 dark:bg-slate-800"
+                }`}>
+                  <Ionicons name={opt.icon} size={18} color={isSelected ? colors.emerald : "#6B7280"} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold">{opt.name}</Text>
+                  <Text className="text-brand-gray dark:text-slate-400 text-xs font-inter mt-0.5">{opt.desc}</Text>
+                </View>
+                {isSelected ? (
+                  <Ionicons name="checkmark-circle" size={20} color={colors.emerald} />
+                ) : (
+                  <View className="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-600" />
+                )}
+              </Pressable>
+            );
+          })}
         </View>
 
         {/* Subscription Status Section */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">SUBSCRIPTION TIER</Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-md shadow-slate-100/40 p-5 flex-row justify-between items-center">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-md shadow-slate-100/40 p-5 flex-row justify-between items-center">
           <View className="flex-1 pr-4">
-            <Text className="text-brand-navy text-base font-inter-semibold">
+            <Text className="text-brand-navy dark:text-slate-100 text-base font-inter-semibold">
               {isPremium ? "💎 FinLit Premium Active" : "🆓 Free Tier (Standard)"}
             </Text>
-            <Text className="text-brand-gray font-inter text-xs mt-1.5 leading-5">
+            <Text className="text-brand-gray dark:text-slate-400 font-inter text-xs mt-1.5 leading-5">
               {isPremium 
                 ? "You have full access to simulators, audio modules, and AI Coach." 
                 : "Unlock advanced financial engines, offline audio, and personal AI Coach."}
@@ -310,10 +224,10 @@ export default function ProfileScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
             })}
             className={`px-4 py-2.5 rounded-2xl border justify-center items-center ${
-              isPremium ? "bg-red-50 border-red-200" : "bg-brand-navy border-brand-navy shadow-sm active:bg-brand-navy/95"
+              isPremium ? "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900" : "bg-brand-navy border-brand-navy shadow-sm active:bg-brand-navy/95"
             }`}
           >
-            <Text className={`text-xs font-inter-semibold uppercase tracking-wider ${isPremium ? "text-red-700" : "text-white"}`}>
+            <Text className={`text-xs font-inter-semibold uppercase tracking-wider ${isPremium ? "text-red-700 dark:text-red-400" : "text-white"}`}>
               {isPremium ? "Downgrade" : "Upgrade"}
             </Text>
           </Pressable>
@@ -322,37 +236,37 @@ export default function ProfileScreen() {
         {/* Support & Logout */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">GENERAL</Text>
 
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-md shadow-slate-100/40">
           <Pressable 
             onPress={() => router.push("/help-support")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-slate-100 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-xl items-center justify-center mr-3">
               <Ionicons name="help-circle-outline" size={18} color="#6B7280" />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Help & Support</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Help & Support</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable 
             onPress={() => router.push("/privacy-policy")}
-            className="p-4 flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            className="p-4 flex-row items-center border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-slate-100 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-slate-100 dark:bg-slate-800 rounded-xl items-center justify-center mr-3">
               <Ionicons name="shield-checkmark-outline" size={18} color="#6B7280" />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Privacy Policy</Text>
+            <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-semibold flex-1">Privacy Policy</Text>
             <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
           </Pressable>
 
           <Pressable 
             onPress={handleLogout} 
-            className="p-4 flex-row items-center active:bg-slate-50"
+            className="p-4 flex-row items-center active:bg-slate-50 dark:active:bg-slate-800"
           >
-            <View className="w-9 h-9 bg-red-50 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-red-50 dark:bg-red-950/50 rounded-xl items-center justify-center mr-3">
               <Ionicons name="log-out-outline" size={18} color="#DC2626" />
             </View>
-            <Text className="text-red-600 text-sm font-inter-bold flex-1">Sign Out</Text>
+            <Text className="text-red-600 dark:text-red-400 text-sm font-inter-bold flex-1">Sign Out</Text>
             <Ionicons name="chevron-forward" size={16} color="#FCA5A5" />
           </Pressable>
         </View>

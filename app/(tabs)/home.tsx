@@ -106,7 +106,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-brand-slateBg"
+      className="flex-1 bg-brand-slateBg dark:bg-slate-950"
       contentContainerStyle={{ paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
@@ -114,7 +114,7 @@ export default function HomeScreen() {
       <View className="bg-brand-navy pt-16 pb-10 px-6 rounded-b-[40px] shadow-lg shadow-brand-navy/15">
         <View className="flex-row justify-between items-center">
           <View className="flex-1 pr-4">
-            <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest">
+            <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest dark:text-amber-400">
               {getGreeting()}
             </Text>
             <Text
@@ -163,25 +163,25 @@ export default function HomeScreen() {
       <View className="px-5 -mt-5">
 
         {/* ── STREAK & DAILY TRACKER ── */}
-        <View className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg shadow-slate-100/40">
+        <View className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg shadow-slate-100/40 dark:bg-slate-900 dark:border-slate-800">
           <View className="flex-row justify-between items-start mb-4">
             <View>
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest dark:text-slate-400">
                 DAILY STREAK
               </Text>
               <View className="flex-row items-center mt-1">
-                <Text className="text-brand-navy text-[32px] font-inter-bold">{streak}</Text>
-                <Text className="text-brand-gray text-sm font-inter ml-2 mt-2">
+                <Text className="text-brand-navy text-[32px] font-inter-bold dark:text-slate-100">{streak}</Text>
+                <Text className="text-brand-gray text-sm font-inter ml-2 mt-2 dark:text-slate-400">
                   {streak === 1 ? "day" : "days"} 🔥
                 </Text>
               </View>
             </View>
             <Pressable
               onPress={() => router.push("/(tabs)/leaderboard")}
-              className="bg-brand-gold/10 border border-brand-gold/20 rounded-xl px-3 py-1.5 flex-row items-center"
+              className="bg-brand-gold/10 border border-brand-gold/20 rounded-xl px-3 py-1.5 flex-row items-center dark:bg-brand-gold/20 dark:border-brand-gold/30"
             >
               <Ionicons name="trophy" size={13} color={colors.gold} />
-              <Text className="text-brand-gold font-inter-bold text-xs ml-1.5">Ranks</Text>
+              <Text className="text-brand-gold font-inter-bold text-xs ml-1.5 dark:text-amber-400">Ranks</Text>
             </Pressable>
           </View>
 
@@ -192,14 +192,14 @@ export default function HomeScreen() {
               const isToday = index === adjustedToday;
               return (
                 <View key={index} className="items-center">
-                  <Text className="text-brand-gray text-[10px] font-inter-bold mb-2">{day}</Text>
+                  <Text className="text-brand-gray text-[10px] font-inter-bold mb-2 dark:text-slate-400">{day}</Text>
                   <View
                     className={`w-8 h-8 rounded-full items-center justify-center ${
                       isToday
                         ? "bg-brand-emerald border-2 border-brand-emerald"
                         : isActive
-                        ? "bg-brand-emerald/15 border border-brand-emerald/30"
-                        : "bg-slate-50 border border-slate-100"
+                        ? "bg-brand-emerald/15 border border-brand-emerald/30 dark:bg-brand-emerald/20"
+                        : "bg-slate-50 border border-slate-100 dark:bg-slate-800 dark:border-slate-800"
                     }`}
                   >
                     {isActive || isToday ? (
@@ -220,29 +220,29 @@ export default function HomeScreen() {
 
         {/* ── QUICK PROGRESS STATS ── */}
         <View className="flex-row mt-4 gap-3">
-          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md">
+          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
             <View className="flex-row justify-between items-center">
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 Lessons
               </Text>
-              <View className="w-6 h-6 bg-brand-emerald/10 rounded-lg items-center justify-center">
+              <View className="w-6 h-6 bg-brand-emerald/10 rounded-lg items-center justify-center dark:bg-brand-emerald/20">
                 <Ionicons name="book" size={12} color={colors.emerald} />
               </View>
             </View>
-            <Text className="text-brand-navy text-2xl font-inter-bold mt-2">{lessonsCompleted}</Text>
+            <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">{lessonsCompleted}</Text>
           </View>
 
-          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md">
+          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
             <View className="flex-row justify-between items-center">
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 XP Score
               </Text>
-              <View className="w-6 h-6 bg-brand-gold/10 rounded-lg items-center justify-center">
+              <View className="w-6 h-6 bg-brand-gold/10 rounded-lg items-center justify-center dark:bg-brand-gold/20">
                 <Ionicons name="flash" size={12} color={colors.gold} />
               </View>
             </View>
-            <Text className="text-brand-navy text-2xl font-inter-bold mt-2">
-              {xp} <Text className="text-xs text-brand-gold font-inter-bold">XP</Text>
+            <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">
+              {xp} <Text className="text-xs text-brand-gold font-inter-bold dark:text-amber-400">XP</Text>
             </Text>
           </View>
         </View>
@@ -250,13 +250,13 @@ export default function HomeScreen() {
         {/* ── FINANCIAL NEWS MINI-FEED ── */}
         <View className="mt-8">
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-[24px] font-inter-semibold text-brand-navy">Financial News</Text>
+            <Text className="text-[24px] font-inter-semibold text-brand-navy dark:text-slate-100">Financial News</Text>
             <Pressable
               onPress={() => router.push("/(tabs)/news")}
               style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
               className="flex-row items-center gap-1"
             >
-              <Text className="text-brand-emerald text-[13px] font-inter-bold">See All</Text>
+              <Text className="text-brand-emerald text-[13px] font-inter-bold dark:text-emerald-400">See All</Text>
               <Ionicons name="arrow-forward" size={14} color="#16A34A" />
             </Pressable>
           </View>
@@ -274,7 +274,7 @@ export default function HomeScreen() {
                   width: 240,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
-                className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm"
+                className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"
               >
                 {/* Card image */}
                 <Image

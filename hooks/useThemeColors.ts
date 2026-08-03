@@ -1,10 +1,7 @@
-import { useUserStore } from "../store/useUserStore";
 import { getThemeVars } from "../constants/theme";
 
 export function useThemeColors() {
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const themeVars = getThemeVars(colorBlindMode, appThemeColor);
+  const themeVars = getThemeVars();
 
   return {
     navy: themeVars["--color-brand-navy"],

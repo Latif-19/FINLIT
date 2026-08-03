@@ -91,8 +91,7 @@ export interface UserState {
   simulationHistory: SimulationResult[];
 
   // Theming & Accessibility
-  colorBlindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome';
-  appThemeColor: 'emerald' | 'blue' | 'purple';
+  themeMode: 'system' | 'light' | 'dark';
 
   // Notification Preferences
   notificationPrefs: Record<string, boolean>;
@@ -129,8 +128,7 @@ export interface UserActions {
   saveQuizScore: (moduleId: number, score: number) => void;
 
   // Theming & Accessibility
-  setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
-  setAppThemeColor: (color: 'emerald' | 'blue' | 'purple') => void;
+  setThemeMode: (mode: 'system' | 'light' | 'dark') => void;
 
   // Notification Preferences
   setNotificationPref: (key: string, value: boolean) => void;
@@ -180,8 +178,7 @@ const DEFAULT_STATE: UserState = {
   // truth and syncs the real value on first load.
   badges: DEFAULT_BADGES,
   quizScores: {},
-  colorBlindMode: 'none',
-  appThemeColor: 'emerald',
+  themeMode: 'system',
   notificationPrefs: {
     dailyReminders: true,
     streakAlerts: true,
@@ -438,8 +435,7 @@ export const useUserStore = create<UserState & UserActions>()(
       clearSimulationHistory: () => set({ simulationHistory: [] }),
 
       // ── Theming & Accessibility ─────────────────────────────────────────
-      setColorBlindMode: (mode) => set({ colorBlindMode: mode }),
-      setAppThemeColor: (color) => set({ appThemeColor: color }),
+      setThemeMode: (mode) => set({ themeMode: mode }),
 
       // ── Notification Preferences ─────────────────────────────────────────
       setNotificationPref: (key, value) =>
@@ -472,8 +468,7 @@ export const useUserStore = create<UserState & UserActions>()(
         lastActiveDate: state.lastActiveDate,
         badges: state.badges,
         quizScores: state.quizScores,
-        colorBlindMode: state.colorBlindMode,
-        appThemeColor: state.appThemeColor,
+        themeMode: state.themeMode,
         notificationPrefs: state.notificationPrefs,
         createdAt: state.createdAt,
         lastAssessedAt: state.lastAssessedAt,
