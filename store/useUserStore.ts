@@ -96,13 +96,9 @@ export interface UserState {
   simulationHistory: SimulationResult[];
 
   // Theming & Accessibility
-<<<<<<< HEAD
-  themeMode: 'system' | 'light' | 'dark';
-=======
   colorBlindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome';
   appThemeColor: 'emerald' | 'blue' | 'purple';
   isDarkMode: boolean;
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
   // Notification Preferences
   notificationPrefs: Record<string, boolean>;
@@ -139,13 +135,9 @@ export interface UserActions {
   saveQuizScore: (moduleId: number, score: number) => void;
 
   // Theming & Accessibility
-<<<<<<< HEAD
-  setThemeMode: (mode: 'system' | 'light' | 'dark') => void;
-=======
   setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
   setAppThemeColor: (color: 'emerald' | 'blue' | 'purple') => void;
   setDarkMode: (isDark: boolean) => void;
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
   // Notification Preferences
   setNotificationPref: (key: string, value: boolean) => void;
@@ -195,15 +187,11 @@ const DEFAULT_STATE: UserState = {
   // truth and syncs the real value on first load.
   badges: DEFAULT_BADGES,
   quizScores: {},
-<<<<<<< HEAD
-  themeMode: 'system',
-=======
   completedLessonIds: [],
   totalTimeSpentSeconds: 0,
   colorBlindMode: 'none',
   appThemeColor: 'emerald',
   isDarkMode: false,
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
   notificationPrefs: {
     dailyReminders: true,
     streakAlerts: true,
@@ -468,13 +456,9 @@ export const useUserStore = create<UserState & UserActions>()(
       clearSimulationHistory: () => set({ simulationHistory: [] }),
 
       // ── Theming & Accessibility ─────────────────────────────────────────
-<<<<<<< HEAD
-      setThemeMode: (mode) => set({ themeMode: mode }),
-=======
       setColorBlindMode: (mode) => set({ colorBlindMode: mode }),
       setAppThemeColor: (color) => set({ appThemeColor: color }),
       setDarkMode: (isDark) => set({ isDarkMode: isDark }),
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 
       // ── Notification Preferences ─────────────────────────────────────────
       setNotificationPref: (key, value) =>
@@ -507,15 +491,11 @@ export const useUserStore = create<UserState & UserActions>()(
         lastActiveDate: state.lastActiveDate,
         badges: state.badges,
         quizScores: state.quizScores,
-<<<<<<< HEAD
-        themeMode: state.themeMode,
-=======
         completedLessonIds: state.completedLessonIds,
         totalTimeSpentSeconds: state.totalTimeSpentSeconds,
         colorBlindMode: state.colorBlindMode,
         appThemeColor: state.appThemeColor,
         isDarkMode: state.isDarkMode,
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
         notificationPrefs: state.notificationPrefs,
         createdAt: state.createdAt,
         lastAssessedAt: state.lastAssessedAt,

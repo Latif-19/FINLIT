@@ -95,11 +95,7 @@ export default function AssessmentScreen() {
         {/* Back Button */}
         <Pressable
           onPress={() => router.back()}
-<<<<<<< HEAD
-          className="p-2.5 bg-white dark:bg-slate-900 rounded-full shadow-md border border-slate-100 dark:border-slate-800 active:opacity-80"
-=======
           className="p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
         >
           <Ionicons name="arrow-back" size={22} color={colors.navy} />
         </Pressable>
@@ -145,11 +141,7 @@ export default function AssessmentScreen() {
         {questions.map((item, qIndex) => (
           <View
             key={qIndex}
-<<<<<<< HEAD
-            className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 mb-6 shadow-md shadow-slate-100/40"
-=======
             className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40"
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
           >
             <Text className="text-brand-gray dark:text-slate-400 font-inter-semibold text-xs uppercase tracking-wider mb-2">
               Question {qIndex + 1}

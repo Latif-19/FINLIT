@@ -172,11 +172,7 @@ export default function HomeScreen() {
       <View className="px-5 -mt-5">
 
         {/* ── STREAK & DAILY TRACKER ── */}
-<<<<<<< HEAD
-        <View className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg shadow-slate-100/40 dark:bg-slate-900 dark:border-slate-800">
-=======
         <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border shadow-lg shadow-slate-100/40">
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
           <View className="flex-row justify-between items-start mb-4">
             <View>
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest dark:text-slate-400">
@@ -211,13 +207,8 @@ export default function HomeScreen() {
                       isToday
                         ? "bg-brand-emerald border-2 border-brand-emerald"
                         : isActive
-<<<<<<< HEAD
-                        ? "bg-brand-emerald/15 border border-brand-emerald/30 dark:bg-brand-emerald/20"
-                        : "bg-slate-50 border border-slate-100 dark:bg-slate-800 dark:border-slate-800"
-=======
                         ? "bg-brand-emerald/15 border border-brand-emerald/30"
                         : "bg-brand-slateBg border border-brand-border"
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
                     }`}
                   >
                     {isActive || isToday ? (
@@ -238,11 +229,7 @@ export default function HomeScreen() {
 
         {/* ── QUICK PROGRESS STATS ── */}
         <View className="flex-row mt-4 gap-3">
-<<<<<<< HEAD
-          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
-=======
           <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             <View className="flex-row justify-between items-center">
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 Lessons
@@ -254,11 +241,7 @@ export default function HomeScreen() {
             <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">{lessonsCompleted}</Text>
           </View>
 
-<<<<<<< HEAD
-          <View className="flex-1 bg-white p-4 rounded-2xl border border-slate-100 shadow-md dark:bg-slate-900 dark:border-slate-800">
-=======
           <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             <View className="flex-row justify-between items-center">
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
                 XP Score
@@ -296,13 +279,8 @@ export default function HomeScreen() {
               style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
               className="flex-row items-center gap-1"
             >
-<<<<<<< HEAD
-              <Text className="text-brand-emerald text-[13px] font-inter-bold dark:text-emerald-400">See All</Text>
-              <Ionicons name="arrow-forward" size={14} color="#16A34A" />
-=======
               <Text className="text-brand-emerald text-[13px] font-inter-bold">See All</Text>
               <Ionicons name="arrow-forward" size={14} color={colors.emerald} />
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
             </Pressable>
           </View>
 
@@ -319,11 +297,7 @@ export default function HomeScreen() {
                   width: 240,
                   transform: [{ scale: pressed ? 0.98 : 1 }],
                 })}
-<<<<<<< HEAD
-                className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"
-=======
                 className="bg-brand-bg rounded-2xl overflow-hidden border border-brand-border shadow-sm"
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
               >
                 {/* Card image */}
                 <Image

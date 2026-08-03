@@ -109,53 +109,32 @@ export default function BadgesScreen() {
                 EARNED ({unlocked.length})
               </Text>
               <View className="flex-row flex-wrap gap-3 mb-6">
-<<<<<<< HEAD
                 {unlocked.map((badge) => {
-                  const imgSource = getBadgeImage(badge.name || (badge as any).title);
+                  const imgSource = getBadgeImage(badge.name);
                   return (
                     <View
                       key={badge.id}
-                      className="bg-white dark:bg-slate-900 rounded-2xl border border-brand-emerald/20 dark:border-brand-emerald/30 p-4 w-[47%] shadow-md shadow-slate-100/40"
+                      className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
                     >
-                      <View className="w-14 h-14 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-2xl items-center justify-center overflow-hidden">
+                      <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center overflow-hidden">
                         {imgSource ? (
                           <Image
                             source={imgSource}
-                            style={{ width: 28, height: 28, resizeMode: "contain" }}
+                            style={{ width: 36, height: 36, resizeMode: "contain" }}
                           />
                         ) : (
                           <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
                         )}
                       </View>
-                      <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-bold mt-3">
+                      <Text className="text-brand-navy text-sm font-inter-bold mt-3">
                         {badge.name}
-=======
-                {unlocked.map((badge) => (
-                  <View
-                    key={badge.id}
-                    className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
-                  >
-                    <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center">
-                      <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
-                    </View>
-                    <Text className="text-brand-navy text-sm font-inter-bold mt-3">
-                      {badge.name}
-                    </Text>
-                    <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
-                      {badge.description}
-                    </Text>
-                    <View className="flex-row items-center mt-2">
-                      <Ionicons name="checkmark-circle" size={12} color={colors.emerald} />
-                      <Text className="text-brand-emerald text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
-                        Earned
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
                       </Text>
-                      <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter mt-1 leading-4">
+                      <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
                         {badge.description}
                       </Text>
                       <View className="flex-row items-center mt-2">
                         <Ionicons name="checkmark-circle" size={12} color={colors.emerald} />
-                        <Text className="text-brand-emerald dark:text-emerald-400 text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
+                        <Text className="text-brand-emerald text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
                           Earned
                         </Text>
                       </View>
@@ -171,53 +150,32 @@ export default function BadgesScreen() {
             LOCKED ({locked.length})
           </Text>
           <View className="flex-row flex-wrap gap-3">
-<<<<<<< HEAD
             {locked.map((badge) => {
-              const imgSource = getBadgeImage(badge.name || (badge as any).title);
+              const imgSource = getBadgeImage(badge.name);
               return (
                 <View
                   key={badge.id}
-                  className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-4 w-[47%] shadow-sm opacity-60"
+                  className="bg-brand-bg rounded-2xl border border-brand-border p-4 w-[47%] shadow-sm opacity-60"
                 >
-                  <View className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl items-center justify-center overflow-hidden">
+                  <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center overflow-hidden">
                     {imgSource ? (
                       <Image
                         source={imgSource}
-                        style={{ width: 28, height: 28, resizeMode: "contain" }}
+                        style={{ width: 36, height: 36, resizeMode: "contain", opacity: 0.5 }}
                       />
                     ) : (
-                      <Ionicons name={badgeIcon(badge.id)} size={28} color="#cbd5e1" />
+                      <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
                     )}
                   </View>
-                  <Text className="text-brand-navy dark:text-slate-100 text-sm font-inter-bold mt-3">
+                  <Text className="text-brand-navy text-sm font-inter-bold mt-3">
                     {badge.name}
-=======
-            {locked.map((badge) => (
-              <View
-                key={badge.id}
-                className="bg-brand-bg rounded-2xl border border-brand-border p-4 w-[47%] shadow-sm opacity-60"
-              >
-                <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center">
-                  <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
-                </View>
-                <Text className="text-brand-navy text-sm font-inter-bold mt-3">
-                  {badge.name}
-                </Text>
-                <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
-                  {badge.description}
-                </Text>
-                <View className="flex-row items-center mt-2">
-                  <Ionicons name="lock-closed" size={12} color={colors.gray} />
-                  <Text className="text-brand-gray text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
-                    Locked
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
                   </Text>
-                  <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter mt-1 leading-4">
+                  <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
                     {badge.description}
                   </Text>
                   <View className="flex-row items-center mt-2">
-                    <Ionicons name="lock-closed" size={12} color="#94A3B8" />
-                    <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
+                    <Ionicons name="lock-closed" size={12} color={colors.gray} />
+                    <Text className="text-brand-gray text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
                       Locked
                     </Text>
                   </View>

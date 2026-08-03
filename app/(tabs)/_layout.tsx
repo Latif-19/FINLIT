@@ -2,16 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { getThemeVars } from "../../constants/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUserStore } from "../../store/useUserStore";
 
 export default function TabsLayout() {
-<<<<<<< HEAD
-  const themeVars = getThemeVars();
-=======
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);
   const appThemeColor = useUserStore((s) => s.appThemeColor);
   const isDarkMode = useUserStore((s) => s.isDarkMode);
   const themeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
   const insets = useSafeAreaInsets();
 
   const activeColor = themeVars["--color-brand-emerald"];
@@ -35,13 +32,8 @@ export default function TabsLayout() {
         },
         tabBarStyle: {
           backgroundColor: tabBgColor,
-<<<<<<< HEAD
-          borderTopColor: '#E2E8F0',
-          borderTopWidth: 1,
-=======
           borderTopColor: tabBorderColor,
           borderTopWidth: colorBlindMode === 'high-contrast' ? 2 : 1,
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
           height: 60 + (insets.bottom > 0 ? insets.bottom : 10),
           paddingBottom: insets.bottom > 0 ? insets.bottom + 2 : 12,
           paddingTop: 8,

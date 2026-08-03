@@ -69,18 +69,6 @@ interface ThemeVariant {
   dark: ThemeVars;
 }
 
-<<<<<<< HEAD
-export function getThemeVars(): ThemeVars {
-  return {
-    '--color-brand-navy': '#0A2540',
-    '--color-brand-emerald': '#10B981',
-    '--color-brand-gold': '#D4AF37',
-    '--color-brand-bg': '#FFFFFF',
-    '--color-brand-slateBg': '#F8FAFC',
-    '--color-brand-dark': '#111827',
-    '--color-brand-gray': '#6B7280',
-  };
-=======
 export const THEME_PRESETS = {
   modes: {
     none: {
@@ -495,12 +483,11 @@ export const THEME_PRESETS = {
 };
 
 export function getThemeVars(
-  colorBlindMode: keyof typeof THEME_PRESETS.modes,
-  appThemeColor: keyof typeof THEME_PRESETS.modes.none,
+  colorBlindMode: keyof typeof THEME_PRESETS.modes = 'none',
+  appThemeColor: keyof typeof THEME_PRESETS.modes.none = 'emerald',
   isDark: boolean = false
 ): ThemeVars {
-  const modePresets = THEME_PRESETS.modes[colorBlindMode];
+  const modePresets = THEME_PRESETS.modes[colorBlindMode] || THEME_PRESETS.modes.none;
   const variant = modePresets[appThemeColor] || modePresets.emerald;
   return isDark ? variant.dark : variant.light;
->>>>>>> f1861be95c2b5852f5a8ef673e00e9d0bec02c77
 }
