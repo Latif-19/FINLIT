@@ -67,10 +67,10 @@ export default function LeaderboardScreen() {
         <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest">
           Weekly Rankings
         </Text>
-        <Text className="text-white text-[28px] font-inter-bold mt-1 tracking-tight">
+        <Text className="text-brand-textOnDark text-[28px] font-inter-bold mt-1 tracking-tight">
           Leaderboard
         </Text>
-        <Text className="text-white/60 text-xs font-inter mt-2">
+        <Text className="text-brand-textOnDark/60 text-xs font-inter mt-2">
           Top learners ranked by XP earned
         </Text>
 
@@ -80,10 +80,10 @@ export default function LeaderboardScreen() {
             <Text className="text-2xl">{avatar}</Text>
           </View>
           <View className="flex-1 ml-3">
-            <Text className="text-white text-xs font-inter-semibold uppercase tracking-wider">
+            <Text className="text-brand-textOnDark text-xs font-inter-semibold uppercase tracking-wider">
               Your Rank
             </Text>
-            <Text className="text-white text-2xl font-inter-bold mt-0.5">
+            <Text className="text-brand-textOnDark text-2xl font-inter-bold mt-0.5">
               #{currentUserRank}
             </Text>
           </View>
@@ -91,7 +91,7 @@ export default function LeaderboardScreen() {
             <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-wider">
               XP
             </Text>
-            <Text className="text-white text-xl font-inter-bold mt-0.5">
+            <Text className="text-brand-textOnDark text-xl font-inter-bold mt-0.5">
               {userXp.toLocaleString()}
             </Text>
           </View>
@@ -112,7 +112,7 @@ export default function LeaderboardScreen() {
                 <View className={`w-16 h-16 rounded-2xl items-center justify-center border-2 ${badge.border} ${badge.bg} shadow-md`}>
                   <Text className="text-3xl">{entry.avatar}</Text>
                 </View>
-                <Text className="text-brand-navy text-xs font-inter-bold mt-2 text-center" numberOfLines={1}>
+                <Text className="text-brand-textPrimary text-xs font-inter-bold mt-2 text-center" numberOfLines={1}>
                   {entry.name.split(" ")[0]}
                 </Text>
                 <Text className="text-brand-gray text-[10px] font-inter">
@@ -123,7 +123,7 @@ export default function LeaderboardScreen() {
                   style={{ minHeight: heights[podiumIndex] }}
                 >
                   <Text className="text-2xl mb-1">{badge.emoji}</Text>
-                  <Text className="text-brand-navy text-lg font-inter-bold">
+                  <Text className="text-brand-textPrimary text-lg font-inter-bold">
                     #{entry.rank}
                   </Text>
                 </View>
@@ -136,11 +136,11 @@ export default function LeaderboardScreen() {
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
           ALL RANKINGS
         </Text>
-        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-brand-shadow">
           {rest.length === 0 && (
             <View className="items-center py-8 px-6">
               <Ionicons name="people-outline" size={30} color={colors.gray} />
-              <Text className="text-brand-navy text-sm font-inter-bold mt-3 text-center">
+              <Text className="text-brand-textPrimary text-sm font-inter-bold mt-3 text-center">
                 You&apos;re leading the pack!
               </Text>
               <Text className="text-brand-gray text-xs mt-1 text-center leading-4">
@@ -164,12 +164,12 @@ export default function LeaderboardScreen() {
                   <Text className="text-xl">{entry.avatar}</Text>
                 </View>
                 <View className="flex-1 ml-3">
-                  <Text className={`text-sm font-inter-semibold ${isCurrentUser ? "text-brand-emerald" : "text-brand-navy"}`}>
+                  <Text className={`text-sm font-inter-semibold ${isCurrentUser ? "text-brand-emerald" : "text-brand-textPrimary"}`}>
                     {entry.name} {isCurrentUser ? "(You)" : ""}
                   </Text>
                 </View>
                 <View className="bg-brand-navy/5 px-3 py-1.5 rounded-xl">
-                  <Text className="text-brand-navy text-xs font-inter-bold">
+                  <Text className="text-brand-textPrimary text-xs font-inter-bold">
                     {entry.xp.toLocaleString()} XP
                   </Text>
                 </View>

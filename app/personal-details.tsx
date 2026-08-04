@@ -81,7 +81,7 @@ export default function PersonalDetailsScreen() {
       {showToast && (
         <View className="absolute top-14 left-6 right-6 z-50 bg-brand-emerald rounded-2xl px-5 py-3.5 flex-row items-center shadow-lg">
           <Ionicons name="checkmark-circle" size={22} color="white" />
-          <Text className="text-white font-inter-bold text-sm ml-2.5">Changes saved successfully!</Text>
+          <Text className="text-brand-textOnDark font-inter-bold text-sm ml-2.5">Changes saved successfully!</Text>
         </View>
       )}
 
@@ -95,7 +95,7 @@ export default function PersonalDetailsScreen() {
           <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
         <View className="flex-1">
-          <Text className="text-xl font-inter-bold text-brand-navy">Personal Details</Text>
+          <Text className="text-xl font-inter-bold text-brand-textPrimary">Personal Details</Text>
           <Text className="text-brand-gray text-xs font-inter mt-0.5">Manage your profile information</Text>
         </View>
       </View>
@@ -111,7 +111,7 @@ export default function PersonalDetailsScreen() {
             <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Name</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
+                className="text-brand-textPrimary text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={name}
                 onChangeText={setName}
                 onBlur={() => { if (name.trim()) useUserStore.getState().setName(name); }}
@@ -124,7 +124,7 @@ export default function PersonalDetailsScreen() {
             <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Email</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border opacity-60"
+                className="text-brand-textPrimary text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border opacity-60"
                 value={email}
                 editable={false}
                 placeholder="you@example.com"
@@ -141,7 +141,7 @@ export default function PersonalDetailsScreen() {
             <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Age</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
+                className="text-brand-textPrimary text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={age}
                 onChangeText={setAge}
                 onBlur={() => useUserStore.getState().setAge(age)}
@@ -155,7 +155,7 @@ export default function PersonalDetailsScreen() {
             <View className="p-4">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Phone</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
+                className="text-brand-textPrimary text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
                 value={phone}
                 onChangeText={setPhone}
                 onBlur={() => useUserStore.getState().setPhone(phone)}
@@ -263,7 +263,7 @@ export default function PersonalDetailsScreen() {
           >
             <View className="flex-row items-center">
               <Ionicons name="checkmark-circle" size={20} color="white" />
-              <Text className="text-white font-inter-bold text-base ml-2">Save Changes</Text>
+              <Text className="text-brand-textOnDark font-inter-bold text-base ml-2">Save Changes</Text>
             </View>
           </Pressable>
         </View>

@@ -624,7 +624,7 @@ export default function AssessmentResultScreen() {
           <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-sm border border-brand-border overflow-hidden">
             <Ionicons name="analytics" size={32} color={colors.emerald} />
           </View>
-          <Text className="text-3xl font-inter-bold text-brand-navy mt-4 tracking-tight">
+          <Text className="text-3xl font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
             Analysis Complete
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4 leading-5">
@@ -659,7 +659,7 @@ export default function AssessmentResultScreen() {
 
           {/* Skill Breakdown */}
           <View className="border-t border-brand-border pt-5 mt-5">
-            <Text className="text-brand-navy font-inter-bold text-sm mb-3">Syllabus Breakdown</Text>
+            <Text className="text-brand-textPrimary font-inter-bold text-sm mb-3">Syllabus Breakdown</Text>
 
               <View className="flex-row justify-between items-center mt-2.5">
                 <Text className="text-brand-gray font-inter text-sm">Budgeting & Expense Control</Text>
@@ -685,7 +685,7 @@ export default function AssessmentResultScreen() {
 
         {/* YOUR FINANCIAL PROFILE */}
         <View className="mt-8">
-          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1 uppercase tracking-tight">
+          <Text className="text-xl font-inter-bold text-brand-textPrimary mb-4 px-1 uppercase tracking-tight">
             📋 Your Financial Profile
           </Text>
 
@@ -698,7 +698,7 @@ export default function AssessmentResultScreen() {
                   <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Financial Knowledge
                   </Text>
-                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-textPrimary mt-1">
                     {score <= 8 ? "Beginner" : score <= 12 ? "Intermediate" : "Advanced"}
                   </Text>
                 </View>
@@ -711,7 +711,7 @@ export default function AssessmentResultScreen() {
                   <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Primary Goal
                   </Text>
-                  <Text className="text-sm font-inter-bold text-brand-dark mt-1" numberOfLines={1}>
+                  <Text className="text-sm font-inter-bold text-brand-textPrimary mt-1" numberOfLines={1}>
                     {goal || "General Literacy"}
                   </Text>
                 </View>
@@ -724,7 +724,7 @@ export default function AssessmentResultScreen() {
                   <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Learning Style
                   </Text>
-                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-textPrimary mt-1">
                     Interactive Lessons
                   </Text>
                 </View>
@@ -737,7 +737,7 @@ export default function AssessmentResultScreen() {
                   <Text className="text-brand-gray text-[10px] font-inter-bold uppercase tracking-wider mt-2">
                     Learning Journey
                   </Text>
-                  <Text className="text-sm font-inter-bold text-brand-dark mt-1">
+                  <Text className="text-sm font-inter-bold text-brand-textPrimary mt-1">
                     {score <= 8 ? "6 Weeks" : score <= 12 ? "4 Weeks" : "3 Weeks"}
                   </Text>
                 </View>
@@ -748,7 +748,7 @@ export default function AssessmentResultScreen() {
 
         {/* 🤖 FinLit AI Recommendation */}
         <View className="mt-8">
-          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1 uppercase tracking-tight">
+          <Text className="text-xl font-inter-bold text-brand-textPrimary mb-4 px-1 uppercase tracking-tight">
             🤖 FinLit AI Recommendation
           </Text>
 
@@ -757,10 +757,10 @@ export default function AssessmentResultScreen() {
               <View className="w-10 h-10 rounded-full bg-brand-emerald/10 items-center justify-center mr-3">
                 <Text className="text-xl">🤖</Text>
               </View>
-              <Text className="text-brand-navy font-inter-bold text-base">FinLit AI Tutor</Text>
+              <Text className="text-brand-textPrimary font-inter-bold text-base">FinLit AI Tutor</Text>
             </View>
 
-            <Text className="text-brand-dark font-inter-semibold text-sm mb-3 leading-5">
+            <Text className="text-brand-textPrimary font-inter-semibold text-sm mb-3 leading-5">
               Based on your assessment,{"\n"}I recommend starting with:
             </Text>
 
@@ -768,7 +768,7 @@ export default function AssessmentResultScreen() {
               {recommendations.map((rec, index) => (
                 <View key={index} className="flex-row items-center mt-2">
                   <View className="w-2 h-2 rounded-full bg-brand-emerald mr-2.5" />
-                  <Text className="text-brand-dark font-inter-bold text-sm">{rec}</Text>
+                  <Text className="text-brand-textPrimary font-inter-bold text-sm">{rec}</Text>
                 </View>
               ))}
             </View>
@@ -783,7 +783,7 @@ export default function AssessmentResultScreen() {
 
         {/* Learning Path Syllabus */}
         <View className="mt-8">
-          <Text className="text-xl font-inter-bold text-brand-navy mb-4 px-1">
+          <Text className="text-xl font-inter-bold text-brand-textPrimary mb-4 px-1">
             🎯 Your Personalized Syllabus
           </Text>
 
@@ -810,7 +810,7 @@ export default function AssessmentResultScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text className="text-base font-inter-bold text-brand-dark mt-1 leading-5">
+                <Text className="text-base font-inter-bold text-brand-textPrimary mt-1 leading-5">
                   {item.title}
                 </Text>
                 <Text className="text-brand-gray font-inter text-xs mt-1 leading-4">
@@ -847,7 +847,7 @@ export default function AssessmentResultScreen() {
           })}
           className="bg-brand-emerald py-4 rounded-2xl mt-8 shadow-md flex-row justify-center items-center"
         >
-          <Text className="text-white text-center font-inter-bold text-base mr-2">
+          <Text className="text-brand-textOnDark text-center font-inter-bold text-base mr-2">
             Continue to Dashboard
           </Text>
           <Ionicons name="arrow-forward" size={18} color="white" />

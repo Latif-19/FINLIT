@@ -342,7 +342,7 @@ export default function NewsScreen() {
       <View className="px-5 pt-3 pb-4 bg-brand-bg border-b border-brand-border">
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-[24px] font-inter-bold text-brand-navy tracking-tight">
+            <Text className="text-[24px] font-inter-bold text-brand-textPrimary tracking-tight">
               Financial News
             </Text>
             <Text className="text-[12px] text-brand-gray font-inter mt-0.5">
@@ -381,7 +381,7 @@ export default function NewsScreen() {
               >
                 <Text
                   className={`text-[11px] font-inter-bold ${
-                    isActive ? "text-white" : "text-brand-gray"
+                    isActive ? "text-brand-textOnDark" : "text-brand-gray"
                   }`}
                 >
                   {cat}
@@ -393,7 +393,7 @@ export default function NewsScreen() {
                 >
                   <Text
                     className={`text-[9px] font-inter-bold ${
-                      isActive ? "text-white" : "text-brand-gray"
+                      isActive ? "text-brand-textOnDark" : "text-brand-gray"
                     }`}
                   >
                     {count}
@@ -450,7 +450,7 @@ export default function NewsScreen() {
                   <Text className="text-[11px] text-brand-gray font-inter">{featured.readTime}</Text>
                 </View>
 
-                <Text className="text-[18px] font-inter-bold text-brand-navy leading-[25px]">
+                <Text className="text-[18px] font-inter-bold text-brand-textPrimary leading-[25px]">
                   {featured.title}
                 </Text>
                 <Text
@@ -491,7 +491,7 @@ export default function NewsScreen() {
                       <View className="flex-1">
                         <CategoryPill category={item.category} small />
                         <Text
-                          className="text-[13px] font-inter-bold text-brand-navy mt-1.5 leading-[19px]"
+                          className="text-[13px] font-inter-bold text-brand-textPrimary mt-1.5 leading-[19px]"
                           numberOfLines={2}
                         >
                           {item.title}
@@ -575,7 +575,7 @@ export default function NewsScreen() {
                     <View className="w-7 h-7 bg-brand-emerald/10 rounded-full items-center justify-center">
                       <Ionicons name="newspaper-outline" size={14} color={colors.emerald} />
                     </View>
-                    <Text className="text-[13px] font-inter-bold text-brand-navy">
+                    <Text className="text-[13px] font-inter-bold text-brand-textPrimary">
                       {selectedArticle.source}
                     </Text>
                     <Text className="text-brand-gray">·</Text>
@@ -589,7 +589,7 @@ export default function NewsScreen() {
                   </View>
 
                   {/* Title */}
-                  <Text className="text-[22px] font-inter-bold text-brand-navy leading-[30px]">
+                  <Text className="text-[22px] font-inter-bold text-brand-textPrimary leading-[30px]">
                     {selectedArticle.title}
                   </Text>
 
@@ -601,7 +601,7 @@ export default function NewsScreen() {
                       color={colors.emerald}
                       style={{ marginTop: 1 }}
                     />
-                    <Text className="flex-1 text-[13px] text-brand-dark font-inter leading-[20px]">
+                    <Text className="flex-1 text-[13px] text-brand-textPrimary font-inter leading-[20px]">
                       {selectedArticle.summary}
                     </Text>
                   </View>
@@ -612,7 +612,7 @@ export default function NewsScreen() {
                   {selectedArticle.paragraphs.map((para, idx) => (
                     <Text
                       key={idx}
-                      className="text-[15px] text-brand-dark font-inter leading-7 mb-4"
+                      className="text-[15px] text-brand-textPrimary font-inter leading-7 mb-4"
                     >
                       {para}
                     </Text>
@@ -628,7 +628,7 @@ export default function NewsScreen() {
                       <Ionicons name="globe-outline" size={20} color={colors.emerald} />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-[13px] font-inter-bold text-brand-navy">
+                      <Text className="text-[13px] font-inter-bold text-brand-textPrimary">
                         Read Full Article
                       </Text>
                       <Text className="text-[11px] text-brand-gray font-inter mt-0.5">
@@ -639,7 +639,7 @@ export default function NewsScreen() {
                       </Text>
                     </View>
                     <View className="bg-brand-navy px-3 py-1.5 rounded-xl">
-                      <Text className="text-white text-[11px] font-inter-bold">Open →</Text>
+                      <Text className="text-brand-textOnDark text-[11px] font-inter-bold">Open →</Text>
                     </View>
                   </Pressable>
                 </View>
@@ -653,7 +653,7 @@ export default function NewsScreen() {
                   className="bg-brand-navy h-14 rounded-2xl flex-row items-center justify-center gap-2 shadow-md"
                 >
                   <Ionicons name="open-outline" size={18} color="white" />
-                  <Text className="text-white font-inter-bold text-sm">
+                  <Text className="text-brand-textOnDark font-inter-bold text-sm">
                     Open on {selectedArticle.source}
                   </Text>
                 </Pressable>

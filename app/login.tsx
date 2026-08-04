@@ -97,7 +97,7 @@ export default function LoginScreen() {
               resizeMode="contain"
             />
           </View>
-          <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+          <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
             Welcome Back
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1 text-center">
@@ -106,10 +106,10 @@ export default function LoginScreen() {
         </View>
 
         {/* Form Card */}
-        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-brand-border mt-8">
+        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-brand-shadow border border-brand-border mt-8">
           {/* Email Address */}
           <View>
-            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Email Address</Text>
+            <Text className="text-brand-textPrimary font-inter-semibold mb-1.5 text-sm">Email Address</Text>
             <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
               <Ionicons name="mail-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
               <TextInput
@@ -118,14 +118,14 @@ export default function LoginScreen() {
                 placeholder="Enter your email"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+                className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
               />
             </View>
           </View>
 
           {/* Password */}
           <View className="mt-4">
-            <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Password</Text>
+            <Text className="text-brand-textPrimary font-inter-semibold mb-1.5 text-sm">Password</Text>
             <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
               <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
               <TextInput
@@ -134,7 +134,7 @@ export default function LoginScreen() {
                 placeholder="Enter your password"
                 secureTextEntry={!passwordVisible}
                 autoCapitalize="none"
-                className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+                className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
               />
               <Pressable onPress={() => setPasswordVisible(!passwordVisible)} className="p-1">
                 <Ionicons
@@ -177,54 +177,11 @@ export default function LoginScreen() {
             {isLoading ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text className="text-white text-center font-inter-semibold text-base">Login</Text>
+              <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">Login</Text>
             )}
           </Pressable>
 
-          {/* Divider */}
-          <View className="flex-row items-center my-6">
-            <View className="flex-1 h-px bg-brand-slateBg" />
-            <Text className="mx-4 text-brand-gray font-inter-semibold text-xs uppercase tracking-wider">OR</Text>
-            <View className="flex-1 h-px bg-brand-slateBg" />
-          </View>
 
-          {/* Google */}
-          <Pressable
-            onPress={() => Alert.alert("Coming Soon", "Google sign-in will be available in the next update.")}
-            style={({ pressed }) => ({
-              transform: [{ scale: pressed ? 0.98 : 1 }],
-              opacity: pressed ? 0.95 : 1,
-            })}
-            className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center shadow-sm active:bg-brand-slateBg"
-          >
-            <Image
-              source={require("../assets/images/google-logo.png")}
-              className="w-6 h-6 rounded-full"
-              resizeMode="contain"
-            />
-            <Text className="ml-3 font-inter-semibold text-brand-dark text-base">
-              Continue with Google
-            </Text>
-          </Pressable>
-
-          {/* Facebook */}
-          <Pressable
-            onPress={() => Alert.alert("Coming Soon", "Facebook sign-in will be available in the next update.")}
-            style={({ pressed }) => ({
-              transform: [{ scale: pressed ? 0.98 : 1 }],
-              opacity: pressed ? 0.95 : 1,
-            })}
-            className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center mt-3 shadow-sm active:bg-brand-slateBg"
-          >
-            <Image
-              source={require("../assets/images/facebook-logo.png")}
-              className="w-6 h-6 rounded-full"
-              resizeMode="contain"
-            />
-            <Text className="ml-3 font-inter-semibold text-brand-dark text-base">
-              Continue with Facebook
-            </Text>
-          </Pressable>
         </View>
 
         {/* Footer */}

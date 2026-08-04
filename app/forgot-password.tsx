@@ -289,7 +289,7 @@ export default function ForgotPasswordScreen() {
           
           {step === "email" && (
             <>
-              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
                 Reset Password
               </Text>
               <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
@@ -300,7 +300,7 @@ export default function ForgotPasswordScreen() {
 
           {step === "code" && (
             <>
-              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
                 Verify Identity
               </Text>
               <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
@@ -312,7 +312,7 @@ export default function ForgotPasswordScreen() {
 
           {step === "password" && (
             <>
-              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
                 New Password
               </Text>
               <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
@@ -323,7 +323,7 @@ export default function ForgotPasswordScreen() {
 
           {step === "success" && (
             <>
-              <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+              <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
                 All Done!
               </Text>
               <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
@@ -334,12 +334,12 @@ export default function ForgotPasswordScreen() {
         </View>
 
         {/* Form Card */}
-        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-brand-border mt-8">
+        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-brand-shadow border border-brand-border mt-8">
           
           {/* STEP 1: EMAIL INPUT */}
           {step === "email" && (
             <View>
-              <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Email Address</Text>
+              <Text className="text-brand-textPrimary font-inter-semibold mb-1.5 text-sm">Email Address</Text>
               <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
                 <Ionicons name="mail-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                 <TextInput
@@ -348,7 +348,7 @@ export default function ForgotPasswordScreen() {
                   placeholder="Enter your registered email"
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+                  className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
                   editable={!isLoading}
                 />
               </View>
@@ -372,7 +372,7 @@ export default function ForgotPasswordScreen() {
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-inter-bold text-base">
+                <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Sending Code..." : "Send Reset Code"}
                 </Text>
               </Pressable>
@@ -382,7 +382,7 @@ export default function ForgotPasswordScreen() {
           {/* STEP 2: CODE VERIFICATION (OTP) */}
           {step === "code" && (
             <View>
-              <Text className="text-brand-dark font-inter-semibold mb-3 text-center text-sm">
+              <Text className="text-brand-textPrimary font-inter-semibold mb-3 text-center text-sm">
                 Enter 6-Digit Code
               </Text>
               
@@ -402,7 +402,7 @@ export default function ForgotPasswordScreen() {
                     // Long enough to accept a pasted full code, which
                     // handleOtpChange then spreads across every box.
                     maxLength={CODE_LENGTH}
-                    className="w-11 h-14 border border-brand-border rounded-2xl text-center text-xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
+                    className="w-11 h-14 border border-brand-border rounded-2xl text-center text-xl font-inter-bold bg-brand-slateBg/40 text-brand-textPrimary"
                     editable={!isLoading}
                   />
                 ))}
@@ -444,7 +444,7 @@ export default function ForgotPasswordScreen() {
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-inter-bold text-base">
+                <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Verifying..." : "Verify Code"}
                 </Text>
               </Pressable>
@@ -456,7 +456,7 @@ export default function ForgotPasswordScreen() {
             <View>
               {/* Password */}
               <View>
-                <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">New Password</Text>
+                <Text className="text-brand-textPrimary font-inter-semibold mb-1.5 text-sm">New Password</Text>
                 <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
                   <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                   <TextInput
@@ -468,7 +468,7 @@ export default function ForgotPasswordScreen() {
                     autoComplete="off"
                     textContentType="none"
                     importantForAutofill="no"
-                    className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+                    className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
                     editable={!isLoading}
                   />
                   <Pressable onPress={() => setPasswordVisible(!passwordVisible)} className="p-1">
@@ -483,7 +483,7 @@ export default function ForgotPasswordScreen() {
 
               {/* Confirm Password */}
               <View className="mt-4">
-                <Text className="text-brand-dark font-inter-semibold mb-1.5 text-sm">Confirm Password</Text>
+                <Text className="text-brand-textPrimary font-inter-semibold mb-1.5 text-sm">Confirm Password</Text>
                 <View className="border border-brand-border rounded-2xl flex-row items-center px-4 bg-brand-slateBg/40">
                   <Ionicons name="lock-closed-outline" size={20} color={colors.gray} style={{ marginRight: 10 }} />
                   <TextInput
@@ -495,7 +495,7 @@ export default function ForgotPasswordScreen() {
                     autoComplete="off"
                     textContentType="none"
                     importantForAutofill="no"
-                    className="flex-1 py-3.5 text-base text-brand-dark font-inter"
+                    className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
                     editable={!isLoading}
                   />
                   <Pressable onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} className="p-1">
@@ -543,7 +543,7 @@ export default function ForgotPasswordScreen() {
                 {isLoading ? (
                   <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
                 ) : null}
-                <Text className="text-white text-center font-inter-bold text-base">
+                <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Resetting Password..." : "Reset Password"}
                 </Text>
               </Pressable>
@@ -557,7 +557,7 @@ export default function ForgotPasswordScreen() {
                 <Ionicons name="checkmark-circle" size={54} color={colors.emerald} />
               </View>
               
-              <Text className="text-brand-dark font-inter text-sm text-center leading-6 px-4">
+              <Text className="text-brand-textPrimary font-inter text-sm text-center leading-6 px-4">
                 Your account is ready! Go ahead and sign in with your updated password to continue building financial literacy.
               </Text>
 
@@ -569,7 +569,7 @@ export default function ForgotPasswordScreen() {
                 })}
                 className="bg-brand-navy h-14 rounded-2xl mt-8 w-full shadow-md shadow-brand-navy/10 justify-center items-center"
               >
-                <Text className="text-white text-center font-inter-semibold text-base">
+                <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
                   Go to Login
                 </Text>
               </Pressable>

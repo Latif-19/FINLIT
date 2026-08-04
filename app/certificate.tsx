@@ -78,7 +78,7 @@ export default function CertificateScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3">
-          <Text className="text-[22px] font-inter-bold text-brand-dark">Certificate</Text>
+          <Text className="text-[22px] font-inter-bold text-brand-textPrimary">Certificate</Text>
         </View>
       </View>
 
@@ -95,7 +95,7 @@ export default function CertificateScreen() {
               <Text className="text-brand-gold text-[10px] font-inter-bold uppercase tracking-[0.2em]">
                 Certificate of Completion
               </Text>
-              <Text className="text-white text-2xl font-inter-bold mt-2">FinLit Ghana</Text>
+              <Text className="text-brand-textOnDark text-2xl font-inter-bold mt-2">FinLit Ghana</Text>
             </View>
 
             {/* Body */}
@@ -103,7 +103,7 @@ export default function CertificateScreen() {
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-[0.15em] mb-2">
                 This certifies that
               </Text>
-              <Text className="text-brand-navy text-3xl font-inter-bold mb-2">
+              <Text className="text-brand-textPrimary text-3xl font-inter-bold mb-2">
                 {userName}
               </Text>
 
@@ -112,7 +112,7 @@ export default function CertificateScreen() {
               <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-[0.15em] mb-2">
                 Has successfully completed the
               </Text>
-              <Text className="text-brand-navy text-lg font-inter-bold text-center">
+              <Text className="text-brand-textPrimary text-lg font-inter-bold text-center">
                 Financial Literacy Pathway
               </Text>
               <Text className="text-brand-gray text-xs font-inter text-center mt-1.5 leading-5">
@@ -162,7 +162,7 @@ export default function CertificateScreen() {
               ) : (
                 <>
                   <Ionicons name="download-outline" size={18} color="white" />
-                  <Text className="text-white font-inter-semibold text-sm ml-2 uppercase tracking-wider">
+                  <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-2 uppercase tracking-wider">
                     Download
                   </Text>
                 </>
@@ -174,7 +174,7 @@ export default function CertificateScreen() {
               className="flex-1 bg-brand-navy h-12 rounded-2xl shadow-sm flex-row justify-center items-center"
             >
               <Ionicons name="arrow-back" size={18} color="white" />
-              <Text className="text-white font-inter-semibold text-sm ml-2 uppercase tracking-wider">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-2 uppercase tracking-wider">
                 Back
               </Text>
             </Pressable>
@@ -187,7 +187,7 @@ export default function CertificateScreen() {
             <View className="w-20 h-20 bg-brand-slateBg rounded-full items-center justify-center mb-4">
               <Text className="text-4xl">🔒</Text>
             </View>
-            <Text className="text-brand-navy text-lg font-inter-semibold mb-2 text-center">
+            <Text className="text-brand-textPrimary text-lg font-inter-semibold mb-2 text-center">
               Certificate Locked
             </Text>
             <Text className="text-brand-gray text-sm text-center font-inter leading-5 mb-4">
@@ -209,7 +209,7 @@ export default function CertificateScreen() {
               style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.98 : 1 }] })}
               className="bg-brand-emerald px-6 py-3 rounded-xl"
             >
-              <Text className="text-white text-sm font-inter-bold uppercase tracking-wider">
+              <Text className="text-brand-textOnDark text-sm font-inter-bold uppercase tracking-wider">
                 Continue Learning
               </Text>
             </Pressable>

@@ -25,6 +25,17 @@ function formatDuration(totalSeconds: number): string {
   return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
 }
 
+const isImageUri = (str?: string | null) => {
+  if (!str) return false;
+  return (
+    str.startsWith("http") ||
+    str.startsWith("file:") ||
+    str.startsWith("content:") ||
+    str.startsWith("data:") ||
+    str.includes("/")
+  );
+};
+
 /** How many articles the dashboard mini-feed shows. */
 const NEWS_PREVIEW_COUNT = 3;
 
@@ -141,7 +152,7 @@ export default function HomeScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-brand-slateBg dark:bg-slate-950"
+      className="flex-1 bg-brand-slateBg"
       contentContainerStyle={{ paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
@@ -149,11 +160,11 @@ export default function HomeScreen() {
       <View className="bg-brand-navy pt-16 pb-10 px-6 rounded-b-[40px] shadow-lg shadow-brand-navy/15">
         <View className="flex-row justify-between items-center">
           <View className="flex-1 pr-4">
-            <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest dark:text-amber-400">
+            <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest">
               {getGreeting()}
             </Text>
             <Text
-              className="text-white text-[32px] font-inter-bold mt-1 tracking-tight"
+              className="text-brand-textOnDark text-[32px] font-inter-bold mt-1 tracking-tight"
               numberOfLines={1}
             >
               Hi, {userName.split(" ")[0]}! 👋
@@ -163,9 +174,13 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => setAvatarModalOpen(true)}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.95 : 1 }] })}
-            className="w-16 h-16 bg-white/10 rounded-2xl items-center justify-center border-2 border-white/20 shadow-sm"
+            className="w-16 h-16 bg-white/10 rounded-2xl items-center justify-center border-2 border-white/20 shadow-sm overflow-hidden"
           >
-            <Text className="text-3xl">{avatar}</Text>
+            {isImageUri(avatar) ? (
+              <Image source={{ uri: avatar }} className="w-full h-full" resizeMode="cover" />
+            ) : (
+              <Text className="text-3xl">{avatar}</Text>
+            )}
             <View className="absolute -bottom-1 -right-1 bg-brand-emerald w-5 h-5 rounded-full items-center justify-center border border-brand-navy">
               <Ionicons name="pencil" size={10} color="white" />
             </View>
@@ -176,7 +191,7 @@ export default function HomeScreen() {
         <View className="mt-6 flex-row flex-wrap items-center gap-2">
           <View className="px-3.5 py-1.5 rounded-2xl bg-white/10 border border-white/5 flex-row items-center">
             <Ionicons name="ribbon" size={13} color={colors.gold} />
-            <Text className="text-white text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
+            <Text className="text-brand-textOnDark text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
               {score >= 13
                 ? "Wealth Builder Pro"
                 : score >= 8
@@ -187,7 +202,7 @@ export default function HomeScreen() {
           {userGoal && (
             <View className="px-3.5 py-1.5 rounded-2xl bg-white/10 border border-white/5 flex-row items-center">
               <Ionicons name="flag" size={13} color={colors.emerald} />
-              <Text className="text-white text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
+              <Text className="text-brand-textOnDark text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
                 Target: {userGoal}
               </Text>
             </View>
@@ -198,25 +213,25 @@ export default function HomeScreen() {
       <View className="px-5 -mt-5">
 
         {/* ── STREAK & DAILY TRACKER ── */}
-        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border shadow-lg shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border shadow-lg shadow-brand-shadow">
           <View className="flex-row justify-between items-start mb-4">
             <View>
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest dark:text-slate-400">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest">
                 DAILY STREAK
               </Text>
               <View className="flex-row items-center mt-1">
-                <Text className="text-brand-navy text-[32px] font-inter-bold dark:text-slate-100">{streak}</Text>
-                <Text className="text-brand-gray text-sm font-inter ml-2 mt-2 dark:text-slate-400">
+                <Text className="text-brand-textPrimary text-[32px] font-inter-bold">{streak}</Text>
+                <Text className="text-brand-gray text-sm font-inter ml-2 mt-2">
                   {streak === 1 ? "day" : "days"} 🔥
                 </Text>
               </View>
             </View>
             <Pressable
               onPress={() => router.push("/(tabs)/leaderboard")}
-              className="bg-brand-gold/10 border border-brand-gold/20 rounded-xl px-3 py-1.5 flex-row items-center dark:bg-brand-gold/20 dark:border-brand-gold/30"
+              className="bg-brand-gold/10 border border-brand-gold/20 rounded-xl px-3 py-1.5 flex-row items-center"
             >
               <Ionicons name="trophy" size={13} color={colors.gold} />
-              <Text className="text-brand-gold font-inter-bold text-xs ml-1.5 dark:text-amber-400">Ranks</Text>
+              <Text className="text-brand-gold font-inter-bold text-xs ml-1.5">Ranks</Text>
             </Pressable>
           </View>
 
@@ -227,7 +242,7 @@ export default function HomeScreen() {
               const isToday = index === adjustedToday;
               return (
                 <View key={index} className="items-center">
-                  <Text className="text-brand-gray text-[10px] font-inter-bold mb-2 dark:text-slate-400">{day}</Text>
+                  <Text className="text-brand-gray text-[10px] font-inter-bold mb-2">{day}</Text>
                   <View
                     className={`w-8 h-8 rounded-full items-center justify-center ${
                       isToday
@@ -257,27 +272,27 @@ export default function HomeScreen() {
         <View className="flex-row mt-4 gap-3">
           <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
             <View className="flex-row justify-between items-center">
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
                 Lessons
               </Text>
               <View className="w-6 h-6 bg-brand-emerald/10 rounded-lg items-center justify-center dark:bg-brand-emerald/20">
                 <Ionicons name="book" size={12} color={colors.emerald} />
               </View>
             </View>
-            <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">{lessonsCompleted}</Text>
+            <Text className="text-brand-textPrimary text-2xl font-inter-bold mt-2">{lessonsCompleted}</Text>
           </View>
 
           <View className="flex-1 bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-md">
             <View className="flex-row justify-between items-center">
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider dark:text-slate-400">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-wider">
                 XP Score
               </Text>
-              <View className="w-6 h-6 bg-brand-gold/10 rounded-lg items-center justify-center dark:bg-brand-gold/20">
+              <View className="w-6 h-6 bg-brand-gold/10 rounded-lg items-center justify-center">
                 <Ionicons name="flash" size={12} color={colors.gold} />
               </View>
             </View>
-            <Text className="text-brand-navy text-2xl font-inter-bold mt-2 dark:text-slate-100">
-              {xp} <Text className="text-xs text-brand-gold font-inter-bold dark:text-amber-400">XP</Text>
+            <Text className="text-brand-textPrimary text-2xl font-inter-bold mt-2">
+              {xp} <Text className="text-xs text-brand-gold font-inter-bold">XP</Text>
             </Text>
           </View>
 
@@ -290,7 +305,7 @@ export default function HomeScreen() {
                 <Ionicons name="time" size={12} color={colors.navy} />
               </View>
             </View>
-            <Text className="text-brand-navy text-2xl font-inter-bold mt-2">
+            <Text className="text-brand-textPrimary text-2xl font-inter-bold mt-2">
               {formatDuration(totalTimeSpentSeconds)}
             </Text>
           </View>
@@ -299,7 +314,7 @@ export default function HomeScreen() {
         {/* ── FINANCIAL NEWS MINI-FEED ── */}
         <View className="mt-8">
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-[24px] font-inter-semibold text-brand-navy dark:text-slate-100">Financial News</Text>
+            <Text className="text-[24px] font-inter-semibold text-brand-textPrimary">Financial News</Text>
             <Pressable
               onPress={() => router.push("/(tabs)/news")}
               style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
@@ -355,7 +370,7 @@ export default function HomeScreen() {
 
                 <View className="p-3">
                   <Text
-                    className="text-[13px] font-inter-bold text-brand-navy leading-[18px]"
+                    className="text-[13px] font-inter-bold text-brand-textPrimary leading-[18px]"
                     numberOfLines={2}
                   >
                     {item.title}
@@ -389,7 +404,7 @@ export default function HomeScreen() {
               <View className="w-10 h-10 bg-brand-navy rounded-full items-center justify-center">
                 <Ionicons name="arrow-forward" size={18} color="white" />
               </View>
-              <Text className="text-[11px] font-inter-bold text-brand-navy text-center px-2 leading-4">
+              <Text className="text-[11px] font-inter-bold text-brand-textPrimary text-center px-2 leading-4">
                 More News
               </Text>
             </Pressable>
@@ -397,7 +412,7 @@ export default function HomeScreen() {
         </View>
 
         {/* ── SMART RECOMMENDATIONS ── */}
-        <Text className="text-[24px] font-inter-semibold text-brand-navy mt-8 mb-4">
+        <Text className="text-[24px] font-inter-semibold text-brand-textPrimary mt-8 mb-4">
           Recommended for You
         </Text>
         {smartRecs.map((rec: SmartRecommendation) => (
@@ -405,7 +420,7 @@ export default function HomeScreen() {
             key={rec.id}
             onPress={() => router.push(rec.route as any)}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.99 : 1 }] })}
-            className="bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-lg shadow-slate-100/40 flex-row items-center justify-between mb-3"
+            className="bg-brand-bg p-4 rounded-2xl border border-brand-border shadow-lg shadow-brand-shadow flex-row items-center justify-between mb-3"
           >
             <View className="flex-row items-center flex-1 mr-3">
               <View className="w-11 h-11 bg-brand-slateBg rounded-xl items-center justify-center mr-3">
@@ -418,7 +433,7 @@ export default function HomeScreen() {
                   </Text>
                 </View>
                 <Text
-                  className="text-[15px] font-inter-semibold text-brand-navy"
+                  className="text-[15px] font-inter-semibold text-brand-textPrimary"
                   numberOfLines={1}
                 >
                   {rec.title}
@@ -438,7 +453,7 @@ export default function HomeScreen() {
         ))}
 
         {/* ── QUICK ACCESS TOOLS ── */}
-        <Text className="text-[24px] font-inter-semibold text-brand-navy mt-8 mb-4">
+        <Text className="text-[24px] font-inter-semibold text-brand-textPrimary mt-8 mb-4">
           Quick Access
         </Text>
         <View className="flex-row gap-3">
@@ -450,7 +465,7 @@ export default function HomeScreen() {
             <View className="w-12 h-12 bg-brand-emerald/10 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="calculator-outline" size={22} color={colors.emerald} />
             </View>
-            <Text className="text-sm font-inter-semibold text-brand-navy">Simulators</Text>
+            <Text className="text-sm font-inter-semibold text-brand-textPrimary">Simulators</Text>
             <Text className="text-[10px] text-brand-gray mt-1.5 text-center leading-4 font-inter px-2">
               MoMo fees, T-Bills, loans
             </Text>
@@ -464,7 +479,7 @@ export default function HomeScreen() {
             <View className="w-12 h-12 bg-brand-navy/5 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="chatbubbles-outline" size={22} color={colors.navy} />
             </View>
-            <Text className="text-sm font-inter-semibold text-brand-navy">AI Coach</Text>
+            <Text className="text-sm font-inter-semibold text-brand-textPrimary">AI Coach</Text>
             <Text className="text-[10px] text-brand-gray mt-1.5 text-center leading-4 font-inter px-2">
               Ask finance questions
             </Text>
@@ -478,7 +493,7 @@ export default function HomeScreen() {
             <View className="w-12 h-12 bg-brand-gold/10 rounded-2xl items-center justify-center mb-3">
               <Ionicons name="trophy-outline" size={22} color={colors.gold} />
             </View>
-            <Text className="text-sm font-inter-semibold text-brand-navy">Badges</Text>
+            <Text className="text-sm font-inter-semibold text-brand-textPrimary">Badges</Text>
             <Text className="text-[10px] text-brand-gray mt-1.5 text-center leading-4 font-inter px-2">
               View achievements
             </Text>
@@ -492,7 +507,7 @@ export default function HomeScreen() {
         <View className="flex-1 bg-brand-navy/60 justify-center items-center px-6">
           <View className="bg-brand-bg w-full rounded-2xl p-6 max-w-sm shadow-2xl border border-brand-border">
             <View className="flex-row justify-between items-center border-b border-brand-border pb-4">
-              <Text className="text-brand-navy text-lg font-inter-bold">Choose Character</Text>
+              <Text className="text-brand-textPrimary text-lg font-inter-bold">Choose Character</Text>
               <Pressable
                 onPress={() => setAvatarModalOpen(false)}
                 className="p-1 active:opacity-75"

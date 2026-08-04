@@ -1,25 +1,12 @@
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, View, Pressable } from "react-native";
+import { ScrollView, Text, View, Pressable, Switch, Image, Alert } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../../store/useUserStore";
 import { useThemeColors } from "../../hooks/useThemeColors";
+import { profileService } from "../../services/profile";
 import "@/types/navigation";
-
-const colorBlindOptions = [
-  { id: "none", name: "Standard (Default)", desc: "Standard colors for default vision", colors: ["#0A2540", "#10B981", "#D4AF37"] },
-  { id: "deuteranopia", name: "Deuteranopia", desc: "Optimized for red-green (green-weak)", colors: ["#002A4A", "#009E73", "#E69F00"] },
-  { id: "protanopia", name: "Protanopia", desc: "Optimized for red-green (red-weak)", colors: ["#002C54", "#009E73", "#FFC400"] },
-  { id: "tritanopia", name: "Tritanopia", desc: "Optimized for blue-yellow vision", colors: ["#4A0A25", "#00796B", "#E65100"] },
-  { id: "high-contrast", name: "High Contrast", desc: "Maximum distinction & readability", colors: ["#000000", "#008000", "#D97706"] },
-  { id: "monochrome", name: "Monochrome", desc: "Grayscale high-readability palette", colors: ["#1F2937", "#4B5563", "#9CA3AF"] },
-] as const;
-
-const appThemeColorOptions = [
-  { id: "emerald", name: "Emerald Green", color: "#10B981" },
-  { id: "blue", name: "Royal Blue", color: "#2563EB" },
-  { id: "purple", name: "Deep Purple", color: "#7C3AED" },
-] as const;
 
 export default function ProfileScreen() {
   const userName = useUserStore((s) => s.name);
@@ -30,14 +17,52 @@ export default function ProfileScreen() {
   const streak = useUserStore((s) => s.streak);
   const createdAt = useUserStore((s) => s.createdAt);
 
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const setColorBlindMode = useUserStore((s) => s.setColorBlindMode);
-  const setAppThemeColor = useUserStore((s) => s.setAppThemeColor);
   const isDarkMode = useUserStore((s) => s.isDarkMode);
   const setDarkMode = useUserStore((s) => s.setDarkMode);
 
   const colors = useThemeColors();
+
+  const isImageUri = (str?: string | null) => {
+    if (!str) return false;
+    return (
+      str.startsWith("http") ||
+      str.startsWith("file:") ||
+      str.startsWith("content:") ||
+      str.startsWith("data:") ||
+      str.includes("/")
+    );
+  };
+
+  const handlePickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert(
+        "Permission Required",
+        "Permission to access your photo library is required to upload a profile picture."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const newUri = result.assets[0].uri;
+      useUserStore.getState().setAvatar(newUri);
+      try {
+        await profileService.updateProfile({
+          name: userName,
+          avatar: newUri,
+        });
+      } catch {
+        // Optimistic local update already applied
+      }
+    }
+  };
 
   const handleLogout = () => {
     useUserStore.getState().logout();
@@ -52,24 +77,31 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView 
-      className="flex-1 bg-brand-slateBg dark:bg-slate-950" 
+      className="flex-1 bg-brand-slateBg" 
       contentContainerStyle={{ paddingBottom: 50 }}
       showsVerticalScrollIndicator={false}
     >
       {/* Profile Header */}
       <View className="bg-brand-bg pt-16 pb-8 px-6 items-center border-b border-brand-border shadow-sm">
-        <View className="w-24 h-24 bg-brand-emerald/10 rounded-full items-center justify-center border-4 border-brand-emerald shadow-sm">
-          {avatar ? (
-            <Text className="text-5xl">{avatar}</Text>
-          ) : (
-            <Text className="text-brand-navy dark:text-slate-100 text-3xl font-inter-bold">
-              {userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "FE"}
-            </Text>
-          )}
-        </View>
+        <Pressable onPress={handlePickImage} accessibilityRole="button" accessibilityLabel="Upload profile picture" className="relative active:opacity-85">
+          <View className="w-24 h-24 bg-brand-emerald/10 rounded-full items-center justify-center border-4 border-brand-emerald shadow-sm overflow-hidden">
+            {isImageUri(avatar) ? (
+              <Image source={{ uri: avatar }} className="w-full h-full" resizeMode="cover" />
+            ) : avatar ? (
+              <Text className="text-5xl">{avatar}</Text>
+            ) : (
+              <Text className="text-brand-textPrimary text-3xl font-inter-bold">
+                {userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "FE"}
+              </Text>
+            )}
+          </View>
+          <View className="absolute bottom-0 right-0 bg-brand-emerald w-7 h-7 rounded-full items-center justify-center border-2 border-white shadow-sm">
+            <Ionicons name="camera" size={14} color="white" />
+          </View>
+        </Pressable>
 
-        <Text className="text-[24px] font-inter-semibold text-brand-navy dark:text-slate-100 mt-4">{userName}</Text>
-        <Text className="text-brand-gray dark:text-slate-400 font-inter text-sm mt-1">
+        <Text className="text-[24px] font-inter-semibold text-brand-textPrimary mt-4">{userName}</Text>
+        <Text className="text-brand-gray font-inter text-sm mt-1">
           {createdAt
             ? `joined ${new Date(createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}`
             : "Just joined"}
@@ -77,15 +109,15 @@ export default function ProfileScreen() {
 
         {/* Level badge */}
         <View className="bg-brand-navy px-4 py-1.5 rounded-full mt-3">
-          <Text className="text-white text-xs font-inter-semibold uppercase tracking-wider">
+          <Text className="text-brand-textOnDark text-xs font-inter-semibold uppercase tracking-wider">
             {getLevelLabel()}
           </Text>
         </View>
 
         {/* Goal badge */}
         {goal ? (
-          <View className="bg-brand-emerald/15 dark:bg-brand-emerald/20 border border-brand-emerald/20 dark:border-brand-emerald/30 px-4 py-1.5 rounded-full mt-2.5 flex-row items-center">
-            <Text className="text-brand-emerald dark:text-emerald-400 text-xs font-inter-bold uppercase tracking-wider">
+          <View className="bg-brand-emerald/15 border border-brand-emerald/20 px-4 py-1.5 rounded-full mt-2.5 flex-row items-center">
+            <Text className="text-brand-emerald text-xs font-inter-bold uppercase tracking-wider">
               🎯 Goal: {goal}
             </Text>
           </View>
@@ -93,8 +125,8 @@ export default function ProfileScreen() {
 
         {/* Streak badge */}
         {streak > 0 && (
-          <View className="bg-brand-gold/15 dark:bg-brand-gold/20 border border-brand-gold/20 dark:border-brand-gold/30 px-4 py-1.5 rounded-full mt-2 flex-row items-center">
-            <Text className="text-brand-gold dark:text-amber-400 text-xs font-inter-bold uppercase tracking-wider">
+          <View className="bg-brand-gold/15 border border-brand-gold/20 px-4 py-1.5 rounded-full mt-2 flex-row items-center">
+            <Text className="text-brand-gold text-xs font-inter-bold uppercase tracking-wider">
               🔥 {streak} Day Streak
             </Text>
           </View>
@@ -103,168 +135,76 @@ export default function ProfileScreen() {
 
       {/* Menu / Settings */}
       <View className="px-5 mt-8">
-        <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">ACCOUNT SETTINGS</Text>
+        <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">ACCOUNT SETTINGS</Text>
 
-        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-3xl border border-brand-border overflow-hidden shadow-sm">
           <Pressable 
             onPress={() => router.push("/personal-details")}
-            className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
+            className="p-4 flex-row items-center justify-between border-b border-brand-border/60 active:bg-brand-slateBg"
           >
-            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="person-outline" size={18} color={colors.emerald} />
+            <View className="flex-1">
+              <Text className="text-brand-textPrimary text-base font-inter-semibold">Personal Details</Text>
+              <Text className="text-brand-gray text-xs font-inter mt-0.5">Name, email, age, and phone</Text>
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Personal Details</Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.gray} />
-          </Pressable>
-
-          <Pressable
-            onPress={() => router.push("/(tabs)/home")}
-            className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
-          >
-            <View className="w-9 h-9 bg-brand-navy/5 dark:bg-slate-700/60 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="grid-outline" size={18} color={colors.navy} />
-            </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Dashboard Overview</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/assessment-review")}
-            className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
+            className="p-4 flex-row items-center justify-between border-b border-brand-border/60 active:bg-brand-slateBg"
           >
-            <View className="w-9 h-9 bg-brand-gold/10 dark:bg-brand-gold/20 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="bar-chart-outline" size={18} color={colors.gold} />
+            <View className="flex-1">
+              <Text className="text-brand-textPrimary text-base font-inter-semibold">Financial Assessment</Text>
+              <Text className="text-brand-gray text-xs font-inter mt-0.5">Review your financial health score</Text>
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Financial Assessment</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
 
           <Pressable
             onPress={() => router.push("/badges")}
-            className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
+            className="p-4 flex-row items-center justify-between border-b border-brand-border/60 active:bg-brand-slateBg"
           >
-            <View className="w-9 h-9 bg-brand-gold/10 dark:bg-brand-gold/20 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="trophy-outline" size={18} color={colors.gold} />
+            <View className="flex-1">
+              <Text className="text-brand-textPrimary text-base font-inter-semibold">Badges & Achievements</Text>
+              <Text className="text-brand-gray text-xs font-inter mt-0.5">Unlocked milestones and awards</Text>
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Badges & Achievements</Text>
-            <Ionicons name="chevron-forward" size={16} color={colors.gray} />
-          </Pressable>
-
-          <Pressable
-            onPress={() => router.push("/(tabs)/news")}
-            className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
-          >
-            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="newspaper-outline" size={18} color={colors.emerald} />
-            </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">News & Market Updates</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
 
           <Pressable 
             onPress={() => router.push("/notifications")}
-            className="p-4 flex-row items-center active:bg-brand-slateBg"
+            className="p-4 flex-row items-center justify-between active:bg-brand-slateBg"
           >
-            <View className="w-9 h-9 bg-brand-emerald/10 dark:bg-brand-emerald/20 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="notifications-outline" size={18} color={colors.emerald} />
+            <View className="flex-1">
+              <Text className="text-brand-textPrimary text-base font-inter-semibold">Notifications</Text>
+              <Text className="text-brand-gray text-xs font-inter mt-0.5">Reminders and streak alerts</Text>
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Notifications</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
         </View>
 
         {/* Accessibility & Theming */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">ACCESSIBILITY & THEMING</Text>
-        <View className="bg-brand-bg rounded-2xl border border-brand-border p-5 shadow-md shadow-slate-100/40">
-          <Pressable onPress={() => setDarkMode(!isDarkMode)} accessibilityRole="button" accessibilityLabel={`Switch to ${isDarkMode ? "light" : "dark"} mode`} className="flex-row items-center justify-between bg-brand-slateBg border border-brand-border rounded-xl p-3 mb-6 active:opacity-80">
-            <Text className="text-brand-navy text-sm font-inter-bold">{isDarkMode ? "Light Mode" : "Dark Mode"}</Text>
+        <View className="bg-brand-bg rounded-2xl border border-brand-border p-5 shadow-md shadow-brand-shadow">
+          <Pressable 
+            onPress={() => setDarkMode(!isDarkMode)} 
+            accessibilityRole="button" 
+            accessibilityLabel={`Switch to ${isDarkMode ? "light" : "dark"} mode`} 
+            className="flex-row items-center justify-between bg-brand-slateBg border border-brand-border rounded-xl p-3 active:opacity-80"
+          >
+            <Text className="text-brand-textPrimary text-sm font-inter-bold">{isDarkMode ? "Light Mode" : "Dark Mode"}</Text>
             <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={20} color={colors.navy} />
           </Pressable>
-          <Text className="text-brand-navy text-sm font-inter-bold mb-1">Color Blindness Mode</Text>
-          <Text className="text-brand-gray text-xs mb-3 font-inter">
-            Select a contrast profile optimized for different color vision needs:
-          </Text>
-
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            className="flex-row mb-6"
-            contentContainerStyle={{ paddingRight: 10 }}
-          >
-            {colorBlindOptions.map((opt) => {
-              const isSelected = colorBlindMode === opt.id;
-              return (
-                <Pressable
-                  key={opt.id}
-                  onPress={() => setColorBlindMode(opt.id)}
-                  style={{ width: 140 }}
-                  className={`p-3 mr-3 rounded-xl border ${
-                    isSelected 
-                      ? "border-brand-emerald bg-brand-emerald/5" 
-                      : "border-brand-border bg-brand-slateBg"
-                  }`}
-                >
-                  <View className="flex-row items-center justify-between mb-2">
-                    <Text className="text-brand-navy text-[13px] font-inter-semibold" numberOfLines={1}>
-                      {opt.name}
-                    </Text>
-                    {isSelected && (
-                      <Ionicons name="checkmark-circle" size={16} color={opt.colors[1]} />
-                    )}
-                  </View>
-                  <Text className="text-[10px] text-brand-gray mb-3 font-inter" numberOfLines={2}>
-                    {opt.desc}
-                  </Text>
-                  
-                  {/* Swatches */}
-                  <View className="flex-row gap-1">
-                    {opt.colors.map((c, i) => (
-                      <View 
-                        key={i} 
-                        style={{ backgroundColor: c, width: 14, height: 14, borderRadius: 7 }} 
-                      />
-                    ))}
-                  </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          <View>
-            <Text className="text-brand-navy text-sm font-inter-bold mb-1">App Custom Color</Text>
-            <Text className="text-brand-gray text-xs mb-3 font-inter">
-              Choose a primary brand color theme optimized for your selected mode:
-            </Text>
-            <View className="flex-row gap-3">
-              {appThemeColorOptions.map((opt) => {
-                const isSelected = appThemeColor === opt.id;
-                return (
-                  <Pressable
-                    key={opt.id}
-                    onPress={() => setAppThemeColor(opt.id)}
-                    className={`flex-1 p-3 rounded-xl border flex-row items-center justify-center gap-2 ${
-                      isSelected
-                        ? "border-brand-emerald bg-brand-emerald/5"
-                        : "border-brand-border bg-brand-slateBg"
-                    }`}
-                  >
-                    <View style={{ backgroundColor: opt.color, width: 12, height: 12, borderRadius: 6 }} />
-                    <Text className="text-brand-navy text-xs font-inter-semibold">{opt.name}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
         </View>
 
         {/* Subscription Status Section */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">SUBSCRIPTION TIER</Text>
-        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-slate-100/40 p-5 flex-row justify-between items-center">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-brand-shadow p-5 flex-row justify-between items-center">
           <View className="flex-1 pr-4">
-            <Text className="text-brand-navy dark:text-slate-100 text-base font-inter-semibold">
+            <Text className="text-brand-textPrimary text-base font-inter-semibold">
               {isPremium ? "💎 FinLit Premium Active" : "🆓 Free Tier (Standard)"}
             </Text>
-            <Text className="text-brand-gray dark:text-slate-400 font-inter text-xs mt-1.5 leading-5">
+            <Text className="text-brand-gray font-inter text-xs mt-1.5 leading-5">
               {isPremium 
                 ? "You have full access to simulators, audio modules, and AI Coach." 
                 : "Unlock advanced financial engines, offline audio, and personal AI Coach."}
@@ -282,10 +222,10 @@ export default function ProfileScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
             })}
             className={`px-4 py-2.5 rounded-2xl border justify-center items-center ${
-              isPremium ? "bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-900" : "bg-brand-navy border-brand-navy shadow-sm active:bg-brand-navy/95"
+              isPremium ? "bg-red-50 border-red-200" : "bg-brand-navy border-brand-navy shadow-sm active:bg-brand-navy/95"
             }`}
           >
-            <Text className={`text-xs font-inter-semibold uppercase tracking-wider ${isPremium ? "text-red-700 dark:text-red-400" : "text-white"}`}>
+            <Text className={`text-xs font-inter-semibold uppercase tracking-wider ${isPremium ? "text-red-700" : "text-brand-textOnDark"}`}>
               {isPremium ? "Downgrade" : "Upgrade"}
             </Text>
           </Pressable>
@@ -294,7 +234,7 @@ export default function ProfileScreen() {
         {/* Support & Logout */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">GENERAL</Text>
 
-        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden shadow-md shadow-brand-shadow">
           <Pressable 
             onPress={() => router.push("/help-support")}
             className="p-4 flex-row items-center border-b border-brand-border active:bg-brand-slateBg"
@@ -302,7 +242,7 @@ export default function ProfileScreen() {
             <View className="w-9 h-9 bg-brand-slateBg rounded-xl items-center justify-center mr-3">
               <Ionicons name="help-circle-outline" size={18} color={colors.gray} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Help & Support</Text>
+            <Text className="text-brand-textPrimary text-sm font-inter-semibold flex-1">Help & Support</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
 
@@ -313,7 +253,7 @@ export default function ProfileScreen() {
             <View className="w-9 h-9 bg-brand-slateBg rounded-xl items-center justify-center mr-3">
               <Ionicons name="shield-checkmark-outline" size={18} color={colors.gray} />
             </View>
-            <Text className="text-brand-navy text-sm font-inter-semibold flex-1">Privacy Policy</Text>
+            <Text className="text-brand-textPrimary text-sm font-inter-semibold flex-1">Privacy Policy</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.gray} />
           </Pressable>
 
@@ -321,10 +261,10 @@ export default function ProfileScreen() {
             onPress={handleLogout} 
             className="p-4 flex-row items-center active:bg-brand-slateBg"
           >
-            <View className="w-9 h-9 bg-red-50 dark:bg-red-950/50 rounded-xl items-center justify-center mr-3">
+            <View className="w-9 h-9 bg-red-50 rounded-xl items-center justify-center mr-3">
               <Ionicons name="log-out-outline" size={18} color="#DC2626" />
             </View>
-            <Text className="text-red-600 dark:text-red-400 text-sm font-inter-bold flex-1">Sign Out</Text>
+            <Text className="text-red-600 text-sm font-inter-bold flex-1">Sign Out</Text>
             <Ionicons name="chevron-forward" size={16} color="#FCA5A5" />
           </Pressable>
         </View>

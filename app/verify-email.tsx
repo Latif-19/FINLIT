@@ -114,19 +114,19 @@ export default function VerifyEmailScreen() {
           <View className="w-16 h-16 bg-brand-emerald/10 rounded-2xl items-center justify-center">
             <Ionicons name="mail-open-outline" size={30} color={colors.emerald} />
           </View>
-          <Text className="text-[28px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+          <Text className="text-[28px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
             Verify your email
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-2 text-center leading-5">
             We sent a {CODE_LENGTH}-digit code to
           </Text>
-          <Text className="text-brand-dark font-inter-semibold text-sm mt-0.5 text-center">
+          <Text className="text-brand-textPrimary font-inter-semibold text-sm mt-0.5 text-center">
             {email || "your email"}
           </Text>
         </View>
 
         {/* Code entry card */}
-        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-slate-100/40 border border-brand-border mt-8">
+        <View className="bg-brand-bg rounded-3xl p-6 shadow-lg shadow-brand-shadow border border-brand-border mt-8">
           {/* Hidden-ish single input styled as the code field */}
           <Pressable onPress={() => inputRef.current?.focus()}>
             <View className="flex-row justify-between">
@@ -144,7 +144,7 @@ export default function VerifyEmailScreen() {
                         : "border-brand-border bg-brand-slateBg/40"
                     }`}
                   >
-                    <Text className="text-2xl font-inter-bold text-brand-navy">{char}</Text>
+                    <Text className="text-2xl font-inter-bold text-brand-textPrimary">{char}</Text>
                   </View>
                 );
               })}
@@ -188,7 +188,7 @@ export default function VerifyEmailScreen() {
             {isLoading ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text className="text-white text-center font-inter-semibold text-base">
+              <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
                 Verify & Continue
               </Text>
             )}

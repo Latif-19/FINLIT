@@ -97,7 +97,7 @@ export default function AssessmentScreen() {
   const progressPercentage = (completedCount / totalQuestions) * 100;
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg dark:bg-slate-950">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Decorative Accent Background */}
       <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 dark:bg-slate-700/60 rounded-b-[100px] -z-10" />
 
@@ -110,7 +110,7 @@ export default function AssessmentScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={colors.navy} />
         </Pressable>
-        <Text className="text-lg font-inter-semibold text-brand-navy dark:text-slate-100 ml-4 flex-1 text-center pr-10">
+        <Text className="text-lg font-inter-semibold text-brand-textPrimary ml-4 flex-1 text-center pr-10">
           Assessment
         </Text>
       </View>
@@ -118,7 +118,7 @@ export default function AssessmentScreen() {
       {/* Progress Bar */}
       <View className="px-6 mb-6">
         <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-brand-gray dark:text-slate-400 font-inter-semibold text-xs uppercase tracking-wider">
+          <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider">
             Progress
           </Text>
           <Text className="text-brand-emerald dark:text-emerald-400 font-inter-bold text-xs">
@@ -140,10 +140,10 @@ export default function AssessmentScreen() {
       >
         {/* Branding header */}
         <View className="items-center mb-6">
-          <Text className="text-[32px] font-inter-bold text-brand-navy dark:text-slate-100 text-center tracking-tight leading-10">
+          <Text className="text-[32px] font-inter-bold text-brand-textPrimary text-center tracking-tight leading-10">
             Financial Literacy
           </Text>
-          <Text className="text-brand-gray dark:text-slate-400 font-inter text-sm mt-1.5 text-center px-6 leading-5">
+          <Text className="text-brand-gray font-inter text-sm mt-1.5 text-center px-6 leading-5">
             Help us personalize your roadmap and lessons to fit your knowledge base.
           </Text>
         </View>
@@ -152,12 +152,12 @@ export default function AssessmentScreen() {
         {questions.map((item, qIndex) => (
           <View
             key={qIndex}
-            className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40"
+            className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-brand-shadow"
           >
-            <Text className="text-brand-gray dark:text-slate-400 font-inter-semibold text-xs uppercase tracking-wider mb-2">
+            <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
               Question {qIndex + 1}
             </Text>
-            <Text className="text-lg font-inter-semibold text-brand-navy dark:text-slate-100 mb-4">
+            <Text className="text-lg font-inter-semibold text-brand-textPrimary mb-4">
               {item.question}
             </Text>
 
@@ -176,7 +176,7 @@ export default function AssessmentScreen() {
                 >
                   <Text
                     className={`text-base font-inter-medium flex-1 ${
-                      isSelected ? "text-brand-emerald" : "text-brand-dark"
+                      isSelected ? "text-brand-emerald" : "text-brand-textPrimary"
                     }`}
                   >
                     {option.text}
@@ -200,7 +200,7 @@ export default function AssessmentScreen() {
 
         {/* YOUR FINANCIAL GOALS SECTION */}
         <View className="mt-4 mb-6">
-          <Text className="text-[24px] font-inter-semibold text-brand-navy tracking-tight uppercase">
+          <Text className="text-[24px] font-inter-semibold text-brand-textPrimary tracking-tight uppercase">
             YOUR FINANCIAL GOALS
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1 leading-5">
@@ -209,11 +209,11 @@ export default function AssessmentScreen() {
         </View>
 
         {/* Question 6 Card */}
-        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-brand-shadow">
           <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
             Question 6
           </Text>
-          <Text className="text-lg font-inter-semibold text-brand-navy mb-4">
+          <Text className="text-lg font-inter-semibold text-brand-textPrimary mb-4">
             What is your primary financial goal?
           </Text>
 
@@ -240,7 +240,7 @@ export default function AssessmentScreen() {
               >
                 <Text
                   className={`text-base font-inter-medium flex-1 ${
-                    isSelected ? "text-brand-emerald" : "text-brand-dark"
+                    isSelected ? "text-brand-emerald" : "text-brand-textPrimary"
                   }`}
                 >
                   {goalOption}
@@ -274,7 +274,7 @@ export default function AssessmentScreen() {
         >
           <Text
             className={`font-inter-semibold text-base ${
-              completed ? "text-white" : "text-brand-gray"
+              completed ? "text-brand-textOnDark" : "text-brand-gray"
             }`}
           >
             View Results
@@ -289,7 +289,7 @@ export default function AssessmentScreen() {
             <View className="w-20 h-20 bg-white/10 rounded-full items-center justify-center mb-4">
               <ActivityIndicator size="large" color={colors.emerald} />
             </View>
-            <Text className="text-white text-2xl font-inter-bold tracking-tight text-center">
+            <Text className="text-brand-textOnDark text-2xl font-inter-bold tracking-tight text-center">
               Personalizing Your Experience
             </Text>
           </View>
@@ -301,7 +301,7 @@ export default function AssessmentScreen() {
                 size={20}
                 color={analysisStep >= 1 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Analyzing your responses...
               </Text>
             </View>
@@ -312,7 +312,7 @@ export default function AssessmentScreen() {
                 size={20}
                 color={analysisStep >= 2 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Measuring your financial knowledge
               </Text>
             </View>
@@ -323,7 +323,7 @@ export default function AssessmentScreen() {
                 size={20}
                 color={analysisStep >= 3 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Building your learning path
               </Text>
             </View>
@@ -334,7 +334,7 @@ export default function AssessmentScreen() {
                 size={20}
                 color={analysisStep >= 4 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Personalizing your dashboard
               </Text>
             </View>

@@ -109,7 +109,7 @@ function NotificationCard({ notification }: { notification: AppNotification }) {
       </View>
       <View className="flex-1 mr-2">
         <View className="flex-row items-center gap-2">
-          <Text className="text-[14px] font-inter-semibold text-brand-dark flex-1" numberOfLines={1}>
+          <Text className="text-[14px] font-inter-semibold text-brand-textPrimary flex-1" numberOfLines={1}>
             {notification.title}
           </Text>
           {!notification.read && (
@@ -180,7 +180,7 @@ export default function NotificationsScreen() {
         <Ionicons name={item.icon} size={22} color={colors.emerald} />
       </View>
       <View className="flex-1 mr-3">
-        <Text className="text-[15px] font-inter-semibold text-brand-dark">{item.title}</Text>
+        <Text className="text-[15px] font-inter-semibold text-brand-textPrimary">{item.title}</Text>
         <Text className="text-xs text-brand-gray mt-0.5">{item.description}</Text>
       </View>
       <Switch
@@ -200,7 +200,7 @@ export default function NotificationsScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3 flex-1">
-          <Text className="text-[22px] font-inter-bold text-brand-dark">Notifications</Text>
+          <Text className="text-[22px] font-inter-bold text-brand-textPrimary">Notifications</Text>
           <Text className="text-sm text-brand-gray mt-0.5">
             Manage how FinLit keeps you on track
           </Text>

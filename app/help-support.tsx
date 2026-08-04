@@ -68,7 +68,7 @@ export default function HelpSupportScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3">
-          <Text className="text-[22px] font-inter-bold text-brand-dark">
+          <Text className="text-[22px] font-inter-bold text-brand-textPrimary">
             Help {"&"} Support
           </Text>
           <Text className="text-sm font-inter text-brand-gray mt-0.5">
@@ -99,7 +99,7 @@ export default function HelpSupportScreen() {
                     color={colors.emerald}
                     style={{ marginRight: 10 }}
                   />
-                  <Text className="text-[15px] font-inter-semibold text-brand-dark flex-1">
+                  <Text className="text-[15px] font-inter-semibold text-brand-textPrimary flex-1">
                     {item.question}
                   </Text>
                 </View>
@@ -140,7 +140,7 @@ export default function HelpSupportScreen() {
               <Ionicons name="mail-outline" size={22} color={colors.emerald} />
             </View>
             <View className="flex-1">
-              <Text className="text-[15px] font-inter-semibold text-brand-dark">
+              <Text className="text-[15px] font-inter-semibold text-brand-textPrimary">
                 Email Support
               </Text>
               <Text className="text-[13px] font-inter text-brand-emerald mt-0.5">

@@ -32,7 +32,11 @@ export const useCommunityStore = create<CommunityState & CommunityActions>()(
         set((state) => ({
           posts: state.posts.map((p) =>
             p.id === postId
-              ? { ...p, likedByUser: !currentlyLiked, likes: currentlyLiked ? p.likes - 1 : p.likes + 1 }
+              ? {
+                  ...p,
+                  likedByUser: !currentlyLiked,
+                  likes: currentlyLiked ? Math.max(0, p.likes - 1) : p.likes + 1,
+                }
               : p
           ),
         })),

@@ -67,7 +67,7 @@ export default function BadgesScreen() {
   const locked = badges.filter((b) => b.unlockedAt === null);
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg dark:bg-slate-950">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       <ScrollView
         contentContainerStyle={{ paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
@@ -82,13 +82,13 @@ export default function BadgesScreen() {
             <Ionicons name="arrow-back" size={20} color="white" />
           </Pressable>
 
-          <Text className="text-brand-gold dark:text-amber-400 text-[10px] font-inter-semibold uppercase tracking-widest">
+          <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest">
             Your Achievements
           </Text>
-          <Text className="text-white text-[28px] font-inter-bold mt-1 tracking-tight">
+          <Text className="text-brand-textOnDark text-[28px] font-inter-bold mt-1 tracking-tight">
             Badges
           </Text>
-          <Text className="text-white/60 text-xs font-inter mt-2">
+          <Text className="text-brand-textOnDark/60 text-xs font-inter mt-2">
             {unlocked.length} of {badges.length} badges earned
           </Text>
 
@@ -105,7 +105,7 @@ export default function BadgesScreen() {
           {/* Unlocked badges */}
           {unlocked.length > 0 && (
             <>
-              <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
+              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
                 EARNED ({unlocked.length})
               </Text>
               <View className="flex-row flex-wrap gap-3 mb-6">
@@ -114,7 +114,7 @@ export default function BadgesScreen() {
                   return (
                     <View
                       key={badge.id}
-                      className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
+                      className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-brand-shadow"
                     >
                       <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center overflow-hidden">
                         {imgSource ? (
@@ -126,7 +126,7 @@ export default function BadgesScreen() {
                           <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
                         )}
                       </View>
-                      <Text className="text-brand-navy text-sm font-inter-bold mt-3">
+                      <Text className="text-brand-textPrimary text-sm font-inter-bold mt-3">
                         {badge.name}
                       </Text>
                       <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
@@ -146,7 +146,7 @@ export default function BadgesScreen() {
           )}
 
           {/* Locked badges */}
-          <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
+          <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
             LOCKED ({locked.length})
           </Text>
           <View className="flex-row flex-wrap gap-3">
@@ -167,7 +167,7 @@ export default function BadgesScreen() {
                       <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
                     )}
                   </View>
-                  <Text className="text-brand-navy text-sm font-inter-bold mt-3">
+                  <Text className="text-brand-textPrimary text-sm font-inter-bold mt-3">
                     {badge.name}
                   </Text>
                   <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
@@ -187,7 +187,7 @@ export default function BadgesScreen() {
           {/* Tip */}
           <View className="flex-row items-start bg-brand-navy/5 dark:bg-slate-700/60 border border-brand-navy/10 rounded-2xl p-4 mt-6">
             <Ionicons name="bulb-outline" size={18} color={colors.navy} style={{ marginTop: 2 }} />
-            <Text className="text-brand-gray dark:text-slate-400 text-xs font-inter ml-2 flex-1 leading-5">
+            <Text className="text-brand-gray text-xs font-inter ml-2 flex-1 leading-5">
               Complete lessons, maintain streaks, and use app features to unlock more badges.
             </Text>
           </View>

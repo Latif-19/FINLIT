@@ -40,7 +40,7 @@ export default function OnboardingScreen() {
     <View className="flex-1 bg-brand-bg">
       {/* Header */}
       <View className="flex-row justify-between items-center px-6 pt-14">
-        <Text className="text-[20px] font-inter-semibold text-brand-navy">FinLit</Text>
+        <Text className="text-[20px] font-inter-semibold text-brand-textPrimary">FinLit</Text>
 
         <Pressable onPress={handleSkip} className="active:opacity-70 py-2">
           <Text className="text-brand-gray font-inter-semibold text-sm">Skip</Text>
@@ -67,7 +67,7 @@ export default function OnboardingScreen() {
               className="w-72 h-72 mb-8"
             />
 
-            <Text className="text-[32px] font-inter-bold text-center text-brand-navy mt-4 leading-[38px]">
+            <Text className="text-[32px] font-inter-bold text-center text-brand-textPrimary mt-4 leading-[38px]">
               {item.title}
             </Text>
 
@@ -100,7 +100,7 @@ export default function OnboardingScreen() {
           })}
           className="bg-brand-navy h-14 rounded-2xl justify-center items-center shadow-lg shadow-brand-navy/10"
         >
-          <Text className="text-white text-center font-inter-semibold text-base">
+          <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
             {currentIndex === slides.length - 1 ? "Get Started" : "Next"}
           </Text>
         </Pressable>

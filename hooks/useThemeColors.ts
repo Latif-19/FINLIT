@@ -1,12 +1,34 @@
+import { useState, useEffect } from "react";
+import { Appearance, AppState } from "react-native";
 import { getSemanticColors, getThemeVars } from "../constants/theme";
 import { useUserStore } from "../store/useUserStore";
 
 export function useThemeColors() {
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const isDarkMode = useUserStore((s) => s.isDarkMode);
-  const themeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
-  const semantic = getSemanticColors(isDarkMode);
+  const [systemColorScheme, setSystemColorScheme] = useState(Appearance.getColorScheme());
+  const themePreference = useUserStore((s) => s.themePreference || "system");
+
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      setSystemColorScheme(colorScheme);
+    });
+    const appStateSub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        setSystemColorScheme(Appearance.getColorScheme());
+      }
+    });
+    return () => {
+      sub.remove();
+      appStateSub.remove();
+    };
+  }, []);
+
+  const isDark =
+    themePreference === "system"
+      ? systemColorScheme === "dark"
+      : themePreference === "dark";
+
+  const themeVars = getThemeVars(isDark);
+  const semantic = getSemanticColors(isDark);
 
   return {
     navy: themeVars["--color-brand-navy"],

@@ -113,7 +113,7 @@ export default function AssessmentReviewScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={colors.navy} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">
           Your Assessment
         </Text>
         <View className="w-10" />
@@ -167,7 +167,7 @@ export default function AssessmentReviewScreen() {
             <View className="bg-brand-bg rounded-3xl p-4 mb-3.5 shadow-md">
               <View className="flex-row items-center gap-2 mb-2.5">
                 <Ionicons name="flag-outline" size={18} color={colors.emerald} />
-                <Text className="text-[15px] font-inter-bold text-brand-navy">
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">
                   Your Financial Goal
                 </Text>
               </View>
@@ -181,7 +181,7 @@ export default function AssessmentReviewScreen() {
 
           {/* Tier Breakdown */}
           <View className="bg-brand-bg rounded-3xl p-4 mb-3.5 shadow-md">
-            <Text className="text-base font-inter-bold text-brand-navy mb-3.5">
+            <Text className="text-base font-inter-bold text-brand-textPrimary mb-3.5">
               Skill Breakdown
             </Text>
             {breakdowns.map((item) => (
@@ -191,7 +191,7 @@ export default function AssessmentReviewScreen() {
               >
                 <View className="flex-row items-center gap-2.5">
                   <Ionicons name={item.icon} size={20} color={item.color} />
-                  <Text className="text-[15px] font-inter-semibold text-brand-navy">
+                  <Text className="text-[15px] font-inter-semibold text-brand-textPrimary">
                     {item.category}
                   </Text>
                 </View>
@@ -218,7 +218,7 @@ export default function AssessmentReviewScreen() {
                 size={20}
                 color={levelInfo.color}
               />
-              <Text className="text-base font-inter-bold text-brand-navy">
+              <Text className="text-base font-inter-bold text-brand-textPrimary">
                 Your Level
               </Text>
             </View>
@@ -260,7 +260,7 @@ export default function AssessmentReviewScreen() {
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 rounded-2xl shadow-lg active:opacity-80"
           >
             <Ionicons name="refresh-outline" size={20} color="#ffffff" />
-            <Text className="text-base font-inter-bold text-white">
+            <Text className="text-base font-inter-bold text-brand-textOnDark">
               Retake Assessment
             </Text>
           </Pressable>
@@ -271,7 +271,7 @@ export default function AssessmentReviewScreen() {
           <View className="w-[100px] h-[100px] rounded-full bg-brand-slateBg items-center justify-center mb-5">
             <Ionicons name="school-outline" size={56} color={colors.gray} />
           </View>
-          <Text className="text-lg font-inter-bold text-brand-navy text-center mb-2.5">
+          <Text className="text-lg font-inter-bold text-brand-textPrimary text-center mb-2.5">
             {"You haven't taken the assessment yet"}
           </Text>
           <Text className="text-sm text-brand-gray text-center leading-[22px] mb-7 px-4">
@@ -283,7 +283,7 @@ export default function AssessmentReviewScreen() {
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 px-8 rounded-2xl shadow-lg active:opacity-80"
           >
             <Ionicons name="rocket-outline" size={20} color="#ffffff" />
-            <Text className="text-base font-inter-bold text-white">
+            <Text className="text-base font-inter-bold text-brand-textOnDark">
               Take Assessment
             </Text>
           </Pressable>

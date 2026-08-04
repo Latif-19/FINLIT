@@ -369,7 +369,7 @@ export default function LearnScreen() {
           <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest">
             UNIT {Math.floor(lessonsCompleted / 4) + 1}
           </Text>
-          <Text className="text-[15px] font-inter-bold text-brand-dark">
+          <Text className="text-[15px] font-inter-bold text-brand-textPrimary">
             Ghana Personal Finance
           </Text>
         </View>
@@ -404,10 +404,10 @@ export default function LearnScreen() {
               <Text className="text-[9px] font-inter-bold text-brand-emerald tracking-widest uppercase">
                 Your Personalized Path
               </Text>
-              <Text className="text-sm font-inter-bold text-brand-navy mt-0.5">
+              <Text className="text-sm font-inter-bold text-brand-textPrimary mt-0.5">
                 Goal: {userGoal}
               </Text>
-              <Text className="text-xs text-brand-dark mt-0.5">
+              <Text className="text-xs text-brand-textPrimary mt-0.5">
                 Start with Lesson {recommendedLesson.id}: {recommendedLesson.title}
               </Text>
             </View>
@@ -427,7 +427,7 @@ export default function LearnScreen() {
               {lessonsCompleted}/{LESSON_MODULES.length} Completed
             </Text>
           </View>
-          <Text className="text-base font-inter-bold text-brand-dark mt-2.5">
+          <Text className="text-base font-inter-bold text-brand-textPrimary mt-2.5">
             Financial Literacy Certificate
           </Text>
           <Text className="text-xs text-brand-gray mt-1 leading-4">
@@ -523,7 +523,7 @@ export default function LearnScreen() {
                       : { right: width * 0.5 + 45 }
                   }
                 >
-                  <Text className="text-[11px] font-inter-bold text-brand-dark">
+                  <Text className="text-[11px] font-inter-bold text-brand-textPrimary">
                     {mod.title}
                   </Text>
                   <Text className="text-[9px] text-brand-gray mt-0.5">
@@ -552,7 +552,7 @@ export default function LearnScreen() {
               className="absolute w-[140px] bg-brand-bg border-[1.5px] border-brand-border rounded-[10px] py-1.5 px-2.5 shadow-sm"
               style={{ left: width * 0.5 + 45 }}
             >
-              <Text className="text-[11px] font-inter-bold text-brand-dark">
+              <Text className="text-[11px] font-inter-bold text-brand-textPrimary">
                 Accredited Certificate
               </Text>
               <Text className="text-[9px] text-brand-gray mt-0.5">
@@ -570,7 +570,7 @@ export default function LearnScreen() {
             <Text className="text-[28px]">🦉</Text>
           </View>
           <View className="flex-1">
-            <Text className="text-[13px] font-inter-semibold text-brand-dark leading-[18px]">
+            <Text className="text-[13px] font-inter-semibold text-brand-textPrimary leading-[18px]">
               {activeTip}
             </Text>
           </View>
@@ -605,7 +605,7 @@ export default function LearnScreen() {
                 </View>
 
                 {/* Content */}
-                <Text className="text-xl font-inter-bold text-brand-dark mb-2">
+                <Text className="text-xl font-inter-bold text-brand-textPrimary mb-2">
                   {selectedModule.title}
                 </Text>
                 <Text className="text-sm text-brand-gray leading-5 mb-[18px]">
@@ -626,7 +626,7 @@ export default function LearnScreen() {
                   onPress={() => startSession(selectedModule)}
                   className="bg-green-500 border-b-[5px] border-b-green-600 h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
                 >
-                  <Text className="text-white text-base font-inter-bold tracking-wider">
+                  <Text className="text-brand-textOnDark text-base font-inter-bold tracking-wider">
                     {completedLessonIds.includes(selectedModule.id)
                       ? "REVIEW LESSON"
                       : "START +100 XP"}
@@ -712,7 +712,7 @@ export default function LearnScreen() {
                       }}
                     />
                     <View className="flex-1 bg-brand-slateBg border-[1.5px] border-brand-border rounded-[18px] p-4 shadow-sm">
-                      <Text className="text-base text-brand-dark leading-6 font-inter-medium">
+                      <Text className="text-base text-brand-textPrimary leading-6 font-inter-medium">
                         {sessionLesson.content[sessionStep]}
                       </Text>
                     </View>
@@ -797,7 +797,7 @@ export default function LearnScreen() {
                       onPress={handleRefillHearts}
                       className="bg-yellow-400 border-b-[5px] border-b-yellow-700 w-full h-[52px] rounded-2xl justify-center items-center mb-3.5 active:opacity-80"
                     >
-                      <Text className="text-white text-base font-inter-bold">
+                      <Text className="text-brand-textOnDark text-base font-inter-bold">
                         Refill Hearts (50 XP)
                       </Text>
                     </Pressable>
@@ -836,7 +836,7 @@ export default function LearnScreen() {
                         }}
                       />
                       <View className="flex-1 bg-brand-slateBg border-[1.5px] border-brand-border rounded-[18px] p-4 shadow-sm">
-                        <Text className="text-base text-brand-dark leading-6 font-inter-bold">
+                        <Text className="text-base text-brand-textPrimary leading-6 font-inter-bold">
                           {"Let's verify what you've learned! Answer the question below:"}
                         </Text>
                       </View>
@@ -846,7 +846,7 @@ export default function LearnScreen() {
                       const quizList = MODULE_QUIZZES[sessionLesson.id];
                       if (!quizList || quizList.length === 0) {
                         return (
-                          <Text className="text-base text-brand-dark leading-6 font-inter-medium">
+                          <Text className="text-base text-brand-textPrimary leading-6 font-inter-medium">
                             No quiz configured for this lesson.
                           </Text>
                         );
@@ -854,7 +854,7 @@ export default function LearnScreen() {
                       const currentQuestion = quizList[currentQuestionIndex];
                       if (!currentQuestion) {
                         return (
-                          <Text className="text-base text-brand-dark leading-6 font-inter-medium">
+                          <Text className="text-base text-brand-textPrimary leading-6 font-inter-medium">
                             No question found for this quiz stage.
                           </Text>
                         );
@@ -865,7 +865,7 @@ export default function LearnScreen() {
                           <Text className="text-[10px] font-inter-bold text-brand-gray tracking-widest mb-1.5">
                             QUESTION {currentQuestionIndex + 1} OF {quizList.length}
                           </Text>
-                          <Text className="text-[22px] font-inter-bold text-brand-dark leading-[30px] mb-[22px]">
+                          <Text className="text-[22px] font-inter-bold text-brand-textPrimary leading-[30px] mb-[22px]">
                             {currentQuestion.question}
                           </Text>
 
@@ -876,7 +876,7 @@ export default function LearnScreen() {
                               let optBtnClass =
                                 "p-4 rounded-2xl border-2 border-brand-border border-b-[6px] bg-brand-bg flex-row items-center justify-between active:opacity-80";
                               let optTextClass =
-                                "text-[17px] font-inter-semibold text-brand-dark flex-1 mr-2.5 leading-6";
+                                "text-[17px] font-inter-semibold text-brand-textPrimary flex-1 mr-2.5 leading-6";
                               let optionIcon = "ellipse-outline";
                               let optionIconColor = colors.gray;
 
@@ -934,12 +934,12 @@ export default function LearnScreen() {
                   <View className="flex-row bg-brand-slateBg border-2 border-brand-border rounded-[20px] p-5 w-full gap-4">
                     <View className="flex-1 items-center bg-brand-bg border-[1.5px] border-brand-border rounded-[14px] py-3.5">
                       <Text className="text-base mb-1">⚡</Text>
-                      <Text className="text-base font-inter-bold text-brand-dark">+{sessionLesson.xpVal} XP</Text>
+                      <Text className="text-base font-inter-bold text-brand-textPrimary">+{sessionLesson.xpVal} XP</Text>
                       <Text className="text-[9px] font-inter-bold text-brand-gray mt-0.5">BONUS POINTS</Text>
                     </View>
                     <View className="flex-1 items-center bg-brand-bg border-[1.5px] border-brand-border rounded-[14px] py-3.5">
                       <Text className="text-base mb-1">❤️</Text>
-                      <Text className="text-base font-inter-bold text-brand-dark">{hearts}/5</Text>
+                      <Text className="text-base font-inter-bold text-brand-textPrimary">{hearts}/5</Text>
                       <Text className="text-[9px] font-inter-bold text-brand-gray mt-0.5">HEARTS LEFT</Text>
                     </View>
                   </View>
@@ -997,7 +997,7 @@ export default function LearnScreen() {
                         : "bg-green-500 border-b-[5px] border-b-green-600"
                     }`}
                   >
-                    <Text className="text-white text-base font-inter-bold tracking-wider">
+                    <Text className="text-brand-textOnDark text-base font-inter-bold tracking-wider">
                       {sessionStep === sessionLesson.content.length
                         ? isAnswerChecked
                           ? isAnswerCorrect

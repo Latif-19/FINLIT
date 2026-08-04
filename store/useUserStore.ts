@@ -96,9 +96,7 @@ export interface UserState {
   simulationHistory: SimulationResult[];
 
   // Theming & Accessibility
-  colorBlindMode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome';
-  appThemeColor: 'emerald' | 'blue' | 'purple';
-  isDarkMode: boolean;
+  themePreference: 'system' | 'light' | 'dark';
 
   // Notification Preferences
   notificationPrefs: Record<string, boolean>;
@@ -136,9 +134,7 @@ export interface UserActions {
   completeLessonOffline: (lessonId: number, xpVal: number, quizScore: number | null) => void;
 
   // Theming & Accessibility
-  setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
-  setAppThemeColor: (color: 'emerald' | 'blue' | 'purple') => void;
-  setDarkMode: (isDark: boolean) => void;
+  setThemePreference: (pref: 'system' | 'light' | 'dark') => void;
 
   // Notification Preferences
   setNotificationPref: (key: string, value: boolean) => void;
@@ -190,9 +186,7 @@ const DEFAULT_STATE: UserState = {
   quizScores: {},
   completedLessonIds: [],
   totalTimeSpentSeconds: 0,
-  colorBlindMode: 'none',
-  appThemeColor: 'emerald',
-  isDarkMode: false,
+  themePreference: 'system',
   notificationPrefs: {
     dailyReminders: true,
     streakAlerts: true,
@@ -492,9 +486,7 @@ export const useUserStore = create<UserState & UserActions>()(
       clearSimulationHistory: () => set({ simulationHistory: [] }),
 
       // ── Theming & Accessibility ─────────────────────────────────────────
-      setColorBlindMode: (mode) => set({ colorBlindMode: mode }),
-      setAppThemeColor: (color) => set({ appThemeColor: color }),
-      setDarkMode: (isDark) => set({ isDarkMode: isDark }),
+      setThemePreference: (pref) => set({ themePreference: pref }),
 
       // ── Notification Preferences ─────────────────────────────────────────
       setNotificationPref: (key, value) =>
@@ -529,9 +521,7 @@ export const useUserStore = create<UserState & UserActions>()(
         quizScores: state.quizScores,
         completedLessonIds: state.completedLessonIds,
         totalTimeSpentSeconds: state.totalTimeSpentSeconds,
-        colorBlindMode: state.colorBlindMode,
-        appThemeColor: state.appThemeColor,
-        isDarkMode: state.isDarkMode,
+        themePreference: state.themePreference,
         notificationPrefs: state.notificationPrefs,
         createdAt: state.createdAt,
         lastAssessedAt: state.lastAssessedAt,

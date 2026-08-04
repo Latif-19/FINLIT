@@ -191,7 +191,7 @@ export default function CommunityScreen() {
       case "Debt Free":
         return "bg-amber-100 text-amber-800 border-amber-200";
       default:
-        return "bg-brand-slateBg text-brand-dark border-brand-border";
+        return "bg-brand-slateBg text-brand-textPrimary border-brand-border";
     }
   };
 
@@ -201,7 +201,7 @@ export default function CommunityScreen() {
       <View className="bg-brand-bg pt-4 pb-5 px-6 border-b border-brand-border">
         <View className="flex-row justify-between items-center">
           <View>
-            <Text className="text-3xl font-inter-bold text-brand-navy">Community Hub</Text>
+            <Text className="text-3xl font-inter-bold text-brand-textPrimary">Community Hub</Text>
             <Text className="text-brand-gray text-xs mt-1">
               {"Connect & grow with fellow financial builders"}
             </Text>
@@ -227,7 +227,7 @@ export default function CommunityScreen() {
             >
               <Text
                 className={`text-xs font-inter-bold ${
-                  selectedCategory === cat ? "text-white" : "text-brand-dark"
+                  selectedCategory === cat ? "text-brand-textOnDark" : "text-brand-textPrimary"
                 }`}
               >
                 {cat === "All" ? cat : `#${cat}`}
@@ -249,7 +249,7 @@ export default function CommunityScreen() {
             <View className="w-20 h-20 bg-brand-emerald/10 rounded-3xl items-center justify-center mb-5">
               <Ionicons name="chatbubbles-outline" size={38} color={colors.emerald} />
             </View>
-            <Text className="text-brand-navy text-lg font-inter-bold text-center">
+            <Text className="text-brand-textPrimary text-lg font-inter-bold text-center">
               {selectedCategory === "All"
                 ? "No discussions yet"
                 : `Nothing in #${selectedCategory} yet`}
@@ -263,7 +263,7 @@ export default function CommunityScreen() {
               className="flex-row items-center bg-brand-emerald mt-6 px-5 py-3 rounded-2xl shadow-sm"
             >
               <Ionicons name="create-outline" size={18} color="white" />
-              <Text className="text-white font-inter-bold text-sm ml-2">Start a discussion</Text>
+              <Text className="text-brand-textOnDark font-inter-bold text-sm ml-2">Start a discussion</Text>
             </Pressable>
           </View>
         }
@@ -280,12 +280,16 @@ export default function CommunityScreen() {
               {/* Post Header */}
               <View className="flex-row justify-between items-start">
                 <View className="flex-row items-center flex-1 mr-2">
-                  <View className="w-11 h-11 bg-brand-emerald/5 rounded-2xl items-center justify-center mr-3 border border-brand-emerald/20">
-                    <Text className="text-2xl">{post.avatar}</Text>
+                  <View className="w-10 h-10 bg-brand-slateBg rounded-xl items-center justify-center mr-3 overflow-hidden border border-brand-border">
+                    {isImageUri(post.avatar) ? (
+                      <Image source={{ uri: post.avatar }} className="w-full h-full" resizeMode="cover" />
+                    ) : (
+                      <Text className="text-2xl">{post.avatar}</Text>
+                    )}
                   </View>
                   <View className="flex-1">
                     <View className="flex-row items-center flex-wrap gap-1.5">
-                      <Text className="font-inter-bold text-brand-navy text-[15px]" numberOfLines={1}>
+                      <Text className="font-inter-bold text-brand-textPrimary text-[15px]" numberOfLines={1}>
                         {post.author}
                       </Text>
                       <View className="px-2 py-0.5 rounded-full bg-brand-emerald/10 border border-brand-emerald/20">
@@ -309,7 +313,7 @@ export default function CommunityScreen() {
               </View>
 
               {/* Post Content */}
-              <Text className="text-brand-dark text-[15px] mt-4 leading-[22px] font-inter">
+              <Text className="text-brand-textPrimary text-[15px] mt-4 leading-[22px] font-inter">
                 {post.content}
               </Text>
             </Pressable>
@@ -391,7 +395,7 @@ export default function CommunityScreen() {
             >
               <Ionicons name="close" size={22} color={colors.navy} />
             </Pressable>
-            <Text className="text-lg font-inter-bold text-brand-dark">Ask the Community</Text>
+            <Text className="text-lg font-inter-bold text-brand-textPrimary">Ask the Community</Text>
             <Pressable
               onPress={handleCreatePost}
               disabled={!newPostContent.trim()}
@@ -401,7 +405,7 @@ export default function CommunityScreen() {
             >
               <Text
                 className={`text-xs font-inter-bold uppercase tracking-wider ${
-                  newPostContent.trim() ? "text-white" : "text-brand-gray"
+                  newPostContent.trim() ? "text-brand-textOnDark" : "text-brand-gray"
                 }`}
               >
                 Post
@@ -416,11 +420,15 @@ export default function CommunityScreen() {
             <ScrollView className="flex-1 p-5">
               {/* User preview header */}
               <View className="flex-row items-center mb-5">
-                <View className="w-11 h-11 bg-brand-emerald/5 rounded-2xl items-center justify-center mr-3 border border-brand-emerald/20">
-                  <Text className="text-2xl">{userAvatar || "🦉"}</Text>
+                <View className="w-10 h-10 bg-brand-bg rounded-xl items-center justify-center mr-3 overflow-hidden">
+                  {isImageUri(userAvatar) ? (
+                    <Image source={{ uri: userAvatar || "" }} className="w-full h-full" resizeMode="cover" />
+                  ) : (
+                    <Text className="text-2xl">{userAvatar || "🦉"}</Text>
+                  )}
                 </View>
                 <View>
-                  <Text className="font-inter-bold text-brand-dark text-sm">
+                  <Text className="font-inter-bold text-brand-textPrimary text-sm">
                     {`Posting as ${userName}`}
                   </Text>
                   <Text className="text-brand-gray text-xs">{getUserHandle()}</Text>
@@ -456,7 +464,7 @@ export default function CommunityScreen() {
               {/* Text Input */}
               <TextInput
                 textAlignVertical="top"
-                className="bg-brand-slateBg rounded-2xl p-4 text-base font-inter-semibold text-brand-dark border border-brand-border min-h-[160]"
+                className="bg-brand-slateBg rounded-2xl p-4 text-base font-inter-semibold text-brand-textPrimary border border-brand-border min-h-[160]"
                 multiline
                 placeholder="What is on your mind? Ask a question, share a victory, or give a tip..."
                 placeholderTextColor={colors.gray}
@@ -487,7 +495,7 @@ export default function CommunityScreen() {
             >
               <Ionicons name="arrow-back" size={22} color={colors.navy} />
             </Pressable>
-            <Text className="text-lg font-inter-bold text-brand-dark">Thread Details</Text>
+            <Text className="text-lg font-inter-bold text-brand-textPrimary">Thread Details</Text>
             <View style={{ width: 40 }} />
           </View>
 
@@ -503,12 +511,16 @@ export default function CommunityScreen() {
                 <View className="bg-brand-bg border border-brand-border rounded-3xl p-5 mb-6 shadow-sm">
                   <View className="flex-row justify-between items-start">
                     <View className="flex-row items-center mr-2 flex-1">
-                      <View className="w-11 h-11 bg-brand-emerald/5 rounded-2xl items-center justify-center mr-3 border border-brand-emerald/20">
-                        <Text className="text-2xl">{activePost.avatar}</Text>
+                      <View className="w-12 h-12 bg-brand-slateBg rounded-2xl items-center justify-center mr-3 overflow-hidden border border-brand-border">
+                        {isImageUri(activePost.avatar) ? (
+                          <Image source={{ uri: activePost.avatar }} className="w-full h-full" resizeMode="cover" />
+                        ) : (
+                          <Text className="text-2xl">{activePost.avatar}</Text>
+                        )}
                       </View>
                       <View className="flex-1">
                         <View className="flex-row items-center flex-wrap gap-1">
-                          <Text className="font-inter-bold text-brand-dark text-base" numberOfLines={1}>
+                          <Text className="font-inter-bold text-brand-textPrimary text-base" numberOfLines={1}>
                             {activePost.author}
                           </Text>
                           <View className="px-2 py-0.5 rounded-full bg-brand-slateBg border border-brand-border">
@@ -529,7 +541,7 @@ export default function CommunityScreen() {
                     </View>
                   </View>
 
-                  <Text className="text-brand-dark text-base mt-4 leading-6 font-inter-semibold">
+                  <Text className="text-brand-textPrimary text-base mt-4 leading-6 font-inter-semibold">
                     {activePost.content}
                   </Text>
 
@@ -571,7 +583,7 @@ export default function CommunityScreen() {
                     <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center mb-3">
                       <Ionicons name="chatbubble-ellipses-outline" size={26} color={colors.gray} />
                     </View>
-                    <Text className="text-brand-navy text-sm font-inter-bold">No replies yet</Text>
+                    <Text className="text-brand-textPrimary text-sm font-inter-bold">No replies yet</Text>
                     <Text className="text-brand-gray text-xs mt-1 font-inter">Be the first to answer this question.</Text>
                   </View>
                 ) : (
@@ -587,7 +599,7 @@ export default function CommunityScreen() {
                           </View>
                           <View className="flex-1">
                             <View className="flex-row items-center flex-wrap gap-1.5">
-                              <Text className="font-inter-bold text-brand-navy text-sm" numberOfLines={1}>
+                              <Text className="font-inter-bold text-brand-textPrimary text-sm" numberOfLines={1}>
                                 {rep.author}
                               </Text>
                               <View className="px-1.5 py-0.5 rounded-md bg-brand-emerald/10 border border-brand-emerald/20">
@@ -601,7 +613,7 @@ export default function CommunityScreen() {
                         </View>
                         <Text className="text-brand-gray text-[10px]">{timeAgo(rep.createdAt)}</Text>
                       </View>
-                      <Text className="text-brand-dark text-sm leading-[20px] font-inter mt-0.5">{rep.content}</Text>
+                      <Text className="text-brand-textPrimary text-sm leading-[20px] font-inter mt-0.5">{rep.content}</Text>
                     </View>
                   ))
                 )}
@@ -610,7 +622,7 @@ export default function CommunityScreen() {
               {/* Bottom Reply Input bar */}
               <View className="p-4 bg-brand-bg border-t border-brand-border flex-row items-center gap-3">
                 <TextInput
-                  className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-sm font-inter-semibold text-brand-dark"
+                  className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-sm font-inter-semibold text-brand-textPrimary"
                   placeholder={`Reply to ${activePost.author}...`}
                   placeholderTextColor={colors.gray}
                   value={replyText}

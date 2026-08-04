@@ -63,7 +63,7 @@ export default function PrivacyPolicyScreen() {
         <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-emerald/5 items-center justify-center active:opacity-80">
           <Ionicons name="arrow-back" size={24} color={colors.emerald} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">Privacy Policy</Text>
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">Privacy Policy</Text>
         <View className="w-10" />
       </View>
 
@@ -92,7 +92,7 @@ export default function PrivacyPolicyScreen() {
               <View className="w-7 h-7 rounded-full bg-brand-emerald/10 items-center justify-center">
                 <Text className="text-[13px] font-inter-bold text-brand-emerald">{section.number}</Text>
               </View>
-              <Text className="text-base font-inter-bold text-brand-navy flex-1">{section.title}</Text>
+              <Text className="text-base font-inter-bold text-brand-textPrimary flex-1">{section.title}</Text>
             </View>
             <Text className="text-sm text-brand-gray leading-[22px] pl-[38px] font-inter">{section.body}</Text>
           </View>

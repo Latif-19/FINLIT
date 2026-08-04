@@ -216,7 +216,7 @@ export default function AiTutorScreen() {
         </Pressable>
 
         <View className="flex-1 ml-4 flex-row items-center justify-center pr-10">
-          <Text className="text-xl font-inter-bold text-brand-navy">AI Tutor</Text>
+          <Text className="text-xl font-inter-bold text-brand-textPrimary">AI Tutor</Text>
           <View
             className={`ml-2 px-2.5 py-0.5 rounded-full border ${
               isPremium
@@ -276,8 +276,8 @@ export default function AiTutorScreen() {
                       isAi
                         ? isLock
                           ? "text-amber-900 font-inter-bold"
-                          : "text-brand-dark"
-                        : "text-white"
+                          : "text-brand-textPrimary"
+                        : "text-brand-textOnDark"
                     }`}
                   >
                     {msg.text}
@@ -289,7 +289,7 @@ export default function AiTutorScreen() {
                       style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
                       className="bg-amber-600 py-2 rounded-xl mt-3 items-center"
                     >
-                      <Text className="text-white text-xs font-inter-bold">
+                      <Text className="text-brand-textOnDark text-xs font-inter-bold">
                         Upgrade to Premium
                       </Text>
                     </Pressable>
@@ -328,7 +328,7 @@ export default function AiTutorScreen() {
                   style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
                   className="bg-brand-bg border border-brand-border rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
                 >
-                  <Text className="text-xs text-brand-navy font-inter-semibold">{q}</Text>
+                  <Text className="text-xs text-brand-textPrimary font-inter-semibold">{q}</Text>
                 </Pressable>
               ))}
             </View>
@@ -342,7 +342,7 @@ export default function AiTutorScreen() {
             onChangeText={setInputText}
             placeholder="Ask a financial question..."
             placeholderTextColor={colors.gray}
-            className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
+            className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-textPrimary font-inter"
             onSubmitEditing={() => handleSend(inputText)}
             editable={!isTyping}
             onFocus={() => {

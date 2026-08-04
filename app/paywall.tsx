@@ -133,7 +133,7 @@ export default function PaywallScreen() {
         <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-slateBg items-center justify-center active:opacity-80">
           <Ionicons name="close" size={24} color={colors.dark} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">FinLit Premium</Text>
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">FinLit Premium</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -142,12 +142,12 @@ export default function PaywallScreen() {
           <View className="mb-6">
             <Ionicons name="checkmark-circle" size={80} color={colors.emerald} />
           </View>
-          <Text className="text-2xl font-inter-bold text-brand-navy text-center">Welcome to Premium!</Text>
-          <Text className="text-sm text-brand-dark text-center mt-2.5 mb-8 px-3 leading-5">
+          <Text className="text-2xl font-inter-bold text-brand-textPrimary text-center">Welcome to Premium!</Text>
+          <Text className="text-sm text-brand-textPrimary text-center mt-2.5 mb-8 px-3 leading-5">
             Your subscription has been activated. All simulators, AI tools, and premium content are now unlocked.
           </Text>
           <Pressable onPress={handleCloseSuccess} className="bg-brand-emerald py-4 px-10 rounded-2xl shadow-md shadow-brand-emerald/30 active:opacity-80">
-            <Text className="text-white text-base font-inter-bold">Start Exploring</Text>
+            <Text className="text-brand-textOnDark text-base font-inter-bold">Start Exploring</Text>
           </Pressable>
         </View>
       ) : (
@@ -157,7 +157,7 @@ export default function PaywallScreen() {
         >
           {/* Headline */}
           <View className="items-center my-3">
-            <Text className="text-[26px] font-inter-black text-brand-navy text-center">Unlock Financial Mastery</Text>
+            <Text className="text-[26px] font-inter-black text-brand-textPrimary text-center">Unlock Financial Mastery</Text>
             <Text className="text-sm text-brand-gray text-center mt-1.5 leading-5 px-2.5">
               Empower your wallet with premium features and certified credentials
             </Text>
@@ -170,7 +170,7 @@ export default function PaywallScreen() {
                 <Ionicons name="chatbubble-ellipses" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Unlimited AI Coach Pro</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Unlimited AI Coach Pro</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Ask unlimited questions and get tailored savings analysis.
                 </Text>
@@ -182,7 +182,7 @@ export default function PaywallScreen() {
                 <Ionicons name="ribbon" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Accredited Certificates</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Accredited Certificates</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Earn downloadable certificates to share on LinkedIn or your CV.
                 </Text>
@@ -194,7 +194,7 @@ export default function PaywallScreen() {
                 <Ionicons name="calculator" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Advanced Simulators</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Advanced Simulators</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Unlock tax estimators, SSNIT planners, and inflation models.
                 </Text>
@@ -206,7 +206,7 @@ export default function PaywallScreen() {
                 <Ionicons name="volume-high" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Audio Lessons & Offline Mode</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Audio Lessons & Offline Mode</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Listen hands-free and download lessons to learn without data.
                 </Text>
@@ -229,13 +229,13 @@ export default function PaywallScreen() {
               >
                 {p.badge && (
                   <View className="absolute -top-2.5 right-4 bg-brand-emerald px-2 py-0.5 rounded-lg">
-                    <Text className="text-[9px] font-inter-extrabold text-white tracking-wider">{p.badge}</Text>
+                    <Text className="text-[9px] font-inter-extrabold text-brand-textOnDark tracking-wider">{p.badge}</Text>
                   </View>
                 )}
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-base font-inter-bold text-brand-navy">{p.title}</Text>
+                  <Text className="text-base font-inter-bold text-brand-textPrimary">{p.title}</Text>
                   <View className="flex-row items-baseline">
-                    <Text className="text-lg font-inter-extrabold text-brand-navy">GH₵ {p.amount.toFixed(2)}</Text>
+                    <Text className="text-lg font-inter-extrabold text-brand-textPrimary">GH₵ {p.amount.toFixed(2)}</Text>
                     <Text className="text-xs text-brand-gray font-inter-medium">/{p.period}</Text>
                   </View>
                 </View>
@@ -249,7 +249,7 @@ export default function PaywallScreen() {
           <View className="flex-row items-center bg-brand-bg rounded-2xl border border-brand-border px-3.5 py-3.5">
             <Ionicons name="mail-outline" size={18} color={colors.gray} style={{ marginRight: 10 }} />
             <TextInput
-              className="flex-1 text-[15px] text-brand-navy"
+              className="flex-1 text-[15px] text-brand-textPrimary"
               placeholder="you@example.com"
               placeholderTextColor={colors.gray}
               keyboardType="email-address"
@@ -270,7 +270,7 @@ export default function PaywallScreen() {
               {isLoading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text className="text-white text-base font-inter-extrabold">
+                <Text className="text-brand-textOnDark text-base font-inter-extrabold">
                   Pay GH₵ {plan.amount.toFixed(2)} & Subscribe
                 </Text>
               )}
