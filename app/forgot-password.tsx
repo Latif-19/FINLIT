@@ -14,8 +14,12 @@ import {
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColors";
+import { authService } from "../services/auth";
 
 type Step = "email" | "code" | "password" | "success";
+
+// Matches the backend's 6-digit reset code (AuthService#assignResetCode).
+const CODE_LENGTH = 6;
 
 export default function ForgotPasswordScreen() {
   const colors = useThemeColors();
@@ -43,7 +47,7 @@ export default function ForgotPasswordScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   // OTP Verification Code state
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>(() => Array(CODE_LENGTH).fill(""));
   const [timer, setTimer] = useState(45);
   const [canResend, setCanResend] = useState(false);
 
@@ -53,11 +57,10 @@ export default function ForgotPasswordScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
-  // Refs for OTP input fields
-  const otpRef1 = useRef<TextInput>(null);
-  const otpRef2 = useRef<TextInput>(null);
-  const otpRef3 = useRef<TextInput>(null);
-  const otpRef4 = useRef<TextInput>(null);
+  // Refs for OTP input fields — one slot per digit, so the count is driven by
+  // CODE_LENGTH rather than hard-coded.
+  const otpRefs = useRef<(TextInput | null)[]>([]);
+  const focusOtp = (index: number) => otpRefs.current[index]?.focus();
 
   // Countdown timer for OTP resend
   useEffect(() => {
@@ -73,22 +76,30 @@ export default function ForgotPasswordScreen() {
   }, [step, timer]);
 
   // Start timer again when code is resent
-  const handleResendCode = () => {
-    if (!canResend) return;
+  const handleResendCode = async () => {
+    if (!canResend || isLoading) return;
     setIsLoading(true);
     setError("");
-    
-    // Simulate sending code API call
-    setTimeout(() => {
-      setIsLoading(false);
+
+    try {
+      await authService.forgotPassword(email.trim());
       setTimer(45);
       setCanResend(false);
-      setOtp(["", "", "", ""]);
-      otpRef1.current?.focus();
-    }, 1000);
+      setOtp(Array(CODE_LENGTH).fill(""));
+      focusOtp(0);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        (err?.message === "Network Error"
+          ? "Cannot reach the server. Is the backend running?"
+          : "Couldn't resend the code. Please try again.");
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     setError("");
     if (!email.trim()) {
       setError("Please enter your email address.");
@@ -101,39 +112,52 @@ export default function ForgotPasswordScreen() {
     }
 
     setIsLoading(true);
-    // Simulate API call to check email and send reset code
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.forgotPassword(email.trim());
       setStep("code");
       setTimer(45);
       setCanResend(false);
       // Give UI a moment to render before focusing
-      setTimeout(() => otpRef1.current?.focus(), 100);
-    }, 1500);
+      setTimeout(() => focusOtp(0), 100);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        (err?.message === "Network Error"
+          ? "Cannot reach the server. Is the backend running?"
+          : "Couldn't send the reset code. Please try again.");
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleVerifyCode = () => {
+  const handleVerifyCode = async () => {
     setError("");
     const codeString = otp.join("");
-    if (codeString.length < 4) {
-      setError("Please enter the complete 4-digit code.");
+    if (codeString.length < CODE_LENGTH) {
+      setError("Please enter the complete 6-digit code.");
       return;
     }
 
     setIsLoading(true);
-    // Simulate API call to verify verification code
-    setTimeout(() => {
-      setIsLoading(false);
-      if (codeString !== "1234") {
-        setIsLoading(false);
-        setError("Invalid verification code. Please try again.");
-        return;
-      }
+    try {
+      // Checks the code without consuming it, so a wrong code fails here
+      // instead of after the user has typed a new password.
+      await authService.verifyResetCode({ email: email.trim(), code: codeString });
       setStep("password");
-    }, 1500);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        (err?.message === "Network Error"
+          ? "Cannot reach the server. Is the backend running?"
+          : "Couldn't verify that code. Please try again.");
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     setError("");
     if (!password || !confirmPassword) {
       setError("Please fill in all fields.");
@@ -149,47 +173,64 @@ export default function ForgotPasswordScreen() {
     }
 
     setIsLoading(true);
-    // Simulate API call to update password
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await authService.resetPassword({
+        email: email.trim(),
+        code: otp.join(""),
+        newPassword: password,
+      });
       setStep("success");
-    }, 1500);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ||
+        (err?.message === "Network Error"
+          ? "Cannot reach the server. Is the backend running?"
+          : "Couldn't reset your password. Please try again.");
+      setError(message);
+      // The code is re-checked server-side here, so an expired one only
+      // surfaces at this point — send them back to request a fresh code.
+      if (/expired|not valid/i.test(message)) {
+        setStep("code");
+        setOtp(Array(CODE_LENGTH).fill(""));
+        setCanResend(true);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleOtpChange = (text: string, index: number) => {
     setError("");
+    const digits = text.replace(/[^0-9]/g, "");
+
+    // Pasting the whole code into one box should fill the row, not just one slot.
+    if (digits.length > 1) {
+      const next = Array(CODE_LENGTH).fill("");
+      digits
+        .slice(0, CODE_LENGTH)
+        .split("")
+        .forEach((d, i) => (next[i] = d));
+      setOtp(next);
+      focusOtp(Math.min(digits.length, CODE_LENGTH) - 1);
+      return;
+    }
+
     const newOtp = [...otp];
-    // Keep only last character to prevent double pasting issues
-    newOtp[index] = text.slice(-1);
+    newOtp[index] = digits.slice(-1);
     setOtp(newOtp);
 
-    // Auto-focus next input
-    if (text && index < 3) {
-      if (index === 0) otpRef2.current?.focus();
-      else if (index === 1) otpRef3.current?.focus();
-      else if (index === 2) otpRef4.current?.focus();
+    if (digits && index < CODE_LENGTH - 1) {
+      focusOtp(index + 1);
     }
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
-    // Move to previous input on backspace
+    // Backspace on an empty box clears the previous one and steps back.
     if (e.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
-      if (index === 1) {
-        otpRef1.current?.focus();
-        const newOtp = [...otp];
-        newOtp[0] = "";
-        setOtp(newOtp);
-      } else if (index === 2) {
-        otpRef2.current?.focus();
-        const newOtp = [...otp];
-        newOtp[1] = "";
-        setOtp(newOtp);
-      } else if (index === 3) {
-        otpRef3.current?.focus();
-        const newOtp = [...otp];
-        newOtp[2] = "";
-        setOtp(newOtp);
-      }
+      const newOtp = [...otp];
+      newOtp[index - 1] = "";
+      setOtp(newOtp);
+      focusOtp(index - 1);
     }
   };
 
@@ -202,8 +243,8 @@ export default function ForgotPasswordScreen() {
     } else if (step === "password") {
       setStep("code");
       setError("");
-      setOtp(["", "", "", ""]);
-      setTimeout(() => otpRef1.current?.focus(), 100);
+      setOtp(Array(CODE_LENGTH).fill(""));
+      setTimeout(() => focusOtp(0), 100);
     }
   };
 
@@ -240,7 +281,7 @@ export default function ForgotPasswordScreen() {
         <View className="items-center mt-12">
           <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
             <Image
-              source={require("../assets/images/finlit-logo.jpeg")}
+              source={require("../assets/images/finlit-logo.png")}
               className="w-14 h-14"
               resizeMode="contain"
             />
@@ -263,7 +304,7 @@ export default function ForgotPasswordScreen() {
                 Verify Identity
               </Text>
               <Text className="text-brand-gray font-inter text-sm mt-1 text-center px-4">
-                We sent a 4-digit reset code to:{"\n"}
+                We sent a 6-digit reset code to:{"\n"}
                 <Text className="font-inter-semibold text-brand-emerald">{email}</Text>
               </Text>
             </>
@@ -342,29 +383,33 @@ export default function ForgotPasswordScreen() {
           {step === "code" && (
             <View>
               <Text className="text-brand-dark font-inter-semibold mb-3 text-center text-sm">
-                Enter 4-Digit Code
+                Enter 6-Digit Code
               </Text>
               
-              <View className="flex-row justify-between px-4 mb-4">
-                {[otpRef1, otpRef2, otpRef3, otpRef4].map((ref, index) => (
+              <View className="flex-row justify-between px-1 mb-4">
+                {Array.from({ length: CODE_LENGTH }).map((_, index) => (
                   <TextInput
                     key={index}
-                    ref={ref}
+                    ref={(el) => {
+                      otpRefs.current[index] = el;
+                    }}
                     value={otp[index]}
                     onChangeText={(text) => handleOtpChange(text, index)}
                     onKeyPress={(e) => handleOtpKeyPress(e, index)}
                     placeholder="•"
                     placeholderTextColor="#d1d5db"
                     keyboardType="number-pad"
-                    maxLength={1}
-                    className="w-12 h-14 border border-brand-border rounded-2xl text-center text-2xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
+                    // Long enough to accept a pasted full code, which
+                    // handleOtpChange then spreads across every box.
+                    maxLength={CODE_LENGTH}
+                    className="w-11 h-14 border border-brand-border rounded-2xl text-center text-xl font-inter-bold bg-brand-slateBg/40 text-brand-dark"
                     editable={!isLoading}
                   />
                 ))}
               </View>
 
               <Text className="text-center text-xs text-brand-gray mt-1 mb-2">
-                Enter the 4-digit code sent to your email
+                Enter the 6-digit code sent to your email
               </Text>
 
               {error ? (

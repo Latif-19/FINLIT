@@ -46,8 +46,28 @@ public class EmailService {
                 + "you can safely ignore this email.\n\n"
                 + "— The FinLit Team";
 
+        send(to, subject, body, code, "Verification");
+    }
+
+    public void sendPasswordResetCode(String to, String name, String code) {
+        String subject = "Your FinLit password reset code";
+        String body = "Hi " + (name == null || name.isBlank() ? "there" : name) + ",\n\n"
+                + "We got a request to reset your FinLit password. Enter this code in the app:\n\n"
+                + "    " + code + "\n\n"
+                + "The code expires in 15 minutes. If you didn't ask to reset your password,\n"
+                + "you can safely ignore this email — your password stays unchanged.\n\n"
+                + "— The FinLit Team";
+
+        send(to, subject, body, code, "Password reset");
+    }
+
+    /**
+     * Shared delivery path. {@code kind} only labels the log lines, so an
+     * operator reading Render's logs can tell which flow a code belongs to.
+     */
+    private void send(String to, String subject, String body, String code, String kind) {
         if (!configured) {
-            log.warn("[EmailService] SMTP not configured — verification code for {} is: {}", to, code);
+            log.warn("[EmailService] SMTP not configured — {} code for {} is: {}", kind, to, code);
             return;
         }
 
@@ -58,10 +78,10 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(body);
             mailSender.send(message);
-            log.info("[EmailService] Verification email sent to {}", to);
+            log.info("[EmailService] {} email sent to {}", kind, to);
         } catch (Exception ex) {
             // Never let a mail failure block the user — log the code so they can
-            // still verify (visible to whoever runs the backend).
+            // still proceed (visible to whoever runs the backend).
             log.error("[EmailService] Failed to send to {} ({}). Code is: {}",
                     to, ex.getMessage(), code);
         }

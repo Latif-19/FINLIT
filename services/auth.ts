@@ -9,6 +9,8 @@ import type {
   AuthResponse,
   RegisterResponse,
   VerifyEmailRequest,
+  VerifyResetCodeRequest,
+  ResetPasswordRequest,
 } from "@/types/api";
 
 export const authService = {
@@ -27,5 +29,11 @@ export const authService = {
     api.post<AuthResponse>("/auth/login", data),
 
   forgotPassword: (email: string) =>
-    api.post("/auth/forgot-password", { email }),
+    api.post<{ message: string }>("/auth/forgot-password", { email }),
+
+  verifyResetCode: (data: VerifyResetCodeRequest) =>
+    api.post<{ message: string }>("/auth/verify-reset-code", data),
+
+  resetPassword: (data: ResetPasswordRequest) =>
+    api.post<{ message: string }>("/auth/reset-password", data),
 };
