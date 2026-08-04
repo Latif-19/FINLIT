@@ -34,6 +34,19 @@ export interface VerifyEmailRequest {
   code: string;
 }
 
+// Password reset: forgot-password emails a 6-digit code, verify-reset-code
+// checks it without consuming it, reset-password swaps it for a new password.
+export interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;

@@ -58,6 +58,17 @@ public class User {
     /** When the current verification code stops being valid. */
     private Instant verificationCodeExpiresAt;
 
+    // ─── Password reset ─────────────────────────────────────────────────────
+    /**
+     * The current 6-digit password-reset code (null when no reset is pending).
+     * Kept separate from verificationCode so a reset can't clobber a sign-up
+     * verification that's still in flight.
+     */
+    private String resetCode;
+
+    /** When the current reset code stops being valid. */
+    private Instant resetCodeExpiresAt;
+
     /** Emoji avatar shown across the app. Defaults to the FinLit owl. */
     @Column(nullable = false)
     private String avatar = "🦉"; // 🦉

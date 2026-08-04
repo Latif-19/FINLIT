@@ -7,7 +7,9 @@ import com.finlit.auth.dto.RefreshRequest;
 import com.finlit.auth.dto.RegisterRequest;
 import com.finlit.auth.dto.RegisterResponse;
 import com.finlit.auth.dto.ResendCodeRequest;
+import com.finlit.auth.dto.ResetPasswordRequest;
 import com.finlit.auth.dto.VerifyEmailRequest;
+import com.finlit.auth.dto.VerifyResetCodeRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,6 +72,18 @@ public class AuthController {
     public Map<String, String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request.email());
         return Map.of("message",
-                "If an account exists for that email, a reset link has been sent.");
+                "If an account exists for that email, a reset code has been sent.");
+    }
+
+    @PostMapping("/verify-reset-code")
+    public Map<String, String> verifyResetCode(@Valid @RequestBody VerifyResetCodeRequest request) {
+        authService.verifyResetCode(request.email(), request.code());
+        return Map.of("message", "Code accepted. You can now set a new password.");
+    }
+
+    @PostMapping("/reset-password")
+    public Map<String, String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.email(), request.code(), request.newPassword());
+        return Map.of("message", "Your password has been reset. Please sign in.");
     }
 }
