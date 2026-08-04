@@ -11,14 +11,14 @@ export default function AuthScreen() {
 
       {/* Top Branding Section */}
       <View className="items-center mt-6">
-        <View className="w-24 h-24 bg-white rounded-3xl items-center justify-center shadow-md border border-slate-100 overflow-hidden">
+        <View className="w-24 h-24 bg-brand-bg rounded-3xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
           <Image
-            source={require("../assets/images/finlit-logo.jpeg")}
+            source={require("../assets/images/finlit-logo.png")}
             className="w-20 h-20"
             resizeMode="contain"
           />
         </View>
-        <Text className="text-[32px] font-inter-bold text-brand-navy mt-4 tracking-tight">
+        <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
           FinLit
         </Text>
         <Text className="text-xs uppercase font-inter-semibold text-brand-emerald tracking-widest mt-2 bg-brand-emerald/10 px-3.5 py-1.5 rounded-full">
@@ -28,27 +28,14 @@ export default function AuthScreen() {
 
       {/* Mid Section: Engaging Value Proposition */}
       <View className="my-8 px-2">
-        <Text className="text-[32px] font-inter-bold text-brand-navy text-center tracking-tight leading-[38px]">
+        <Text className="text-[32px] font-inter-bold text-brand-textPrimary text-center tracking-tight leading-[38px]">
           Master Your Money.{"\n"}
           <Text className="text-brand-emerald">Own Your Future.</Text>
         </Text>
         
-        <Text className="text-center text-brand-gray font-inter text-base mt-4 leading-6 px-4">
-          Join thousands of smart savers building wealth, tracking milestones, and learning the secrets of compounding growth.
-        </Text>
 
-        {/* Core Value Proposition Pills */}
-        <View className="flex-row flex-wrap justify-center gap-2 mt-6">
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
-            <Text className="text-sm font-inter-medium text-brand-dark">🎯 Goal-Driven</Text>
-          </View>
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
-            <Text className="text-sm font-inter-medium text-brand-dark">🎓 Bite-sized Lessons</Text>
-          </View>
-          <View className="flex-row items-center bg-white border border-slate-100 px-4 py-2 rounded-2xl shadow-sm">
-            <Text className="text-sm font-inter-medium text-brand-dark">👥 Smart Community</Text>
-          </View>
-        </View>
+
+
       </View>
 
       {/* Bottom Actions Section */}
@@ -62,7 +49,7 @@ export default function AuthScreen() {
           })}
           className="bg-brand-navy h-14 rounded-2xl justify-center items-center shadow-lg shadow-brand-navy/15"
         >
-          <Text className="text-white text-center font-inter-semibold text-base">
+          <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
             Create Free Account
           </Text>
         </Pressable>
@@ -74,19 +61,14 @@ export default function AuthScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
             opacity: pressed ? 0.95 : 1,
           })}
-          className="border border-brand-navy/20 bg-white h-14 rounded-2xl justify-center items-center mt-4 active:bg-slate-50"
+          className="border border-brand-navy/20 bg-brand-bg h-14 rounded-2xl justify-center items-center mt-4 active:bg-brand-slateBg"
         >
-          <Text className="text-brand-navy text-center font-inter-semibold text-base">
+          <Text className="text-brand-textPrimary text-center font-inter-semibold text-base">
             Already have an account? Sign In
           </Text>
         </Pressable>
 
-        {/* Professional Emoji Branding Footer */}
-        <View className="items-center mt-10">
-          <Text className="text-brand-gray font-inter-semibold text-xs tracking-widest uppercase">
-            📚 Learn  •  💰 Save  •  📈 Grow
-          </Text>
-        </View>
+
       </View>
     </SafeAreaView>
   );

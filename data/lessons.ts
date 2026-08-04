@@ -112,6 +112,21 @@ export const LESSON_MODULES: LessonModule[] = [
       "3. Calculate net profit margins. Reinvest a portion of your profits back into growing the business rather than spending all the initial revenue on personal items.",
     ],
   },
+  {
+    id: 7,
+    title: "Credit Scores & Digital Credit History",
+    desc: "Understand how your MoMo activity and loan repayment history build a digital credit score in Ghana, and how to protect it.",
+    duration: "12 min",
+    xp: "130 XP",
+    xpVal: 130,
+    emoji: "🪪",
+    content: [
+      "In Ghana, a growing digital credit scoring system now decides whether lenders trust you with a loan — and how much you can borrow.",
+      "1. Your MoMo and airtime activity IS your credit file. Digital lenders like Fido, MTN Credit, and Zeepay score you using your mobile money transaction history, airtime top-up frequency, and repayment behavior — not a traditional bank credit file.",
+      "2. Repay every digital loan on time. A single late Qwikloan or Fido repayment can lower your score and shrink your future borrowing limit, even if the loan itself was small.",
+      "3. Know your rights. The Ghana Credit Reporting Act entitles you to one free credit report per year from bureaus like TransUnion Ghana and XDS Data — use it to check your score and dispute errors.",
+    ],
+  },
 ];
 
 export const RECOMMENDED_LESSONS: Record<string, { tag: string; title: string; desc: string }> = {

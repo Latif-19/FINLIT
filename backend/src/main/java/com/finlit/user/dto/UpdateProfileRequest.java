@@ -14,5 +14,7 @@ public record UpdateProfileRequest(
 
         String age,
 
-        String phone
+        String phone,
+
+        String goal
 ) {}

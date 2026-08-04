@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import "@/types/navigation";
 
@@ -92,6 +93,7 @@ const getLevelInfo = (
 };
 
 export default function AssessmentReviewScreen() {
+  const colors = useThemeColors();
   const score = useUserStore((s) => s.score);
   const goal = useUserStore((s) => s.goal);
   const lastAssessedAt = useUserStore((s) => s.lastAssessedAt);
@@ -104,14 +106,14 @@ export default function AssessmentReviewScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-white">
+      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-brand-border bg-brand-bg">
         <Pressable
           onPress={() => router.back()}
           className="w-10 h-10 rounded-full bg-brand-emerald/5 items-center justify-center active:opacity-80"
         >
-          <Ionicons name="arrow-back" size={24} color="#0A2540" />
+          <Ionicons name="arrow-back" size={24} color={colors.navy} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">
           Your Assessment
         </Text>
         <View className="w-10" />
@@ -125,7 +127,7 @@ export default function AssessmentReviewScreen() {
         >
           {/* Tier Badge */}
           <View
-            className="bg-white rounded-3xl p-6 items-center mb-3.5 border border-slate-100 shadow-md"
+            className="bg-brand-bg rounded-3xl p-6 items-center mb-3.5 border border-brand-border shadow-md"
             style={{ borderColor: tier.color + "30" }}
           >
             <View
@@ -146,7 +148,7 @@ export default function AssessmentReviewScreen() {
           </View>
 
           {/* Score Circle */}
-          <View className="bg-white rounded-3xl p-6 items-center mb-3.5 shadow-md">
+          <View className="bg-brand-bg rounded-3xl p-6 items-center mb-3.5 shadow-md">
             <View className="w-[100px] h-[100px] rounded-full border-4 border-brand-emerald items-center justify-center mb-2.5">
               <Text className="text-3xl font-inter-bold text-brand-emerald">
                 {score}
@@ -162,10 +164,10 @@ export default function AssessmentReviewScreen() {
 
           {/* Goal Badge */}
           {goal ? (
-            <View className="bg-white rounded-3xl p-4 mb-3.5 shadow-md">
+            <View className="bg-brand-bg rounded-3xl p-4 mb-3.5 shadow-md">
               <View className="flex-row items-center gap-2 mb-2.5">
-                <Ionicons name="flag-outline" size={18} color="#16A34A" />
-                <Text className="text-[15px] font-inter-bold text-brand-navy">
+                <Ionicons name="flag-outline" size={18} color={colors.emerald} />
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">
                   Your Financial Goal
                 </Text>
               </View>
@@ -178,18 +180,18 @@ export default function AssessmentReviewScreen() {
           ) : null}
 
           {/* Tier Breakdown */}
-          <View className="bg-white rounded-3xl p-4 mb-3.5 shadow-md">
-            <Text className="text-base font-inter-bold text-brand-navy mb-3.5">
+          <View className="bg-brand-bg rounded-3xl p-4 mb-3.5 shadow-md">
+            <Text className="text-base font-inter-bold text-brand-textPrimary mb-3.5">
               Skill Breakdown
             </Text>
             {breakdowns.map((item) => (
               <View
                 key={item.category}
-                className="flex-row items-center justify-between py-2.5 border-b border-slate-100"
+                className="flex-row items-center justify-between py-2.5 border-b border-brand-border"
               >
                 <View className="flex-row items-center gap-2.5">
                   <Ionicons name={item.icon} size={20} color={item.color} />
-                  <Text className="text-[15px] font-inter-semibold text-brand-navy">
+                  <Text className="text-[15px] font-inter-semibold text-brand-textPrimary">
                     {item.category}
                   </Text>
                 </View>
@@ -209,14 +211,14 @@ export default function AssessmentReviewScreen() {
           </View>
 
           {/* Level Card */}
-          <View className="bg-white rounded-3xl p-4 mb-3.5 shadow-md">
+          <View className="bg-brand-bg rounded-3xl p-4 mb-3.5 shadow-md">
             <View className="flex-row items-center gap-2 mb-3">
               <Ionicons
                 name="bar-chart-outline"
                 size={20}
                 color={levelInfo.color}
               />
-              <Text className="text-base font-inter-bold text-brand-navy">
+              <Text className="text-base font-inter-bold text-brand-textPrimary">
                 Your Level
               </Text>
             </View>
@@ -238,7 +240,7 @@ export default function AssessmentReviewScreen() {
 
           {/* Last Assessed */}
           <View className="flex-row items-center justify-center gap-1.5 mb-2">
-            <Ionicons name="time-outline" size={14} color="#9ca3af" />
+            <Ionicons name="time-outline" size={14} color={colors.gray} />
             <Text className="text-xs text-brand-gray font-inter-medium">
               {lastAssessedAt
                 ? `Last assessed: ${new Date(lastAssessedAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}`
@@ -258,7 +260,7 @@ export default function AssessmentReviewScreen() {
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 rounded-2xl shadow-lg active:opacity-80"
           >
             <Ionicons name="refresh-outline" size={20} color="#ffffff" />
-            <Text className="text-base font-inter-bold text-white">
+            <Text className="text-base font-inter-bold text-brand-textOnDark">
               Retake Assessment
             </Text>
           </Pressable>
@@ -266,10 +268,10 @@ export default function AssessmentReviewScreen() {
       ) : (
         /* Empty State - Never Assessed */
         <View className="flex-1 items-center justify-center p-8">
-          <View className="w-[100px] h-[100px] rounded-full bg-slate-100 items-center justify-center mb-5">
-            <Ionicons name="school-outline" size={56} color="#9ca3af" />
+          <View className="w-[100px] h-[100px] rounded-full bg-brand-slateBg items-center justify-center mb-5">
+            <Ionicons name="school-outline" size={56} color={colors.gray} />
           </View>
-          <Text className="text-lg font-inter-bold text-brand-navy text-center mb-2.5">
+          <Text className="text-lg font-inter-bold text-brand-textPrimary text-center mb-2.5">
             {"You haven't taken the assessment yet"}
           </Text>
           <Text className="text-sm text-brand-gray text-center leading-[22px] mb-7 px-4">
@@ -281,7 +283,7 @@ export default function AssessmentReviewScreen() {
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 px-8 rounded-2xl shadow-lg active:opacity-80"
           >
             <Ionicons name="rocket-outline" size={20} color="#ffffff" />
-            <Text className="text-base font-inter-bold text-white">
+            <Text className="text-base font-inter-bold text-brand-textOnDark">
               Take Assessment
             </Text>
           </Pressable>

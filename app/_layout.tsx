@@ -1,7 +1,7 @@
 import { Stack, useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Appearance, View } from "react-native";
 import { vars } from "nativewind";
 import { useUserStore } from "../store/useUserStore";
 import { getThemeVars } from "../constants/theme";
@@ -14,6 +14,8 @@ import {
   Inter_600SemiBold,
   Inter_700Bold
 } from "@expo-google-fonts/inter";
+import { Poppins_700Bold, Poppins_800ExtraBold } from "@expo-google-fonts/poppins";
+import { PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from "@expo-google-fonts/plus-jakarta-sans";
 import * as SplashScreen from "expo-splash-screen";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { PaystackProvider } from "react-native-paystack-webview";
@@ -32,6 +34,7 @@ function NavigationGuard() {
   const router = useRouter();
   const segments = useSegments() as unknown as string[];
   const isAuthenticated = useUserStore((s) => s.isAuthenticated);
+  const lastAssessedAt = useUserStore((s) => s.lastAssessedAt);
   const rootNavigationState = useRootNavigationState();
 
   useEffect(() => {
@@ -49,14 +52,25 @@ function NavigationGuard() {
       segments[0] === "index" ||
       segments.length === 0;
 
+    // The one-time onboarding assessment — backend-verified via lastAssessedAt,
+    // not a one-shot redirect that's easy to fall out of (e.g. by later logging
+    // in instead of registering fresh).
+    const inAssessmentFlow =
+      segments[0] === "assessment" || segments[0] === "assessment-result";
+    const needsAssessment = isAuthenticated && !lastAssessedAt;
+
     if (!isAuthenticated && !inAuthGroup) {
       // Redirect unauthenticated user
       router.replace("/auth");
     } else if (isAuthenticated && inAuthGroup && segments[0] !== "index") {
       // Prevent authenticated user from accessing auth screens
-      router.replace("/(tabs)/home");
+      router.replace(needsAssessment ? "/assessment" : "/(tabs)/home");
+    } else if (needsAssessment && !inAuthGroup && !inAssessmentFlow) {
+      // Never let an authenticated-but-unassessed user reach the rest of the
+      // app, regardless of how they got authenticated.
+      router.replace("/assessment");
     }
-  }, [isAuthenticated, segments, router, rootNavigationState?.key]);
+  }, [isAuthenticated, lastAssessedAt, segments, router, rootNavigationState?.key]);
 
   return null;
 }
@@ -65,12 +79,17 @@ export default function RootLayout() {
   const [isHydrated, setIsHydrated] = useState(false);
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);
   const appThemeColor = useUserStore((s) => s.appThemeColor);
+  const isDarkMode = useUserStore((s) => s.isDarkMode);
 
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Poppins_700Bold,
+    Poppins_800ExtraBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
 
   // Monitor store hydration and font loading
@@ -92,12 +111,19 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError, isHydrated]);
 
+  // Apply the user's preferred color scheme (dark / light / follow system).
+  useEffect(() => {
+    if (typeof Appearance.setColorScheme === "function") {
+      Appearance.setColorScheme(isDarkMode ? "dark" : "light");
+    }
+  }, [isDarkMode]);
+
   if (!isHydrated || (!fontsLoaded && !fontError)) {
     return null;
   }
 
   // Resolve active theme variables style object
-  const activeThemeVars = getThemeVars(colorBlindMode, appThemeColor);
+  const activeThemeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
 
   return (
     <PaystackProvider publicKey={PAYSTACK_PUBLIC_KEY} currency="GHS" defaultChannels={["card", "mobile_money", "bank_transfer"]}>
@@ -128,7 +154,7 @@ export default function RootLayout() {
       </Stack>
 
       <NavigationGuard />
-      <StatusBar style="auto" />
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
     </View>
     </PaystackProvider>
   );

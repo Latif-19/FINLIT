@@ -10,7 +10,7 @@ public final class BadgeCatalog {
     public static final List<BadgeDefinition> ALL = List.of(
             new BadgeDefinition("first-lesson", "First Steps", "Complete your first lesson", "🎯"),
             new BadgeDefinition("three-lessons", "Getting Smart", "Complete 3 lessons", "📚"),
-            new BadgeDefinition("all-lessons", "Financial Guru", "Complete all 6 lessons", "🏆"),
+            new BadgeDefinition("all-lessons", "Financial Guru", "Complete every lesson", "🏆"),
             new BadgeDefinition("quiz-perfect", "Perfect Score", "Get 100% on any quiz", "💯"),
             new BadgeDefinition("streak-3", "On Fire", "Maintain a 3-day streak", "🔥"),
             new BadgeDefinition("streak-7", "Unstoppable", "Maintain a 7-day streak", "⚡"),

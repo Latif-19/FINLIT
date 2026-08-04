@@ -1,0 +1,21 @@
+{
+  "cli": {
+    "version": ">= 13.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_PAYSTACK_KEY": "your_paystack_public_key_here",
+        "EXPO_PUBLIC_API_URL": "your_render_backend_url_here"
+      }
+    }
+  }
+}

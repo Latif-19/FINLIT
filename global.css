@@ -11,3 +11,15 @@
   --color-brand-dark: #111827;
   --color-brand-gray: #6B7280;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-brand-bg: #1e293b;
+    --color-brand-slateBg: #0f172a;
+  }
+}
+
+.dark {
+  --color-brand-bg: #1e293b;
+  --color-brand-slateBg: #0f172a;
+}

@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserStore } from "../store/useUserStore";
 import { tutorService } from "../services/tutor";
 import { useThemeColors } from "../hooks/useThemeColors";
@@ -45,6 +46,43 @@ const SUGGESTED_QUESTIONS = [
   "Can you explain the SSNIT 3-Tier pension system?",
   "What is Databank Mfund and how do I start?",
 ];
+
+// Daily free-question limit. Persisted per user + per day so leaving the
+// screen (unmount) can't reset it — the limit is genuinely "for today".
+const FREE_DAILY_LIMIT = 2;
+
+function dailyKey(email: string): string {
+  return `finlit-tutor-daily-${email.trim().toLowerCase()}`;
+}
+
+async function readDailyCount(): Promise<number> {
+  const email = useUserStore.getState().email;
+  if (!email) return 0;
+  try {
+    const raw = await AsyncStorage.getItem(dailyKey(email));
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    const today = new Date().toISOString().split("T")[0];
+    return parsed?.date === today && typeof parsed?.count === "number"
+      ? parsed.count
+      : 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function writeDailyCount(count: number): Promise<void> {
+  const email = useUserStore.getState().email;
+  if (!email) return;
+  try {
+    await AsyncStorage.setItem(
+      dailyKey(email),
+      JSON.stringify({ date: new Date().toISOString().split("T")[0], count })
+    );
+  } catch {
+    // Best-effort persistence — a failure just resets the count next session.
+  }
+}
 
 function getFallbackAnswer(text: string): string {
   const trimmed = text.trim();
@@ -85,8 +123,23 @@ export default function AiTutorScreen() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
+  const [countLoaded, setCountLoaded] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Restore today's question count when the screen mounts.
+  useEffect(() => {
+    let active = true;
+    readDailyCount().then((count) => {
+      if (active) {
+        setQuestionCount(count);
+        setCountLoaded(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -98,14 +151,18 @@ export default function AiTutorScreen() {
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
-    if (!isPremium && questionCount >= 2) {
+    // Don't accept new questions until today's persisted count is loaded,
+    // and block concurrent sends (prevents duplicate requests + double count).
+    if (!countLoaded || isTyping) return;
+
+    if (!isPremium && questionCount >= FREE_DAILY_LIMIT) {
       setMessages((prev) => [
         ...prev,
         { id: `limit-user-${Date.now()}`, sender: "user", text, timestamp: new Date() },
         {
           id: `limit-ai-${Date.now()}`,
           sender: "ai",
-          text: "🔒 You've used your 2 free AI Tutor questions for today! Upgrade to FinLit Premium for unlimited queries and advanced personal financial guidance.",
+          text: `🔒 You've used your ${FREE_DAILY_LIMIT} free AI Tutor questions for today! Upgrade to FinLit Premium for unlimited queries and advanced personal financial guidance.`,
           timestamp: new Date(),
         },
       ]);
@@ -124,7 +181,11 @@ export default function AiTutorScreen() {
     setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setIsTyping(true);
-    setQuestionCount((q) => q + 1);
+    setQuestionCount((q) => {
+      const next = q + 1;
+      writeDailyCount(next);
+      return next;
+    });
     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
 
     try {
@@ -145,17 +206,17 @@ export default function AiTutorScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* ── HEADER ── */}
-      <View className="flex-row items-center px-5 pt-2 pb-4 bg-white border-b border-slate-100">
+      <View className="flex-row items-center px-5 pt-2 pb-4 bg-brand-bg border-b border-brand-border">
         <Pressable
           onPress={() => router.back()}
           style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-          className="w-10 h-10 bg-brand-slateBg rounded-full border border-slate-100 items-center justify-center"
+          className="w-10 h-10 bg-brand-slateBg rounded-full border border-brand-border items-center justify-center"
         >
           <Ionicons name="arrow-back" size={20} color={colors.navy} />
         </Pressable>
 
         <View className="flex-1 ml-4 flex-row items-center justify-center pr-10">
-          <Text className="text-xl font-inter-bold text-brand-navy">AI Tutor</Text>
+          <Text className="text-xl font-inter-bold text-brand-textPrimary">AI Tutor</Text>
           <View
             className={`ml-2 px-2.5 py-0.5 rounded-full border ${
               isPremium
@@ -206,7 +267,7 @@ export default function AiTutorScreen() {
                     isAi
                       ? isLock
                         ? "bg-amber-50 border border-amber-200"
-                        : "bg-white border border-slate-100 shadow-sm"
+                        : "bg-brand-bg border border-brand-border shadow-sm"
                       : "bg-brand-emerald"
                   }`}
                 >
@@ -215,8 +276,8 @@ export default function AiTutorScreen() {
                       isAi
                         ? isLock
                           ? "text-amber-900 font-inter-bold"
-                          : "text-brand-dark"
-                        : "text-white"
+                          : "text-brand-textPrimary"
+                        : "text-brand-textOnDark"
                     }`}
                   >
                     {msg.text}
@@ -228,7 +289,7 @@ export default function AiTutorScreen() {
                       style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
                       className="bg-amber-600 py-2 rounded-xl mt-3 items-center"
                     >
-                      <Text className="text-white text-xs font-inter-bold">
+                      <Text className="text-brand-textOnDark text-xs font-inter-bold">
                         Upgrade to Premium
                       </Text>
                     </Pressable>
@@ -243,7 +304,7 @@ export default function AiTutorScreen() {
               <View className="w-8 h-8 rounded-full bg-brand-emerald/10 items-center justify-center mr-2 mt-1">
                 <Text className="text-sm">🤖</Text>
               </View>
-              <View className="bg-white border border-slate-100 rounded-2xl p-4 flex-row items-center shadow-sm">
+              <View className="bg-brand-bg border border-brand-border rounded-2xl p-4 flex-row items-center shadow-sm">
                 <ActivityIndicator size="small" color={colors.emerald} />
                 <Text className="text-brand-gray text-xs font-inter-semibold ml-2">
                   Tutor is thinking...
@@ -265,9 +326,9 @@ export default function AiTutorScreen() {
                   key={q}
                   onPress={() => handleSend(q)}
                   style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}
-                  className="bg-white border border-slate-200 rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
+                  className="bg-brand-bg border border-brand-border rounded-full px-3.5 py-2 active:bg-brand-emerald/5 active:border-brand-emerald/30"
                 >
-                  <Text className="text-xs text-brand-navy font-inter-semibold">{q}</Text>
+                  <Text className="text-xs text-brand-textPrimary font-inter-semibold">{q}</Text>
                 </Pressable>
               ))}
             </View>
@@ -275,32 +336,33 @@ export default function AiTutorScreen() {
         )}
 
         {/* ── INPUT BAR ── */}
-        <View className="bg-white border-t border-slate-100 p-4 flex-row items-center gap-3">
+        <View className="bg-brand-bg border-t border-brand-border p-4 flex-row items-center gap-3">
           <TextInput
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask a financial question..."
-            placeholderTextColor="#94a3b8"
-            className="flex-1 bg-brand-slateBg border border-slate-200 rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
+            placeholderTextColor={colors.gray}
+            className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-textPrimary font-inter"
             onSubmitEditing={() => handleSend(inputText)}
+            editable={!isTyping}
             onFocus={() => {
               setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
             }}
           />
           <Pressable
             onPress={() => handleSend(inputText)}
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() || isTyping}
             style={({ pressed }) => ({
               transform: [{ scale: pressed && inputText.trim() ? 0.95 : 1 }],
             })}
             className={`w-12 h-12 rounded-2xl items-center justify-center ${
-              inputText.trim() ? "bg-brand-emerald" : "bg-slate-200"
+              inputText.trim() ? "bg-brand-emerald" : "bg-brand-slateBg"
             }`}
           >
             <Ionicons
               name="send"
               size={18}
-              color={inputText.trim() ? "white" : "#94a3b8"}
+              color={inputText.trim() ? "white" : colors.gray}
             />
           </Pressable>
         </View>

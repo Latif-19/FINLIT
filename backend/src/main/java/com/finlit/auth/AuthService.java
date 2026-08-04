@@ -97,11 +97,20 @@ public class AuthService {
         // Correct credentials but unverified: send a fresh code and tell the app
         // to show the verification screen (403, distinct from a wrong password).
         if (!user.isEmailVerified()) {
-            assignNewCode(user);
-            userRepository.save(user);
-            emailService.sendVerificationCode(email, user.getName(), user.getVerificationCode());
+            // Only mint a new code if there isn't already a usable one. Otherwise a
+            // second login attempt would silently invalidate the code the user is
+            // already reading in their inbox.
+            boolean needsNewCode = user.getVerificationCode() == null
+                    || user.getVerificationCodeExpiresAt() == null
+                    || Instant.now().isAfter(user.getVerificationCodeExpiresAt());
+            if (needsNewCode) {
+                assignNewCode(user);
+                userRepository.save(user);
+                emailService.sendVerificationCode(email, user.getName(), user.getVerificationCode());
+            }
             throw new EmailNotVerifiedException(
-                    "Your email isn't verified yet. We've sent you a new code.");
+                    "Your email isn't verified yet. Enter the code we emailed you, "
+                            + "or tap Resend for a new one.");
         }
 
         return buildAuthResponse(user);
@@ -173,17 +182,84 @@ public class AuthService {
      * Password-reset request. Full email delivery will be added later; for now
      * this succeeds silently and never reveals whether the email is registered.
      */
-    public void forgotPassword(String email) {
-        // Intentionally a no-op stub for now (prevents account enumeration).
+    @Transactional
+    public void forgotPassword(String rawEmail) {
+        String email = rawEmail.trim().toLowerCase();
+
+        // Same generic response either way, so this can't be used to discover
+        // which email addresses have accounts. Unverified accounts are skipped:
+        // they still have the sign-up flow to finish first.
+        userRepository.findByEmail(email).ifPresent(user -> {
+            if (user.isEmailVerified()) {
+                assignResetCode(user);
+                userRepository.save(user);
+                emailService.sendPasswordResetCode(email, user.getName(), user.getResetCode());
+            }
+        });
+    }
+
+    /**
+     * Checks a reset code without consuming it, so the app can validate on its
+     * code screen. The code is checked again by {@link #resetPassword}.
+     */
+    @Transactional(readOnly = true)
+    public void verifyResetCode(String rawEmail, String code) {
+        requireValidResetCode(rawEmail, code);
+    }
+
+    /** Swaps a valid reset code for a new password, then burns the code. */
+    @Transactional
+    public void resetPassword(String rawEmail, String code, String newPassword) {
+        User user = requireValidResetCode(rawEmail, code);
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setResetCode(null);
+        user.setResetCodeExpiresAt(null);
+        userRepository.save(user);
+    }
+
+    /**
+     * Shared guard for both reset steps. Deliberately uses one message for
+     * "no such account", "no code pending", and "wrong code" so a caller can't
+     * tell them apart; expiry is called out separately because the user needs
+     * to know to request a fresh one.
+     */
+    private User requireValidResetCode(String rawEmail, String code) {
+        String email = rawEmail.trim().toLowerCase();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException(
+                        "That code is not valid. Please request a new one."));
+
+        if (user.getResetCode() == null || user.getResetCodeExpiresAt() == null) {
+            throw new BadRequestException("That code is not valid. Please request a new one.");
+        }
+        if (Instant.now().isAfter(user.getResetCodeExpiresAt())) {
+            throw new BadRequestException("That code has expired. Please request a new one.");
+        }
+        if (!user.getResetCode().equals(code.trim())) {
+            throw new BadRequestException("That code is not valid. Please request a new one.");
+        }
+
+        return user;
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────
 
     /** Generates a fresh 6-digit code with a TTL and stores it on the user. */
     private void assignNewCode(User user) {
-        String code = String.format("%06d", RANDOM.nextInt(1_000_000));
-        user.setVerificationCode(code);
+        user.setVerificationCode(newSixDigitCode());
         user.setVerificationCodeExpiresAt(Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES));
+    }
+
+    /** Same, for the password-reset flow's separate code field. */
+    private void assignResetCode(User user) {
+        user.setResetCode(newSixDigitCode());
+        user.setResetCodeExpiresAt(Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES));
+    }
+
+    private String newSixDigitCode() {
+        return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 
     private AuthResponse buildAuthResponse(User user) {

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 interface PolicySection {
   number: number;
@@ -54,14 +55,15 @@ const POLICY_SECTIONS: PolicySection[] = [
 ];
 
 export default function PrivacyPolicyScreen() {
+  const colors = useThemeColors();
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-white">
+      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-brand-border bg-brand-bg">
         <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-emerald/5 items-center justify-center active:opacity-80">
-          <Ionicons name="arrow-back" size={24} color="#16A34A" />
+          <Ionicons name="arrow-back" size={24} color={colors.emerald} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">Privacy Policy</Text>
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">Privacy Policy</Text>
         <View className="w-10" />
       </View>
 
@@ -72,7 +74,7 @@ export default function PrivacyPolicyScreen() {
       >
         {/* Last Updated */}
         <View className="flex-row items-center self-start bg-brand-slateBg px-3 py-1.5 rounded-full gap-1.5 mb-3">
-          <Ionicons name="time-outline" size={14} color="#6b7280" />
+          <Ionicons name="time-outline" size={14} color={colors.gray} />
           <Text className="text-xs text-brand-gray font-inter-medium">Last updated: June 2026</Text>
         </View>
 
@@ -85,12 +87,12 @@ export default function PrivacyPolicyScreen() {
 
         {/* Policy Sections */}
         {POLICY_SECTIONS.map((section) => (
-          <View key={section.number} className="bg-white rounded-2xl p-[18px] mb-3 shadow-md">
+          <View key={section.number} className="bg-brand-bg rounded-2xl p-[18px] mb-3 shadow-md">
             <View className="flex-row items-center mb-2.5 gap-2.5">
               <View className="w-7 h-7 rounded-full bg-brand-emerald/10 items-center justify-center">
                 <Text className="text-[13px] font-inter-bold text-brand-emerald">{section.number}</Text>
               </View>
-              <Text className="text-base font-inter-bold text-brand-navy flex-1">{section.title}</Text>
+              <Text className="text-base font-inter-bold text-brand-textPrimary flex-1">{section.title}</Text>
             </View>
             <Text className="text-sm text-brand-gray leading-[22px] pl-[38px] font-inter">{section.body}</Text>
           </View>
@@ -98,7 +100,7 @@ export default function PrivacyPolicyScreen() {
 
         {/* Footer */}
         <View className="flex-row items-center justify-center gap-2 mt-4 py-4">
-          <Ionicons name="shield-checkmark" size={20} color="#16A34A" />
+          <Ionicons name="shield-checkmark" size={20} color={colors.emerald} />
           <Text className="text-xs text-brand-gray font-inter">
             Questions? Contact us at support@finlit.app
           </Text>

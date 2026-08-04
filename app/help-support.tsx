@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 interface FAQItem {
   question: string;
@@ -49,6 +50,7 @@ const FAQ_DATA: FAQItem[] = [
 ];
 
 export default function HelpSupportScreen() {
+  const colors = useThemeColors();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
@@ -61,12 +63,12 @@ export default function HelpSupportScreen() {
       <View className="flex-row items-center px-5 pt-4 pb-3">
         <Pressable
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-white justify-center items-center border border-slate-100 active:opacity-80"
+          className="w-10 h-10 rounded-full bg-brand-bg justify-center items-center border border-brand-border active:opacity-80"
         >
-          <Ionicons name="arrow-back" size={24} color="#111827" />
+          <Ionicons name="arrow-back" size={24} color={colors.dark} />
         </Pressable>
         <View className="ml-3">
-          <Text className="text-[22px] font-inter-bold text-brand-dark">
+          <Text className="text-[22px] font-inter-bold text-brand-textPrimary">
             Help {"&"} Support
           </Text>
           <Text className="text-sm font-inter text-brand-gray mt-0.5">
@@ -83,7 +85,7 @@ export default function HelpSupportScreen() {
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-6 mb-2.5 ml-1">
           FREQUENTLY ASKED QUESTIONS
         </Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
           {FAQ_DATA.map((item, index) => (
             <React.Fragment key={index}>
               <Pressable
@@ -94,10 +96,10 @@ export default function HelpSupportScreen() {
                   <Ionicons
                     name="help-circle-outline"
                     size={20}
-                    color="#16A34A"
+                    color={colors.emerald}
                     style={{ marginRight: 10 }}
                   />
-                  <Text className="text-[15px] font-inter-semibold text-brand-dark flex-1">
+                  <Text className="text-[15px] font-inter-semibold text-brand-textPrimary flex-1">
                     {item.question}
                   </Text>
                 </View>
@@ -108,7 +110,7 @@ export default function HelpSupportScreen() {
                       : 'chevron-down'
                   }
                   size={20}
-                  color="#9ca3af"
+                  color={colors.gray}
                 />
               </Pressable>
               {expandedIndex === index && (
@@ -119,7 +121,7 @@ export default function HelpSupportScreen() {
                 </View>
               )}
               {index < FAQ_DATA.length - 1 && (
-                <View className="h-px bg-slate-100 ml-[46px]" />
+                <View className="h-px bg-brand-slateBg ml-[46px]" />
               )}
             </React.Fragment>
           ))}
@@ -129,29 +131,29 @@ export default function HelpSupportScreen() {
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-6 mb-2.5 ml-1">
           CONTACT US
         </Text>
-        <View className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <View className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
           <Pressable
             onPress={() => Linking.openURL('mailto:support@finlit.app')}
             className="flex-row items-center py-3.5 px-4 active:opacity-80"
           >
             <View className="w-[38px] h-[38px] rounded-[10px] bg-brand-emerald/10 justify-center items-center mr-3">
-              <Ionicons name="mail-outline" size={22} color="#16A34A" />
+              <Ionicons name="mail-outline" size={22} color={colors.emerald} />
             </View>
             <View className="flex-1">
-              <Text className="text-[15px] font-inter-semibold text-brand-dark">
+              <Text className="text-[15px] font-inter-semibold text-brand-textPrimary">
                 Email Support
               </Text>
               <Text className="text-[13px] font-inter text-brand-emerald mt-0.5">
                 support@finlit.app
               </Text>
             </View>
-            <Ionicons name="open-outline" size={18} color="#9ca3af" />
+            <Ionicons name="open-outline" size={18} color={colors.gray} />
           </Pressable>
         </View>
 
         {/* Version Info */}
         <View className="flex-row items-center justify-center mt-8 gap-2">
-          <Ionicons name="leaf-outline" size={18} color="#9ca3af" />
+          <Ionicons name="leaf-outline" size={18} color={colors.gray} />
           <Text className="text-[13px] font-inter text-brand-gray">
             FinLit v2.0.0 — Built for CodeQuest 2026
           </Text>

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import { profileService } from "../services/profile";
 import { usePaystack } from "react-native-paystack-webview";
@@ -59,6 +60,7 @@ function generateRef(): string {
 }
 
 export default function PaywallScreen() {
+  const colors = useThemeColors();
   const [selectedPlan, setSelectedPlan] = useState<PlanId>("three_months");
   const [email, setEmail] = useState(useUserStore.getState().email || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -77,27 +79,42 @@ export default function PaywallScreen() {
     }
 
     setIsLoading(true);
+    const reference = generateRef();
+
+    // Safety net: react-native-paystack-webview never calls the onError
+    // callback for WebView/JS failures (it silently closes the modal), so the
+    // Subscribe button could stay stuck on its spinner forever. Reset loading
+    // after a generous window if neither success nor cancel ever fired.
+    const safetyTimer = setTimeout(() => setIsLoading(false), 3 * 60 * 1000);
 
     popup.checkout({
       email: payerEmail,
+      // GHS amount — the (patched) library converts to whole pesewas. See
+      // patches/react-native-paystack-webview: Math.round applied so that
+      // 19.99 * 100 = 1999 instead of 1998.999… (Paystack rejects non-integers).
       amount: plan.amount,
-      reference: generateRef(),
-      onSuccess: (res: any) => {
+      reference,
+      onSuccess: () => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
         useUserStore.getState().setPremium(true); // optimistic
         setPaymentSuccess(true);
-        // Persist premium on the backend so it survives across sessions/devices.
+        // Persist premium on the backend — it re-verifies this reference with
+        // Paystack server-side before granting the tier, so this call alone
+        // can't be spoofed by hitting the endpoint directly.
         profileService
-          .activatePremium()
+          .activatePremium(reference)
           .then((r) => useUserStore.getState().setAuthenticatedUser(r.data))
           .catch(() => {
             // Offline — will reconcile on next login (backend reflects the tier).
           });
       },
       onCancel: () => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
       },
       onError: (err: any) => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
         Alert.alert("Payment Error", err?.message || "Something went wrong. Please try again.");
       },
@@ -112,25 +129,25 @@ export default function PaywallScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Header */}
-      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-slate-200 bg-white">
-        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center active:opacity-80">
-          <Ionicons name="close" size={24} color="#1f2937" />
+      <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-brand-border bg-brand-bg">
+        <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-slateBg items-center justify-center active:opacity-80">
+          <Ionicons name="close" size={24} color={colors.dark} />
         </Pressable>
-        <Text className="text-lg font-inter-bold text-brand-navy">FinLit Premium</Text>
+        <Text className="text-lg font-inter-bold text-brand-textPrimary">FinLit Premium</Text>
         <View style={{ width: 40 }} />
       </View>
 
       {paymentSuccess ? (
         <View className="flex-1 items-center justify-center p-7">
           <View className="mb-6">
-            <Ionicons name="checkmark-circle" size={80} color="#16A34A" />
+            <Ionicons name="checkmark-circle" size={80} color={colors.emerald} />
           </View>
-          <Text className="text-2xl font-inter-bold text-brand-navy text-center">Welcome to Premium!</Text>
-          <Text className="text-sm text-brand-dark text-center mt-2.5 mb-8 px-3 leading-5">
+          <Text className="text-2xl font-inter-bold text-brand-textPrimary text-center">Welcome to Premium!</Text>
+          <Text className="text-sm text-brand-textPrimary text-center mt-2.5 mb-8 px-3 leading-5">
             Your subscription has been activated. All simulators, AI tools, and premium content are now unlocked.
           </Text>
           <Pressable onPress={handleCloseSuccess} className="bg-brand-emerald py-4 px-10 rounded-2xl shadow-md shadow-brand-emerald/30 active:opacity-80">
-            <Text className="text-white text-base font-inter-bold">Start Exploring</Text>
+            <Text className="text-brand-textOnDark text-base font-inter-bold">Start Exploring</Text>
           </Pressable>
         </View>
       ) : (
@@ -140,20 +157,20 @@ export default function PaywallScreen() {
         >
           {/* Headline */}
           <View className="items-center my-3">
-            <Text className="text-[26px] font-inter-black text-brand-navy text-center">Unlock Financial Mastery</Text>
+            <Text className="text-[26px] font-inter-black text-brand-textPrimary text-center">Unlock Financial Mastery</Text>
             <Text className="text-sm text-brand-gray text-center mt-1.5 leading-5 px-2.5">
               Empower your wallet with premium features and certified credentials
             </Text>
           </View>
 
           {/* Premium Value Props */}
-          <View className="bg-white rounded-3xl p-4 border border-slate-200 mt-5">
+          <View className="bg-brand-bg rounded-3xl p-4 border border-brand-border mt-5">
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="chatbubble-ellipses" size={20} color="#16A34A" />
+                <Ionicons name="chatbubble-ellipses" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Unlimited AI Coach Pro</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Unlimited AI Coach Pro</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Ask unlimited questions and get tailored savings analysis.
                 </Text>
@@ -162,10 +179,10 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="ribbon" size={20} color="#16A34A" />
+                <Ionicons name="ribbon" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Accredited Certificates</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Accredited Certificates</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Earn downloadable certificates to share on LinkedIn or your CV.
                 </Text>
@@ -174,10 +191,10 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="calculator" size={20} color="#16A34A" />
+                <Ionicons name="calculator" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Advanced Simulators</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Advanced Simulators</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Unlock tax estimators, SSNIT planners, and inflation models.
                 </Text>
@@ -186,10 +203,10 @@ export default function PaywallScreen() {
 
             <View className="flex-row items-start py-3">
               <View className="w-9 h-9 rounded-[10px] bg-brand-emerald/10 items-center justify-center mr-3">
-                <Ionicons name="volume-high" size={20} color="#16A34A" />
+                <Ionicons name="volume-high" size={20} color={colors.emerald} />
               </View>
               <View className="flex-1">
-                <Text className="text-[15px] font-inter-bold text-brand-dark">Audio Lessons & Offline Mode</Text>
+                <Text className="text-[15px] font-inter-bold text-brand-textPrimary">Audio Lessons & Offline Mode</Text>
                 <Text className="text-xs text-brand-gray mt-0.5 leading-4">
                   Listen hands-free and download lessons to learn without data.
                 </Text>
@@ -204,21 +221,21 @@ export default function PaywallScreen() {
               <Pressable
                 key={p.id}
                 onPress={() => setSelectedPlan(p.id)}
-                className={`bg-white rounded-[20px] p-4 border-2 relative active:opacity-80 ${
+                className={`bg-brand-bg rounded-[20px] p-4 border-2 relative active:opacity-80 ${
                   selectedPlan === p.id
                     ? "border-brand-emerald bg-brand-emerald/10"
-                    : "border-slate-200"
+                    : "border-brand-border"
                 }`}
               >
                 {p.badge && (
                   <View className="absolute -top-2.5 right-4 bg-brand-emerald px-2 py-0.5 rounded-lg">
-                    <Text className="text-[9px] font-inter-extrabold text-white tracking-wider">{p.badge}</Text>
+                    <Text className="text-[9px] font-inter-extrabold text-brand-textOnDark tracking-wider">{p.badge}</Text>
                   </View>
                 )}
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-base font-inter-bold text-brand-navy">{p.title}</Text>
+                  <Text className="text-base font-inter-bold text-brand-textPrimary">{p.title}</Text>
                   <View className="flex-row items-baseline">
-                    <Text className="text-lg font-inter-extrabold text-brand-navy">GH₵ {p.amount.toFixed(2)}</Text>
+                    <Text className="text-lg font-inter-extrabold text-brand-textPrimary">GH₵ {p.amount.toFixed(2)}</Text>
                     <Text className="text-xs text-brand-gray font-inter-medium">/{p.period}</Text>
                   </View>
                 </View>
@@ -229,12 +246,12 @@ export default function PaywallScreen() {
 
           {/* Email Input */}
           <Text className="text-xs font-inter-extrabold text-brand-gray tracking-widest mt-7 mb-3 ml-0.5">YOUR EMAIL</Text>
-          <View className="flex-row items-center bg-white rounded-2xl border border-slate-200 px-3.5 py-3.5">
-            <Ionicons name="mail-outline" size={18} color="#9ca3af" style={{ marginRight: 10 }} />
+          <View className="flex-row items-center bg-brand-bg rounded-2xl border border-brand-border px-3.5 py-3.5">
+            <Ionicons name="mail-outline" size={18} color={colors.gray} style={{ marginRight: 10 }} />
             <TextInput
-              className="flex-1 text-[15px] text-brand-navy"
+              className="flex-1 text-[15px] text-brand-textPrimary"
               placeholder="you@example.com"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.gray}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -253,7 +270,7 @@ export default function PaywallScreen() {
               {isLoading ? (
                 <ActivityIndicator color="white" />
               ) : (
-                <Text className="text-white text-base font-inter-extrabold">
+                <Text className="text-brand-textOnDark text-base font-inter-extrabold">
                   Pay GH₵ {plan.amount.toFixed(2)} & Subscribe
                 </Text>
               )}

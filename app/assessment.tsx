@@ -1,8 +1,9 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
-import { Pressable, ScrollView, Text, View, ActivityIndicator, Modal } from "react-native";
+import { Pressable, ScrollView, Text, View, ActivityIndicator, Modal, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import { useUserStore } from "../store/useUserStore";
 import { progressService } from "../services/progress";
 import { ASSESSMENT_QUESTIONS } from "@/data/assessment";
@@ -10,6 +11,7 @@ import { ASSESSMENT_QUESTIONS } from "@/data/assessment";
 const questions = ASSESSMENT_QUESTIONS;
 
 export default function AssessmentScreen() {
+  const colors = useThemeColors();
   const [answers, setAnswers] = useState<number[]>(
     Array(questions.length).fill(0),
   );
@@ -26,6 +28,7 @@ export default function AssessmentScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isAnalyzing) return;
     setIsAnalyzing(true);
     setAnalysisStep(0);
 
@@ -36,7 +39,7 @@ export default function AssessmentScreen() {
     setTimeout(() => setAnalysisStep(4), 2400);
 
     // Submit to the backend: it scores the answers, saves score/goal on the
-    // user, and returns the tier + syllabus. Fall back to local scoring offline.
+    // user, and returns the tier + syllabus.
     let score = answers.reduce((a, b) => a + b, 0);
     let goal = selectedGoal;
     try {
@@ -44,7 +47,30 @@ export default function AssessmentScreen() {
       score = res.data.score;
       goal = res.data.goal;
     } catch {
-      // keep the locally-computed score/goal
+      // A 401 that couldn't be refreshed logs the user out entirely (see the
+      // response interceptor in services/api.ts). Don't silently pretend this
+      // succeeded — NavigationGuard would just bounce them off
+      // assessment-result with no explanation a moment later.
+      if (!useUserStore.getState().isAuthenticated) {
+        setIsAnalyzing(false);
+        Alert.alert(
+          "Session Expired",
+          "You've been signed out. Please sign in again to finish your assessment.",
+          [{ text: "OK", onPress: () => router.replace("/auth") }]
+        );
+        return;
+      }
+      // Network/server error: do NOT mark the user assessed locally. The
+      // backend is the source of truth for lastAssessedAt — a fake local
+      // assessment is discarded on next login, and the user would be forced
+      // to retake it anyway. Stop and let them retry instead.
+      setIsAnalyzing(false);
+      Alert.alert(
+        "Couldn't Submit Assessment",
+        "We couldn't reach the server to save your assessment. Check your connection and try again.",
+        [{ text: "OK" }]
+      );
+      return;
     }
 
     const store = useUserStore.getState();
@@ -73,18 +99,18 @@ export default function AssessmentScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Decorative Accent Background */}
-      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 dark:bg-slate-700/60 rounded-b-[100px] -z-10" />
 
       {/* Header Container */}
       <View className="flex-row items-center px-6 pt-14 pb-4">
         {/* Back Button */}
         <Pressable
           onPress={() => router.back()}
-          className="p-2.5 bg-white rounded-full shadow-md border border-slate-100 active:opacity-80"
+          className="p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
         >
-          <Ionicons name="arrow-back" size={22} color="#0A2540" />
+          <Ionicons name="arrow-back" size={22} color={colors.navy} />
         </Pressable>
-        <Text className="text-lg font-inter-semibold text-brand-navy ml-4 flex-1 text-center pr-10">
+        <Text className="text-lg font-inter-semibold text-brand-textPrimary ml-4 flex-1 text-center pr-10">
           Assessment
         </Text>
       </View>
@@ -95,11 +121,11 @@ export default function AssessmentScreen() {
           <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider">
             Progress
           </Text>
-          <Text className="text-brand-emerald font-inter-bold text-xs">
+          <Text className="text-brand-emerald dark:text-emerald-400 font-inter-bold text-xs">
             {completedCount} / {totalQuestions} Questions
           </Text>
         </View>
-        <View className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+        <View className="w-full h-2.5 bg-brand-slateBg rounded-full overflow-hidden">
           <View
             style={{ width: `${progressPercentage}%` }}
             className="h-full bg-brand-emerald rounded-full"
@@ -114,7 +140,7 @@ export default function AssessmentScreen() {
       >
         {/* Branding header */}
         <View className="items-center mb-6">
-          <Text className="text-[32px] font-inter-bold text-brand-navy text-center tracking-tight leading-10">
+          <Text className="text-[32px] font-inter-bold text-brand-textPrimary text-center tracking-tight leading-10">
             Financial Literacy
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1.5 text-center px-6 leading-5">
@@ -126,12 +152,12 @@ export default function AssessmentScreen() {
         {questions.map((item, qIndex) => (
           <View
             key={qIndex}
-            className="bg-white rounded-2xl p-5 border border-slate-100 mb-6 shadow-md shadow-slate-100/40"
+            className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-brand-shadow"
           >
             <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
               Question {qIndex + 1}
             </Text>
-            <Text className="text-lg font-inter-semibold text-brand-navy mb-4">
+            <Text className="text-lg font-inter-semibold text-brand-textPrimary mb-4">
               {item.question}
             </Text>
 
@@ -145,12 +171,12 @@ export default function AssessmentScreen() {
                   className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                     isSelected
                       ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                      : "border-slate-200 bg-slate-50/20"
+                      : "border-brand-border bg-slate-50/20"
                   }`}
                 >
                   <Text
                     className={`text-base font-inter-medium flex-1 ${
-                      isSelected ? "text-brand-emerald" : "text-brand-dark"
+                      isSelected ? "text-brand-emerald" : "text-brand-textPrimary"
                     }`}
                   >
                     {option.text}
@@ -159,7 +185,7 @@ export default function AssessmentScreen() {
                     className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                       isSelected
                         ? "border-brand-emerald bg-brand-emerald"
-                        : "border-slate-300 bg-white"
+                        : "border-brand-border bg-brand-bg"
                     }`}
                   >
                     {isSelected && (
@@ -174,7 +200,7 @@ export default function AssessmentScreen() {
 
         {/* YOUR FINANCIAL GOALS SECTION */}
         <View className="mt-4 mb-6">
-          <Text className="text-[24px] font-inter-semibold text-brand-navy tracking-tight uppercase">
+          <Text className="text-[24px] font-inter-semibold text-brand-textPrimary tracking-tight uppercase">
             YOUR FINANCIAL GOALS
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1 leading-5">
@@ -183,11 +209,11 @@ export default function AssessmentScreen() {
         </View>
 
         {/* Question 6 Card */}
-        <View className="bg-white rounded-2xl p-5 border border-slate-100 mb-6 shadow-md shadow-slate-100/40">
+        <View className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-brand-shadow">
           <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
             Question 6
           </Text>
-          <Text className="text-lg font-inter-semibold text-brand-navy mb-4">
+          <Text className="text-lg font-inter-semibold text-brand-textPrimary mb-4">
             What is your primary financial goal?
           </Text>
 
@@ -209,12 +235,12 @@ export default function AssessmentScreen() {
                 className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                   isSelected
                     ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                    : "border-slate-200 bg-slate-50/20"
+                    : "border-brand-border bg-slate-50/20"
                 }`}
               >
                 <Text
                   className={`text-base font-inter-medium flex-1 ${
-                    isSelected ? "text-brand-emerald" : "text-brand-dark"
+                    isSelected ? "text-brand-emerald" : "text-brand-textPrimary"
                   }`}
                 >
                   {goalOption}
@@ -223,7 +249,7 @@ export default function AssessmentScreen() {
                   className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                     isSelected
                       ? "border-brand-emerald bg-brand-emerald"
-                      : "border-slate-300 bg-white"
+                      : "border-brand-border bg-brand-bg"
                   }`}
                 >
                   {isSelected && (
@@ -237,18 +263,18 @@ export default function AssessmentScreen() {
 
         {/* Submit Button */}
         <Pressable
-          disabled={!completed}
+          disabled={!completed || isAnalyzing}
           onPress={handleSubmit}
           style={({ pressed }) => ({
             transform: [{ scale: pressed ? 0.98 : 1 }],
           })}
           className={`h-14 rounded-2xl mt-4 shadow-md items-center justify-center ${
-            completed ? "bg-brand-navy shadow-brand-navy/10" : "bg-slate-200"
+            completed ? "bg-brand-navy shadow-brand-navy/10" : "bg-brand-slateBg"
           }`}
         >
           <Text
             className={`font-inter-semibold text-base ${
-              completed ? "text-white" : "text-slate-400"
+              completed ? "text-brand-textOnDark" : "text-brand-gray"
             }`}
           >
             View Results
@@ -261,9 +287,9 @@ export default function AssessmentScreen() {
         <View className="flex-1 bg-brand-navy/95 items-center justify-center px-8">
           <View className="items-center mb-8">
             <View className="w-20 h-20 bg-white/10 rounded-full items-center justify-center mb-4">
-              <ActivityIndicator size="large" color="#16A34A" />
+              <ActivityIndicator size="large" color={colors.emerald} />
             </View>
-            <Text className="text-white text-2xl font-inter-bold tracking-tight text-center">
+            <Text className="text-brand-textOnDark text-2xl font-inter-bold tracking-tight text-center">
               Personalizing Your Experience
             </Text>
           </View>
@@ -273,9 +299,9 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 1 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 1 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 1 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Analyzing your responses...
               </Text>
             </View>
@@ -284,9 +310,9 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 2 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 2 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 2 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Measuring your financial knowledge
               </Text>
             </View>
@@ -295,9 +321,9 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 3 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 3 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 3 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Building your learning path
               </Text>
             </View>
@@ -306,9 +332,9 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 4 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 4 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 4 ? colors.success : colors.gold}
               />
-              <Text className="text-white font-inter-semibold text-sm ml-3">
+              <Text className="text-brand-textOnDark font-inter-semibold text-sm ml-3">
                 Personalizing your dashboard
               </Text>
             </View>
@@ -317,7 +343,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name="checkmark-circle"
                 size={20}
-                color="#16A34A"
+                color={colors.emerald}
               />
               <Text className="text-brand-emerald font-inter-bold text-sm ml-3">
                 Done!
