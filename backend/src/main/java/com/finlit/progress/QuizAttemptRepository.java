@@ -10,4 +10,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, UUID> 
 
     /** All of a user's attempts, oldest first, so score history reads in order. */
     List<QuizAttempt> findByUserIdOrderByTakenAtAsc(UUID userId);
+
+    /** Whether this module's quiz has been attempted before — gates the XP award. */
+    boolean existsByUserIdAndModuleId(UUID userId, Long moduleId);
 }
