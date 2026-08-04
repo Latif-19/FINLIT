@@ -37,6 +37,8 @@ export default function PersonalDetailsScreen() {
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => { setName(storeName); }, [storeName]);
+  // Email is read-only (backend UpdateProfileRequest has no email field), but
+  // keep the local copy in sync if the store ever changes it elsewhere.
   useEffect(() => { setEmail(storeEmail); }, [storeEmail]);
   useEffect(() => { setAge(storeAge); }, [storeAge]);
   useEffect(() => { setPhone(storePhone); }, [storePhone]);
@@ -50,14 +52,15 @@ export default function PersonalDetailsScreen() {
     const store = useUserStore.getState();
     // Optimistic local update for instant feedback.
     if (name.trim()) store.setName(name);
-    store.setEmail(email);
     store.setAge(age);
     store.setPhone(phone);
     if (selectedGoal) store.setGoal(selectedGoal);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2500);
 
-    // Persist name / avatar / age / phone to the backend.
+    // Persist name / avatar / age / phone to the backend. Email is excluded:
+    // the backend's UpdateProfileRequest has no email field (it's the account
+    // identifier), so the field is read-only on this screen.
     try {
       const res = await profileService.updateProfile({
         name: name.trim() || store.name,
@@ -121,15 +124,17 @@ export default function PersonalDetailsScreen() {
             <View className="p-4 border-b border-brand-border">
               <Text className="text-brand-gray text-xs font-inter-semibold uppercase tracking-wider mb-1.5">Email</Text>
               <TextInput
-                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border"
+                className="text-brand-dark text-base font-inter-semibold bg-brand-slateBg/40 rounded-xl px-3.5 py-2.5 border border-brand-border opacity-60"
                 value={email}
-                onChangeText={setEmail}
-                onBlur={() => useUserStore.getState().setEmail(email)}
+                editable={false}
                 placeholder="you@example.com"
                 placeholderTextColor="#9CA3AF"
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
+              <Text className="text-brand-gray text-[11px] font-inter mt-1.5">
+                {"Email is your account identifier and can't be changed in the app."}
+              </Text>
             </View>
 
             {/* Age */}

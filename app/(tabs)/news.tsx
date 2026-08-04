@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef } from "react";
 import {
   ScrollView,
   Text,
@@ -330,9 +330,18 @@ export default function NewsScreen() {
   const [startIndex, setStartIndex] = useState(0);
   const [updatedLabel, setUpdatedLabel] = useState("Today");
 
+  // Bumped on every load request; stale in-flight responses (from a previous
+  // focus or refresh) are dropped so they can't overwrite newer data.
+  const loadTokenRef = useRef(0);
+  // Single "Today" revert timer — rapid refreshes must not stack 12s timers
+  // that reset the label out of order.
+  const labelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const loadNews = useCallback(async () => {
+    const token = ++loadTokenRef.current;
     try {
       const res = await contentService.getNews();
+      if (token !== loadTokenRef.current) return; // stale response — ignore
       if (res.data && res.data.length > 0) {
         setArticles(mapBackendNews(res.data));
       }
@@ -357,15 +366,14 @@ export default function NewsScreen() {
     return [...base.slice(idx), ...base.slice(0, idx)];
   }, [articles, activeCategory, startIndex]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    loadNews();
-    setTimeout(() => {
-      setStartIndex((prev) => prev + 1);
-      setUpdatedLabel("Just now");
-      setRefreshing(false);
-      setTimeout(() => setUpdatedLabel("Today"), 12000);
-    }, 1200);
+    await loadNews();
+    setStartIndex((prev) => prev + 1);
+    setUpdatedLabel("Just now");
+    setRefreshing(false);
+    if (labelTimerRef.current) clearTimeout(labelTimerRef.current);
+    labelTimerRef.current = setTimeout(() => setUpdatedLabel("Today"), 12000);
   }, [loadNews]);
 
   const getCount = (cat: string) =>

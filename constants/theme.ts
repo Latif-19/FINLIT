@@ -491,3 +491,34 @@ export function getThemeVars(
   const variant = modePresets[appThemeColor] || modePresets.emerald;
   return isDark ? variant.dark : variant.light;
 }
+
+/**
+ * Status colours — success, danger, warning, info.
+ *
+ * Deliberately NOT part of the brand palettes above. "Error" should read as
+ * error whether the user picked the emerald, blue or purple theme, so these
+ * vary only by light/dark rather than being duplicated across all 37 palette
+ * variants. Screens previously hardcoded these as raw hex, which meant they
+ * ignored dark mode entirely.
+ */
+const SEMANTIC_COLORS = {
+  light: {
+    success: '#16A34A',
+    danger: '#DC2626',
+    warning: '#B45309',
+    info: '#1D4ED8',
+  },
+  dark: {
+    // Lifted in lightness so they stay legible on the dark surfaces.
+    success: '#4ADE80',
+    danger: '#F87171',
+    warning: '#FBBF24',
+    info: '#60A5FA',
+  },
+} as const;
+
+export type SemanticColors = typeof SEMANTIC_COLORS.light;
+
+export function getSemanticColors(isDark: boolean = false): SemanticColors {
+  return isDark ? SEMANTIC_COLORS.dark : SEMANTIC_COLORS.light;
+}

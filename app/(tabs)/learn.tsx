@@ -206,12 +206,19 @@ export default function LearnScreen() {
         const res = await progressService.getProgress();
         store.applyProgress(res.data);
       } catch {
-        // Offline / server down — keep the user progressing locally.
-        if (store.lessonsCompleted < lessonId) {
-          store.incrementLessons();
-          store.addXp(xpVal);
-          store.saveQuizScore(lessonId, hearts);
+        // Offline / server down — keep the user progressing locally. Mirror the
+        // backend's semantics: XP/count only on first completion, the specific
+        // lesson id tracked so the map unlocks, and the quiz score as the
+        // count of correct answers (not the hearts remaining).
+        const quizList = MODULE_QUIZZES[lessonId];
+        let quizScore: number | null = null;
+        if (quizList && answers.length > 0) {
+          quizScore = answers.filter(
+            (a) =>
+              quizList[a.questionIndex]?.options[a.selectedOptionIndex]?.isCorrect
+          ).length;
         }
+        store.completeLessonOffline(lessonId, xpVal, quizScore);
       }
     }
   };

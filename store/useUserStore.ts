@@ -133,6 +133,7 @@ export interface UserActions {
   updateStreak: () => void;
   unlockBadge: (badgeId: string) => void;
   saveQuizScore: (moduleId: number, score: number) => void;
+  completeLessonOffline: (lessonId: number, xpVal: number, quizScore: number | null) => void;
 
   // Theming & Accessibility
   setColorBlindMode: (mode: 'none' | 'deuteranopia' | 'protanopia' | 'tritanopia' | 'high-contrast' | 'monochrome') => void;
@@ -294,8 +295,15 @@ export const useUserStore = create<UserState & UserActions>()(
               new Date().toISOString(),
             // Explicit null from the backend means "never assessed" and must win —
             // only fall back to local state when the field is truly absent.
+            // On an account switch the reset (null) must win too, otherwise
+            // account B inherits account A's lastAssessedAt and skips the
+            // mandatory onboarding assessment.
             lastAssessedAt:
-              user.lastAssessedAt !== undefined ? user.lastAssessedAt : state.lastAssessedAt,
+              user.lastAssessedAt !== undefined
+                ? user.lastAssessedAt
+                : isDifferentAccount
+                  ? null
+                  : state.lastAssessedAt,
           };
         }),
 
@@ -437,6 +445,34 @@ export const useUserStore = create<UserState & UserActions>()(
             [moduleId]: [...(state.quizScores[moduleId] || []), score],
           },
         })),
+
+      // Offline lesson completion (server unreachable) — mirrors what the
+      // backend would have recorded: XP and the lesson count only on FIRST
+      // completion (lesson ids can complete out of order), the specific
+      // lesson id must be tracked so the Learn map unlocks correctly, and
+      // the quiz score is the count of correct answers (backend semantics).
+      completeLessonOffline: (lessonId, xpVal, quizScore) =>
+        set((state) => {
+          const firstCompletion = !state.completedLessonIds.includes(lessonId);
+          const next = {
+            completedLessonIds: firstCompletion
+              ? [...state.completedLessonIds, lessonId]
+              : state.completedLessonIds,
+            lessonsCompleted: firstCompletion
+              ? state.lessonsCompleted + 1
+              : state.lessonsCompleted,
+            xp: firstCompletion ? state.xp + xpVal : state.xp,
+          };
+          return quizScore === null
+            ? next
+            : {
+                ...next,
+                quizScores: {
+                  ...state.quizScores,
+                  [lessonId]: [...(state.quizScores[lessonId] || []), quizScore],
+                },
+              };
+        }),
 
       // ── Simulation History ────────────────────────────────────────────────
       saveSimulationResult: (result) =>

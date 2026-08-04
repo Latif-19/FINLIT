@@ -28,6 +28,7 @@ export default function AssessmentScreen() {
   };
 
   const handleSubmit = async () => {
+    if (isAnalyzing) return;
     setIsAnalyzing(true);
     setAnalysisStep(0);
 
@@ -38,7 +39,7 @@ export default function AssessmentScreen() {
     setTimeout(() => setAnalysisStep(4), 2400);
 
     // Submit to the backend: it scores the answers, saves score/goal on the
-    // user, and returns the tier + syllabus. Fall back to local scoring offline.
+    // user, and returns the tier + syllabus.
     let score = answers.reduce((a, b) => a + b, 0);
     let goal = selectedGoal;
     try {
@@ -59,7 +60,17 @@ export default function AssessmentScreen() {
         );
         return;
       }
-      // Otherwise — offline / network error — keep the locally-computed score/goal.
+      // Network/server error: do NOT mark the user assessed locally. The
+      // backend is the source of truth for lastAssessedAt — a fake local
+      // assessment is discarded on next login, and the user would be forced
+      // to retake it anyway. Stop and let them retry instead.
+      setIsAnalyzing(false);
+      Alert.alert(
+        "Couldn't Submit Assessment",
+        "We couldn't reach the server to save your assessment. Check your connection and try again.",
+        [{ text: "OK" }]
+      );
+      return;
     }
 
     const store = useUserStore.getState();
@@ -252,7 +263,7 @@ export default function AssessmentScreen() {
 
         {/* Submit Button */}
         <Pressable
-          disabled={!completed}
+          disabled={!completed || isAnalyzing}
           onPress={handleSubmit}
           style={({ pressed }) => ({
             transform: [{ scale: pressed ? 0.98 : 1 }],

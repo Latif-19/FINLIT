@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useUserStore } from "../store/useUserStore";
 import { tutorService } from "../services/tutor";
 import { useThemeColors } from "../hooks/useThemeColors";
@@ -45,6 +46,43 @@ const SUGGESTED_QUESTIONS = [
   "Can you explain the SSNIT 3-Tier pension system?",
   "What is Databank Mfund and how do I start?",
 ];
+
+// Daily free-question limit. Persisted per user + per day so leaving the
+// screen (unmount) can't reset it — the limit is genuinely "for today".
+const FREE_DAILY_LIMIT = 2;
+
+function dailyKey(email: string): string {
+  return `finlit-tutor-daily-${email.trim().toLowerCase()}`;
+}
+
+async function readDailyCount(): Promise<number> {
+  const email = useUserStore.getState().email;
+  if (!email) return 0;
+  try {
+    const raw = await AsyncStorage.getItem(dailyKey(email));
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    const today = new Date().toISOString().split("T")[0];
+    return parsed?.date === today && typeof parsed?.count === "number"
+      ? parsed.count
+      : 0;
+  } catch {
+    return 0;
+  }
+}
+
+async function writeDailyCount(count: number): Promise<void> {
+  const email = useUserStore.getState().email;
+  if (!email) return;
+  try {
+    await AsyncStorage.setItem(
+      dailyKey(email),
+      JSON.stringify({ date: new Date().toISOString().split("T")[0], count })
+    );
+  } catch {
+    // Best-effort persistence — a failure just resets the count next session.
+  }
+}
 
 function getFallbackAnswer(text: string): string {
   const trimmed = text.trim();
@@ -85,8 +123,23 @@ export default function AiTutorScreen() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
+  const [countLoaded, setCountLoaded] = useState(false);
 
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Restore today's question count when the screen mounts.
+  useEffect(() => {
+    let active = true;
+    readDailyCount().then((count) => {
+      if (active) {
+        setQuestionCount(count);
+        setCountLoaded(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -98,14 +151,18 @@ export default function AiTutorScreen() {
   const handleSend = async (text: string) => {
     if (!text.trim()) return;
 
-    if (!isPremium && questionCount >= 2) {
+    // Don't accept new questions until today's persisted count is loaded,
+    // and block concurrent sends (prevents duplicate requests + double count).
+    if (!countLoaded || isTyping) return;
+
+    if (!isPremium && questionCount >= FREE_DAILY_LIMIT) {
       setMessages((prev) => [
         ...prev,
         { id: `limit-user-${Date.now()}`, sender: "user", text, timestamp: new Date() },
         {
           id: `limit-ai-${Date.now()}`,
           sender: "ai",
-          text: "🔒 You've used your 2 free AI Tutor questions for today! Upgrade to FinLit Premium for unlimited queries and advanced personal financial guidance.",
+          text: `🔒 You've used your ${FREE_DAILY_LIMIT} free AI Tutor questions for today! Upgrade to FinLit Premium for unlimited queries and advanced personal financial guidance.`,
           timestamp: new Date(),
         },
       ]);
@@ -124,7 +181,11 @@ export default function AiTutorScreen() {
     setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setIsTyping(true);
-    setQuestionCount((q) => q + 1);
+    setQuestionCount((q) => {
+      const next = q + 1;
+      writeDailyCount(next);
+      return next;
+    });
     setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
 
     try {
@@ -283,13 +344,14 @@ export default function AiTutorScreen() {
             placeholderTextColor="#94a3b8"
             className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
             onSubmitEditing={() => handleSend(inputText)}
+            editable={!isTyping}
             onFocus={() => {
               setTimeout(() => scrollViewRef.current?.scrollToEnd({ animated: true }), 100);
             }}
           />
           <Pressable
             onPress={() => handleSend(inputText)}
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() || isTyping}
             style={({ pressed }) => ({
               transform: [{ scale: pressed && inputText.trim() ? 0.95 : 1 }],
             })}

@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native-paystack-webview/production/lib/utils.js b/node_modules/react-native-paystack-webview/production/lib/utils.js
+index 356789c..12780a7 100644
+--- a/node_modules/react-native-paystack-webview/production/lib/utils.js
++++ b/node_modules/react-native-paystack-webview/production/lib/utils.js
+@@ -98,7 +98,9 @@ const generatePaystackParams = (config) => {
+     const props = [
+         `key: '${config.publicKey}'`,
+         `email: '${config.email}'`,
+-        `amount: ${config.amount * 100}`,
++        // Patched: Math.round — 19.99 * 100 === 1998.999... and Paystack
++        // rejects non-integer pesewa amounts (charge refused or truncated).
++        `amount: ${Math.round(config.amount * 100)}`,
+         config.currency ? `currency: '${config.currency}'` : '',
+         `reference: '${config.reference}'`,
+         config.metadata ? `metadata: ${JSON.stringify(config.metadata)}` : '',

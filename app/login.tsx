@@ -97,7 +97,7 @@ export default function LoginScreen() {
         <View className="items-center mt-12">
           <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
             <Image
-              source={require("../assets/images/finlit-logo.jpeg")}
+              source={require("../assets/images/finlit-logo.png")}
               className="w-14 h-14"
               resizeMode="contain"
             />
@@ -203,7 +203,7 @@ export default function LoginScreen() {
             className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center shadow-sm active:bg-brand-slateBg"
           >
             <Image
-              source={require("../assets/images/google-logo.jpg")}
+              source={require("../assets/images/google-logo.png")}
               className="w-6 h-6 rounded-full"
               resizeMode="contain"
             />
@@ -222,7 +222,7 @@ export default function LoginScreen() {
             className="border border-brand-border bg-brand-bg rounded-2xl h-14 flex-row justify-center items-center mt-3 shadow-sm active:bg-brand-slateBg"
           >
             <Image
-              source={require("../assets/images/facebook-logo.jpg")}
+              source={require("../assets/images/facebook-logo.png")}
               className="w-6 h-6 rounded-full"
               resizeMode="contain"
             />

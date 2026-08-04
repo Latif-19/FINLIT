@@ -13,7 +13,7 @@ export default function AuthScreen() {
       <View className="items-center mt-6">
         <View className="w-24 h-24 bg-brand-bg rounded-3xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
           <Image
-            source={require("../assets/images/finlit-logo.jpeg")}
+            source={require("../assets/images/finlit-logo.png")}
             className="w-20 h-20"
             resizeMode="contain"
           />

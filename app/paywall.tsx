@@ -81,11 +81,21 @@ export default function PaywallScreen() {
     setIsLoading(true);
     const reference = generateRef();
 
+    // Safety net: react-native-paystack-webview never calls the onError
+    // callback for WebView/JS failures (it silently closes the modal), so the
+    // Subscribe button could stay stuck on its spinner forever. Reset loading
+    // after a generous window if neither success nor cancel ever fired.
+    const safetyTimer = setTimeout(() => setIsLoading(false), 3 * 60 * 1000);
+
     popup.checkout({
       email: payerEmail,
+      // GHS amount — the (patched) library converts to whole pesewas. See
+      // patches/react-native-paystack-webview: Math.round applied so that
+      // 19.99 * 100 = 1999 instead of 1998.999… (Paystack rejects non-integers).
       amount: plan.amount,
       reference,
       onSuccess: () => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
         useUserStore.getState().setPremium(true); // optimistic
         setPaymentSuccess(true);
@@ -100,9 +110,11 @@ export default function PaywallScreen() {
           });
       },
       onCancel: () => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
       },
       onError: (err: any) => {
+        clearTimeout(safetyTimer);
         setIsLoading(false);
         Alert.alert("Payment Error", err?.message || "Something went wrong. Please try again.");
       },
