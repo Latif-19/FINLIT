@@ -116,7 +116,7 @@ export default function PersonalDetailsScreen() {
                 onChangeText={setName}
                 onBlur={() => { if (name.trim()) useUserStore.getState().setName(name); }}
                 placeholder="Your name"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.gray}
               />
             </View>
 
@@ -128,7 +128,7 @@ export default function PersonalDetailsScreen() {
                 value={email}
                 editable={false}
                 placeholder="you@example.com"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.gray}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
@@ -146,7 +146,7 @@ export default function PersonalDetailsScreen() {
                 onChangeText={setAge}
                 onBlur={() => useUserStore.getState().setAge(age)}
                 placeholder="e.g. 25"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.gray}
                 keyboardType="number-pad"
               />
             </View>
@@ -160,7 +160,7 @@ export default function PersonalDetailsScreen() {
                 onChangeText={setPhone}
                 onBlur={() => useUserStore.getState().setPhone(phone)}
                 placeholder="+233 XX XXX XXXX"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.gray}
                 keyboardType="phone-pad"
               />
             </View>

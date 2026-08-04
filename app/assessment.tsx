@@ -299,7 +299,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 1 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 1 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 1 ? colors.success : colors.gold}
               />
               <Text className="text-white font-inter-semibold text-sm ml-3">
                 Analyzing your responses...
@@ -310,7 +310,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 2 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 2 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 2 ? colors.success : colors.gold}
               />
               <Text className="text-white font-inter-semibold text-sm ml-3">
                 Measuring your financial knowledge
@@ -321,7 +321,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 3 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 3 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 3 ? colors.success : colors.gold}
               />
               <Text className="text-white font-inter-semibold text-sm ml-3">
                 Building your learning path
@@ -332,7 +332,7 @@ export default function AssessmentScreen() {
               <Ionicons
                 name={analysisStep >= 4 ? "checkmark-circle" : "sync-outline"}
                 size={20}
-                color={analysisStep >= 4 ? "#16A34A" : "#D4AF37"}
+                color={analysisStep >= 4 ? colors.success : colors.gold}
               />
               <Text className="text-white font-inter-semibold text-sm ml-3">
                 Personalizing your dashboard

@@ -251,7 +251,7 @@ export default function PaywallScreen() {
             <TextInput
               className="flex-1 text-[15px] text-brand-navy"
               placeholder="you@example.com"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.gray}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}

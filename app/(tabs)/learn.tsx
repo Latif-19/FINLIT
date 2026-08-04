@@ -469,7 +469,7 @@ export default function LearnScreen() {
             }
 
             const isBig = index % 2 === 0;
-            const nodeIconColor = isCompleted ? "#ffffff" : isCurrent ? "#0A2540" : "#64748b";
+            const nodeIconColor = isCompleted ? "#ffffff" : isCurrent ? colors.navy : "#64748b";
 
             return (
               <View
@@ -878,24 +878,24 @@ export default function LearnScreen() {
                               let optTextClass =
                                 "text-[17px] font-inter-semibold text-brand-dark flex-1 mr-2.5 leading-6";
                               let optionIcon = "ellipse-outline";
-                              let optionIconColor = "#94a3b8";
+                              let optionIconColor = colors.gray;
 
                               if (isAnswerChecked) {
                                 if (opt.isCorrect) {
                                   optBtnClass += " border-green-500 border-b-green-900 bg-green-50";
                                   optTextClass += " text-green-700";
                                   optionIcon = "checkmark-circle";
-                                  optionIconColor = "#22c55e";
+                                  optionIconColor = colors.success;
                                 } else if (isSelected) {
                                   optBtnClass += " border-red-500 border-b-red-900 bg-red-50";
                                   optTextClass += " text-red-700";
                                   optionIcon = "close-circle";
-                                  optionIconColor = "#ef4444";
+                                  optionIconColor = colors.danger;
                                 }
                               } else if (isSelected) {
                                 optBtnClass += " border-blue-700 border-b-blue-950 bg-blue-50";
                                 optTextClass += " text-blue-700";
-                                optionIconColor = "#1d4ed8";
+                                optionIconColor = colors.info;
                               }
 
                               return (
@@ -962,7 +962,7 @@ export default function LearnScreen() {
                       <Ionicons
                         name={isAnswerCorrect ? "checkmark-circle" : "alert-circle"}
                         size={24}
-                        color={isAnswerCorrect ? "#22c55e" : "#ef4444"}
+                        color={isAnswerCorrect ? colors.success : colors.danger}
                       />
                       <Text
                         className={`text-sm font-inter-bold flex-1 ${

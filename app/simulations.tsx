@@ -337,12 +337,12 @@ export default function SimulationsScreen() {
                   isActive ? "bg-brand-emerald border-brand-emerald" : "bg-brand-slateBg border-brand-border"
                 }`}
               >
-                <Ionicons name={iconMap[tab] as any} size={14} color={isActive ? "white" : "#94a3b8"} />
+                <Ionicons name={iconMap[tab] as any} size={14} color={isActive ? "white" : colors.gray} />
                 <Text className={`text-xs font-inter-bold ml-1.5 ${isActive ? "text-white" : "text-brand-dark"}`}>
                   {labelMap[tab]}
                 </Text>
                 {!isPremium && (
-                  <Ionicons name="lock-closed" size={10} color={isActive ? "white" : "#b45309"} style={{ marginLeft: 4 }} />
+                  <Ionicons name="lock-closed" size={10} color={isActive ? "white" : colors.warning} style={{ marginLeft: 4 }} />
                 )}
               </Pressable>
             );

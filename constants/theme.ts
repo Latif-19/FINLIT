@@ -501,7 +501,14 @@ export function getThemeVars(
  * variants. Screens previously hardcoded these as raw hex, which meant they
  * ignored dark mode entirely.
  */
-const SEMANTIC_COLORS = {
+export interface SemanticColors {
+  success: string;
+  danger: string;
+  warning: string;
+  info: string;
+}
+
+const SEMANTIC_COLORS: { light: SemanticColors; dark: SemanticColors } = {
   light: {
     success: '#16A34A',
     danger: '#DC2626',
@@ -515,9 +522,7 @@ const SEMANTIC_COLORS = {
     warning: '#FBBF24',
     info: '#60A5FA',
   },
-} as const;
-
-export type SemanticColors = typeof SEMANTIC_COLORS.light;
+};
 
 export function getSemanticColors(isDark: boolean = false): SemanticColors {
   return isDark ? SEMANTIC_COLORS.dark : SEMANTIC_COLORS.light;

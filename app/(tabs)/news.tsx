@@ -14,34 +14,7 @@ import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { contentService } from "../../services/content";
-import type { NewsArticle as BackendNewsArticle } from "@/types/api";
-
-// Turns a backend ISO timestamp into a short relative label.
-function newsTimeAgo(value: string): string {
-  if (!value) return "";
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return value;
-  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
-  if (mins < 60) return `${Math.max(1, mins)}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return `${Math.floor(days / 7)}w ago`;
-}
-
-interface Article {
-  id: number;
-  title: string;
-  source: string;
-  sourceUrl: string;
-  category: string;
-  time: string;
-  readTime: string;
-  image: string;
-  summary: string;
-  paragraphs: string[];
-}
+import { CATEGORY_META, mapBackendNews, type Article } from "@/data/news";
 
 const NEWS_ARTICLES: Article[] = [
   {
@@ -279,30 +252,7 @@ const NEWS_ARTICLES: Article[] = [
   },
 ];
 
-const CATEGORY_META: Record<string, { bg: string; text: string; border: string; icon: string }> = {
-  Policy:    { bg: "#f0fdf4", text: "#166534", border: "#bbf7d0", icon: "newspaper-outline" },
-  Fintech:   { bg: "#eff6ff", text: "#1e40af", border: "#bfdbfe", icon: "phone-portrait-outline" },
-  Investing: { bg: "#faf5ff", text: "#6b21a8", border: "#e9d5ff", icon: "trending-up-outline" },
-  Savings:   { bg: "#fefce8", text: "#854d0e", border: "#fde68a", icon: "wallet-outline" },
-};
-
 const ALL_CATEGORIES = ["All", ...Array.from(new Set(NEWS_ARTICLES.map((a) => a.category)))];
-
-// Maps a backend news article to the shape this screen renders.
-function mapBackendNews(items: BackendNewsArticle[]): Article[] {
-  return items.map((a) => ({
-    id: a.id,
-    title: a.title,
-    source: a.source,
-    sourceUrl: a.sourceUrl,
-    category: a.category,
-    time: newsTimeAgo(a.publishedAt),
-    readTime: a.readTime,
-    image: a.imageUrl,
-    summary: a.summary,
-    paragraphs: a.content,
-  }));
-}
 
 function CategoryPill({ category, small = false }: { category: string; small?: boolean }) {
   const meta = CATEGORY_META[category];
@@ -463,8 +413,8 @@ export default function NewsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#16A34A"
-            colors={["#16A34A"]}
+            tintColor={colors.success}
+            colors={[colors.success]}
           />
         }
       >

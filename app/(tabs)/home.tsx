@@ -11,6 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../../store/useUserStore";
 import { progressService } from "../../services/progress";
+import { contentService } from "../../services/content";
+import { categoryMeta, mapBackendNews, type Article } from "@/data/news";
 import { AVATAR_OPTIONS } from "@/data/avatars";
 import { getSmartRecommendations, SmartRecommendation } from "@/data/recommendations";
 import { useThemeColors } from "../../hooks/useThemeColors";
@@ -23,42 +25,50 @@ function formatDuration(totalSeconds: number): string {
   return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
 }
 
-const HOME_NEWS_PREVIEW = [
+/** How many articles the dashboard mini-feed shows. */
+const NEWS_PREVIEW_COUNT = 3;
+
+/**
+ * Offline fallback only — the real articles come from GET /news on focus.
+ * Category chip colours are looked up via categoryMeta() rather than stored
+ * per item, so these can't drift from what the News tab renders.
+ */
+const HOME_NEWS_PREVIEW: Article[] = [
   {
     id: 1,
     title: "Bank of Ghana Adjusts Monetary Policy Rate to Curb Inflation",
     source: "Bank of Ghana",
+    sourceUrl: "",
     category: "Policy",
-    categoryColor: "#166534",
-    categoryBg: "#f0fdf4",
-    categoryBorder: "#bbf7d0",
     time: "2h ago",
+    readTime: "3 min read",
     image: "https://picsum.photos/seed/bog-monetary-policy/800/450",
     summary: "The MPC revised the policy rate to manage inflation, affecting deposit yields and loan costs.",
+    paragraphs: [],
   },
   {
     id: 2,
     title: "E-Levy & MoMo Fees: 3 Strategies to Save on Transfers",
     source: "Joy Business",
+    sourceUrl: "",
     category: "Fintech",
-    categoryColor: "#1e40af",
-    categoryBg: "#eff6ff",
-    categoryBorder: "#bfdbfe",
     time: "5h ago",
+    readTime: "4 min read",
     image: "https://picsum.photos/seed/momo-elevy-ghana/800/450",
     summary: "How mobile money charges affect your daily cash flow and tips to reduce transfer costs.",
+    paragraphs: [],
   },
   {
     id: 3,
     title: "T-Bills Explained: Ghana's Safest Investment in 2026",
     source: "Ghana Stock Exchange",
+    sourceUrl: "",
     category: "Investing",
-    categoryColor: "#6b21a8",
-    categoryBg: "#faf5ff",
-    categoryBorder: "#e9d5ff",
     time: "1d ago",
+    readTime: "5 min read",
     image: "https://picsum.photos/seed/tbills-gse-invest/800/450",
     summary: "A beginner's guide to Treasury Bills, current yields, and how to buy them via mobile money.",
+    paragraphs: [],
   },
 ];
 
@@ -76,6 +86,10 @@ export default function HomeScreen() {
 
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
 
+  // Live news for the mini-feed, falling back to the bundled preview when
+  // offline — the same pattern the News tab uses, so the two agree.
+  const [newsPreview, setNewsPreview] = useState<Article[]>(HOME_NEWS_PREVIEW);
+
   // Pull the real dashboard (XP, streak, lessons, badges) from the backend
   // every time this screen comes into focus, and sync it into the store.
   useFocusEffect(
@@ -89,6 +103,18 @@ export default function HomeScreen() {
         .catch(() => {
           // Offline or server down — keep whatever is already in the store.
         });
+
+      contentService
+        .getNews()
+        .then((res) => {
+          if (active && Array.isArray(res.data) && res.data.length > 0) {
+            setNewsPreview(mapBackendNews(res.data).slice(0, NEWS_PREVIEW_COUNT));
+          }
+        })
+        .catch(() => {
+          // Offline — keep the bundled preview articles.
+        });
+
       return () => {
         active = false;
       };
@@ -289,7 +315,7 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 12, paddingRight: 4 }}
           >
-            {HOME_NEWS_PREVIEW.map((item) => (
+            {newsPreview.map((item) => (
               <Pressable
                 key={item.id}
                 onPress={() => router.push("/(tabs)/news")}
@@ -312,8 +338,8 @@ export default function HomeScreen() {
                     position: "absolute",
                     top: 10,
                     left: 10,
-                    backgroundColor: item.categoryBg,
-                    borderColor: item.categoryBorder,
+                    backgroundColor: categoryMeta(item.category).bg,
+                    borderColor: categoryMeta(item.category).border,
                     borderWidth: 1,
                     borderRadius: 999,
                     paddingHorizontal: 8,
@@ -321,7 +347,7 @@ export default function HomeScreen() {
                   }}
                 >
                   <Text
-                    style={{ color: item.categoryColor, fontSize: 9, fontWeight: "700" }}
+                    style={{ color: categoryMeta(item.category).text, fontSize: 9, fontWeight: "700" }}
                   >
                     {item.category.toUpperCase()}
                   </Text>

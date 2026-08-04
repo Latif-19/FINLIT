@@ -159,7 +159,7 @@ export default function LoginScreen() {
           {/* Error Message */}
           {error ? (
             <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
-              <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+              <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
               <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
             </View>
           ) : null}

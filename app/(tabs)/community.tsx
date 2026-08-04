@@ -326,7 +326,7 @@ export default function CommunityScreen() {
                 <Ionicons
                   name={post.likedByUser ? "heart" : "heart-outline"}
                   size={17}
-                  color={post.likedByUser ? "#ef4444" : "#94a3b8"}
+                  color={post.likedByUser ? colors.danger : colors.gray}
                 />
                 <Text
                   className={`text-xs font-inter-bold ml-1.5 ${
@@ -459,7 +459,7 @@ export default function CommunityScreen() {
                 className="bg-brand-slateBg rounded-2xl p-4 text-base font-inter-semibold text-brand-dark border border-brand-border min-h-[160]"
                 multiline
                 placeholder="What is on your mind? Ask a question, share a victory, or give a tip..."
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor={colors.gray}
                 value={newPostContent}
                 onChangeText={setNewPostContent}
               />
@@ -541,7 +541,7 @@ export default function CommunityScreen() {
                       <Ionicons
                         name={activePost.likedByUser ? "heart" : "heart-outline"}
                         size={20}
-                        color={activePost.likedByUser ? "#ef4444" : "#9ca3af"}
+                        color={activePost.likedByUser ? colors.danger : colors.gray}
                       />
                       <Text
                         className={`text-sm font-inter-bold ml-2 ${
@@ -612,7 +612,7 @@ export default function CommunityScreen() {
                 <TextInput
                   className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-sm font-inter-semibold text-brand-dark"
                   placeholder={`Reply to ${activePost.author}...`}
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={colors.gray}
                   value={replyText}
                   onChangeText={setReplyText}
                 />
@@ -629,7 +629,7 @@ export default function CommunityScreen() {
                   <Ionicons
                     name="send"
                     size={16}
-                    color={replyText.trim() ? "white" : "#9ca3af"}
+                    color={replyText.trim() ? "white" : colors.gray}
                   />
                 </Pressable>
               </View>

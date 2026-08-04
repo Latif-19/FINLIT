@@ -341,7 +341,7 @@ export default function AiTutorScreen() {
             value={inputText}
             onChangeText={setInputText}
             placeholder="Ask a financial question..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.gray}
             className="flex-1 bg-brand-slateBg border border-brand-border rounded-2xl px-4 py-3 text-base text-brand-dark font-inter"
             onSubmitEditing={() => handleSend(inputText)}
             editable={!isTyping}
@@ -362,7 +362,7 @@ export default function AiTutorScreen() {
             <Ionicons
               name="send"
               size={18}
-              color={inputText.trim() ? "white" : "#94a3b8"}
+              color={inputText.trim() ? "white" : colors.gray}
             />
           </Pressable>
         </View>

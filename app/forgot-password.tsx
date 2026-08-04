@@ -355,7 +355,7 @@ export default function ForgotPasswordScreen() {
 
               {error ? (
                 <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
-                  <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+                  <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
                   <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
@@ -414,7 +414,7 @@ export default function ForgotPasswordScreen() {
 
               {error ? (
                 <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-2 flex-row items-center">
-                  <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+                  <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
                   <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
@@ -511,7 +511,7 @@ export default function ForgotPasswordScreen() {
                     <Ionicons
                       name={password === confirmPassword ? "checkmark-circle" : "close-circle"}
                       size={14}
-                      color={password === confirmPassword ? "#16A34A" : "#dc2626"}
+                      color={password === confirmPassword ? colors.success : colors.danger}
                     />
                     <Text
                       className={`text-xs font-inter-medium ml-1.5 ${
@@ -526,7 +526,7 @@ export default function ForgotPasswordScreen() {
 
               {error ? (
                 <View className="bg-red-50 border border-red-100 rounded-2xl p-3.5 mt-4 flex-row items-center">
-                  <Ionicons name="alert-circle-outline" size={18} color="#dc2626" />
+                  <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
                   <Text className="text-red-600 font-inter-semibold text-xs ml-2 flex-1">{error}</Text>
                 </View>
               ) : null}
