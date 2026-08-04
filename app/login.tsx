@@ -39,19 +39,14 @@ export default function LoginScreen() {
       return;
     }
 
-    // Authenticate against the backend.
     setIsLoading(true);
     try {
       const res = await authService.login({ email: email.trim(), password });
       const { user, token, refreshToken } = res.data;
       await tokenStorage.setTokens(token, refreshToken);
       useUserStore.getState().setAuthenticatedUser(user);
-      // Accounts that verified but never finished the onboarding assessment
-      // (e.g. the app was closed mid-flow) go there instead of the dashboard.
       router.replace(user.lastAssessedAt ? "/(tabs)/home" : "/assessment");
     } catch (err: any) {
-      // 403 = correct password but email not verified. The backend has just
-      // re-sent a fresh code, so take the user straight to the verify screen.
       if (err?.response?.status === 403) {
         router.replace({
           pathname: "/verify-email",
@@ -73,7 +68,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
       className="flex-1 bg-brand-slateBg"
     >
       {/* Decorative Accent Background */}
@@ -106,7 +101,7 @@ export default function LoginScreen() {
             Welcome Back
           </Text>
           <Text className="text-brand-gray font-inter text-sm mt-1 text-center">
-            Sign in to continue your financial journey.
+            Login to your account
           </Text>
         </View>
 
@@ -154,7 +149,7 @@ export default function LoginScreen() {
           {/* Forgot Password */}
           <Pressable
             onPress={() => router.push("/forgot-password")}
-            className="mt-3 self-end active:opacity-70"
+            className="mt-2 self-end active:opacity-70"
           >
             <Text className="text-brand-emerald font-inter-semibold text-sm">
               Forgot Password?
@@ -177,12 +172,12 @@ export default function LoginScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
               opacity: pressed || isLoading ? 0.95 : 1,
             })}
-            className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center"
+            className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/15 justify-center items-center active:opacity-90"
           >
             {isLoading ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text className="text-white text-center font-inter-semibold text-base">Sign In</Text>
+              <Text className="text-white text-center font-inter-semibold text-base">Login</Text>
             )}
           </Pressable>
 
@@ -235,14 +230,11 @@ export default function LoginScreen() {
         {/* Footer */}
         <View className="flex-row justify-center mt-8 pb-4">
           <Text className="text-brand-gray font-inter text-sm">
-            {"Don't have an account?"}
+            Don't have an account?{" "}
           </Text>
-
-          <Pressable
-            onPress={() => router.replace("/register")}
-          >
+          <Pressable onPress={() => router.replace("/register")}>
             <Text className="text-brand-emerald font-inter-bold text-sm ml-1.5">
-              Create Account
+              Sign up
             </Text>
           </Pressable>
         </View>

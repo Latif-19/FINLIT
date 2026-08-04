@@ -1,5 +1,5 @@
+import { getSemanticColors, getThemeVars } from "../constants/theme";
 import { useUserStore } from "../store/useUserStore";
-import { getThemeVars, getSemanticColors } from "../constants/theme";
 
 export function useThemeColors() {
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);

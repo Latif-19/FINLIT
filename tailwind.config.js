@@ -24,6 +24,10 @@ module.exports = {
         'inter-medium': ['Inter_500Medium'],
         'inter-semibold': ['Inter_600SemiBold'],
         'inter-bold': ['Inter_700Bold'],
+        poppins: ['Poppins_700Bold'],
+        'poppins-extrabold': ['Poppins_800ExtraBold'],
+        jakarta: ['PlusJakartaSans_700Bold'],
+        'jakarta-extrabold': ['PlusJakartaSans_800ExtraBold'],
       }
     },
   },

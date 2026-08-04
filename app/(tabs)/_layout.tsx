@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useUserStore } from "../../store/useUserStore";
 import { getThemeVars } from "../../constants/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUserStore } from "../../store/useUserStore";
 
 export default function TabsLayout() {
   const colorBlindMode = useUserStore((s) => s.colorBlindMode);

@@ -10,7 +10,7 @@ export default function SplashScreen() {
   useEffect(() => {
     Animated.timing(progress, {
       toValue: 100,
-      duration: 4000,
+      duration: 3000,
       useNativeDriver: false,
     }).start();
 
@@ -21,7 +21,7 @@ export default function SplashScreen() {
       } else {
         router.replace("/onboarding");
       }
-    }, 4000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [progress]);

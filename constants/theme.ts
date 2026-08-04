@@ -483,11 +483,11 @@ export const THEME_PRESETS = {
 };
 
 export function getThemeVars(
-  colorBlindMode: keyof typeof THEME_PRESETS.modes,
-  appThemeColor: keyof typeof THEME_PRESETS.modes.none,
+  colorBlindMode: keyof typeof THEME_PRESETS.modes = 'none',
+  appThemeColor: keyof typeof THEME_PRESETS.modes.none = 'emerald',
   isDark: boolean = false
 ): ThemeVars {
-  const modePresets = THEME_PRESETS.modes[colorBlindMode];
+  const modePresets = THEME_PRESETS.modes[colorBlindMode] || THEME_PRESETS.modes.none;
   const variant = modePresets[appThemeColor] || modePresets.emerald;
   return isDark ? variant.dark : variant.light;
 }

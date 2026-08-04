@@ -1,13 +1,31 @@
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback } from "react";
-import { ScrollView, Text, View, Pressable } from "react-native";
+import { ScrollView, Text, View, Pressable, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../store/useUserStore";
 import { gamificationService } from "../services/gamification";
 import { useThemeColors } from "../hooks/useThemeColors";
 
-// A professional vector icon per badge (replaces the emoji).
+// Badge title to image mapping
+const BADGE_IMAGES: Record<string, any> = {
+  "First Steps": require("../assets/first.jpg"),
+  "Getting Smart": require("../assets/gettingsmart.jpg"),
+  "Financial Guru": require("../assets/guru.jpg"),
+  "Perfect Score": require("../assets/pscore.jpg"),
+  "On Fire": require("../assets/fire.jpg"),
+  "Unstoppable": require("../assets/unstoppable.jpg"),
+  "Saver": require("../assets/saver.jpg"),
+  "Goal Crusher": require("../assets/crusher.jpg"),
+  "Explorer": require("../assets/explorer.jpg"),
+  "Curious Mind": require("../assets/curious_mind.png"),
+};
+
+function getBadgeImage(title: string) {
+  return BADGE_IMAGES[title] ?? null;
+}
+
+// A professional vector icon per badge (fallback)
 const BADGE_ICONS: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
   "first-lesson": "footsteps",
   "three-lessons": "library",
@@ -49,7 +67,7 @@ export default function BadgesScreen() {
   const locked = badges.filter((b) => b.unlockedAt === null);
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg dark:bg-slate-950">
       <ScrollView
         contentContainerStyle={{ paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
@@ -64,7 +82,7 @@ export default function BadgesScreen() {
             <Ionicons name="arrow-back" size={20} color="white" />
           </Pressable>
 
-          <Text className="text-brand-gold text-[10px] font-inter-semibold uppercase tracking-widest">
+          <Text className="text-brand-gold dark:text-amber-400 text-[10px] font-inter-semibold uppercase tracking-widest">
             Your Achievements
           </Text>
           <Text className="text-white text-[28px] font-inter-bold mt-1 tracking-tight">
@@ -87,69 +105,89 @@ export default function BadgesScreen() {
           {/* Unlocked badges */}
           {unlocked.length > 0 && (
             <>
-              <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
+              <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
                 EARNED ({unlocked.length})
               </Text>
               <View className="flex-row flex-wrap gap-3 mb-6">
-                {unlocked.map((badge) => (
-                  <View
-                    key={badge.id}
-                    className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
-                  >
-                    <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center">
-                      <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
-                    </View>
-                    <Text className="text-brand-navy text-sm font-inter-bold mt-3">
-                      {badge.name}
-                    </Text>
-                    <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
-                      {badge.description}
-                    </Text>
-                    <View className="flex-row items-center mt-2">
-                      <Ionicons name="checkmark-circle" size={12} color={colors.emerald} />
-                      <Text className="text-brand-emerald text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
-                        Earned
+                {unlocked.map((badge) => {
+                  const imgSource = getBadgeImage(badge.name);
+                  return (
+                    <View
+                      key={badge.id}
+                      className="bg-brand-bg rounded-2xl border border-brand-emerald/20 p-4 w-[47%] shadow-md shadow-slate-100/40"
+                    >
+                      <View className="w-14 h-14 bg-brand-emerald/10 rounded-2xl items-center justify-center overflow-hidden">
+                        {imgSource ? (
+                          <Image
+                            source={imgSource}
+                            style={{ width: 36, height: 36, resizeMode: "contain" }}
+                          />
+                        ) : (
+                          <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.emerald} />
+                        )}
+                      </View>
+                      <Text className="text-brand-navy text-sm font-inter-bold mt-3">
+                        {badge.name}
                       </Text>
+                      <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
+                        {badge.description}
+                      </Text>
+                      <View className="flex-row items-center mt-2">
+                        <Ionicons name="checkmark-circle" size={12} color={colors.emerald} />
+                        <Text className="text-brand-emerald text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
+                          Earned
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                ))}
+                  );
+                })}
               </View>
             </>
           )}
 
           {/* Locked badges */}
-          <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
+          <Text className="text-brand-gray dark:text-slate-400 text-[10px] font-inter-semibold uppercase tracking-widest mb-3 ml-2">
             LOCKED ({locked.length})
           </Text>
           <View className="flex-row flex-wrap gap-3">
-            {locked.map((badge) => (
-              <View
-                key={badge.id}
-                className="bg-brand-bg rounded-2xl border border-brand-border p-4 w-[47%] shadow-sm opacity-60"
-              >
-                <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center">
-                  <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
-                </View>
-                <Text className="text-brand-navy text-sm font-inter-bold mt-3">
-                  {badge.name}
-                </Text>
-                <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
-                  {badge.description}
-                </Text>
-                <View className="flex-row items-center mt-2">
-                  <Ionicons name="lock-closed" size={12} color={colors.gray} />
-                  <Text className="text-brand-gray text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
-                    Locked
+            {locked.map((badge) => {
+              const imgSource = getBadgeImage(badge.name);
+              return (
+                <View
+                  key={badge.id}
+                  className="bg-brand-bg rounded-2xl border border-brand-border p-4 w-[47%] shadow-sm opacity-60"
+                >
+                  <View className="w-14 h-14 bg-brand-slateBg rounded-2xl items-center justify-center overflow-hidden">
+                    {imgSource ? (
+                      <Image
+                        source={imgSource}
+                        style={{ width: 36, height: 36, resizeMode: "contain", opacity: 0.5 }}
+                      />
+                    ) : (
+                      <Ionicons name={badgeIcon(badge.id)} size={28} color={colors.gray} />
+                    )}
+                  </View>
+                  <Text className="text-brand-navy text-sm font-inter-bold mt-3">
+                    {badge.name}
                   </Text>
+                  <Text className="text-brand-gray text-[10px] font-inter mt-1 leading-4">
+                    {badge.description}
+                  </Text>
+                  <View className="flex-row items-center mt-2">
+                    <Ionicons name="lock-closed" size={12} color={colors.gray} />
+                    <Text className="text-brand-gray text-[10px] font-inter-bold ml-1 uppercase tracking-wider">
+                      Locked
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
 
           {/* Tip */}
-          <View className="flex-row items-start bg-brand-navy/5 border border-brand-navy/10 rounded-2xl p-4 mt-6">
+          <View className="flex-row items-start bg-brand-navy/5 dark:bg-slate-700/60 border border-brand-navy/10 rounded-2xl p-4 mt-6">
             <Ionicons name="bulb-outline" size={18} color={colors.navy} style={{ marginTop: 2 }} />
-            <Text className="text-brand-gray text-xs font-inter ml-2 flex-1 leading-5">
+            <Text className="text-brand-gray dark:text-slate-400 text-xs font-inter ml-2 flex-1 leading-5">
               Complete lessons, maintain streaks, and use app features to unlock more badges.
             </Text>
           </View>

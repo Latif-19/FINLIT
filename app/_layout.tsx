@@ -1,7 +1,7 @@
 import { Stack, useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Appearance, View } from "react-native";
 import { vars } from "nativewind";
 import { useUserStore } from "../store/useUserStore";
 import { getThemeVars } from "../constants/theme";
@@ -14,6 +14,8 @@ import {
   Inter_600SemiBold,
   Inter_700Bold
 } from "@expo-google-fonts/inter";
+import { Poppins_700Bold, Poppins_800ExtraBold } from "@expo-google-fonts/poppins";
+import { PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from "@expo-google-fonts/plus-jakarta-sans";
 import * as SplashScreen from "expo-splash-screen";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 import { PaystackProvider } from "react-native-paystack-webview";
@@ -84,6 +86,10 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Poppins_700Bold,
+    Poppins_800ExtraBold,
+    PlusJakartaSans_700Bold,
+    PlusJakartaSans_800ExtraBold,
   });
 
   // Monitor store hydration and font loading
@@ -104,6 +110,13 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded, fontError, isHydrated]);
+
+  // Apply the user's preferred color scheme (dark / light / follow system).
+  useEffect(() => {
+    if (typeof Appearance.setColorScheme === "function") {
+      Appearance.setColorScheme(isDarkMode ? "dark" : "light");
+    }
+  }, [isDarkMode]);
 
   if (!isHydrated || (!fontsLoaded && !fontError)) {
     return null;

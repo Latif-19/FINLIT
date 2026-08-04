@@ -1,6 +1,18 @@
 import { router } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { Pressable, Text, TextInput, View, KeyboardAvoidingView, Platform, ScrollView, Image, Keyboard, ActivityIndicator, Alert } from "react-native";
+import {
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Image,
+  Keyboard,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { authService } from "../services/auth";
@@ -9,6 +21,13 @@ import "@/types/navigation";
 export default function RegisterScreen() {
   const colors = useThemeColors();
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   useEffect(() => {
@@ -27,13 +46,6 @@ export default function RegisterScreen() {
       hideSubscription.remove();
     };
   }, []);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async () => {
     setError("");
@@ -55,7 +67,6 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Create the account on the backend.
     setIsLoading(true);
     try {
       await authService.register({
@@ -63,8 +74,6 @@ export default function RegisterScreen() {
         email: email.trim(),
         password,
       });
-      // Strict verification: no tokens yet. Send the user to confirm the code
-      // emailed to them; the assessment starts after they verify.
       router.replace({
         pathname: "/verify-email",
         params: { email: email.trim(), flow: "register" },
@@ -84,7 +93,7 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 0}
       className="flex-1 bg-brand-slateBg"
     >
       {/* Decorative Accent Background */}
@@ -242,12 +251,12 @@ export default function RegisterScreen() {
               transform: [{ scale: pressed ? 0.98 : 1 }],
               opacity: pressed || isLoading ? 0.95 : 1,
             })}
-            className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center"
+            className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/15 justify-center items-center active:opacity-90"
           >
             {isLoading ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text className="text-white text-center font-inter-semibold text-base">Create Account</Text>
+              <Text className="text-white text-center font-inter-semibold text-base">Sign Up</Text>
             )}
           </Pressable>
 
@@ -301,7 +310,7 @@ export default function RegisterScreen() {
         <View className="flex-row justify-center mt-8 pb-4">
           <Text className="text-brand-gray font-inter text-sm">Already have an account? </Text>
           <Pressable onPress={() => router.replace("/login")}>
-            <Text className="text-brand-emerald font-inter-bold text-sm ml-1.5">Sign In</Text>
+            <Text className="text-brand-emerald font-inter-bold text-sm ml-1.5">Login</Text>
           </Pressable>
         </View>
 

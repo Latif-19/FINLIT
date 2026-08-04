@@ -97,9 +97,9 @@ export default function AssessmentScreen() {
   const progressPercentage = (completedCount / totalQuestions) * 100;
 
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
+    <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg dark:bg-slate-950">
       {/* Decorative Accent Background */}
-      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 dark:bg-slate-700/60 rounded-b-[100px] -z-10" />
 
       {/* Header Container */}
       <View className="flex-row items-center px-6 pt-14 pb-4">
@@ -110,7 +110,7 @@ export default function AssessmentScreen() {
         >
           <Ionicons name="arrow-back" size={22} color={colors.navy} />
         </Pressable>
-        <Text className="text-lg font-inter-semibold text-brand-navy ml-4 flex-1 text-center pr-10">
+        <Text className="text-lg font-inter-semibold text-brand-navy dark:text-slate-100 ml-4 flex-1 text-center pr-10">
           Assessment
         </Text>
       </View>
@@ -118,10 +118,10 @@ export default function AssessmentScreen() {
       {/* Progress Bar */}
       <View className="px-6 mb-6">
         <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider">
+          <Text className="text-brand-gray dark:text-slate-400 font-inter-semibold text-xs uppercase tracking-wider">
             Progress
           </Text>
-          <Text className="text-brand-emerald font-inter-bold text-xs">
+          <Text className="text-brand-emerald dark:text-emerald-400 font-inter-bold text-xs">
             {completedCount} / {totalQuestions} Questions
           </Text>
         </View>
@@ -140,10 +140,10 @@ export default function AssessmentScreen() {
       >
         {/* Branding header */}
         <View className="items-center mb-6">
-          <Text className="text-[32px] font-inter-bold text-brand-navy text-center tracking-tight leading-10">
+          <Text className="text-[32px] font-inter-bold text-brand-navy dark:text-slate-100 text-center tracking-tight leading-10">
             Financial Literacy
           </Text>
-          <Text className="text-brand-gray font-inter text-sm mt-1.5 text-center px-6 leading-5">
+          <Text className="text-brand-gray dark:text-slate-400 font-inter text-sm mt-1.5 text-center px-6 leading-5">
             Help us personalize your roadmap and lessons to fit your knowledge base.
           </Text>
         </View>
@@ -154,10 +154,10 @@ export default function AssessmentScreen() {
             key={qIndex}
             className="bg-brand-bg rounded-2xl p-5 border border-brand-border mb-6 shadow-md shadow-slate-100/40"
           >
-            <Text className="text-brand-gray font-inter-semibold text-xs uppercase tracking-wider mb-2">
+            <Text className="text-brand-gray dark:text-slate-400 font-inter-semibold text-xs uppercase tracking-wider mb-2">
               Question {qIndex + 1}
             </Text>
-            <Text className="text-lg font-inter-semibold text-brand-navy mb-4">
+            <Text className="text-lg font-inter-semibold text-brand-navy dark:text-slate-100 mb-4">
               {item.question}
             </Text>
 
