@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -92,14 +94,24 @@ public class GamificationService {
             correctAnswers.add(correctIdx);
         }
 
-        // Score the submitted answers against the correct indices.
+        // Score the submitted answers against the correct indices. Each question
+        // may only count once — the submitted list is client-controlled, so
+        // without this the same correct answer could be repeated to run the
+        // score (and the XP below) far past the number of questions.
+        Set<Integer> scoredQuestions = new HashSet<>();
         int score = 0;
         for (QuizAnswerDto answer : answers) {
             int qi = answer.questionIndex();
-            if (qi >= 0 && qi < total && answer.selectedOptionIndex().equals(correctAnswers.get(qi))) {
+            if (qi >= 0 && qi < total
+                    && scoredQuestions.add(qi)
+                    && answer.selectedOptionIndex().equals(correctAnswers.get(qi))) {
                 score++;
             }
         }
+
+        // Whether XP is owed has to be read BEFORE saving this attempt, or the
+        // attempt we're about to write would itself count as a prior one.
+        boolean firstAttempt = !quizAttemptRepository.existsByUserIdAndModuleId(userId, moduleId);
 
         // Record the attempt (feeds the progress dashboard's quizScores).
         QuizAttempt attempt = new QuizAttempt();
@@ -109,11 +121,15 @@ public class GamificationService {
         attempt.setTotalQuestions(total);
         quizAttemptRepository.save(attempt);
 
-        // Award XP for correct answers, then re-check badges (e.g. Perfect Score).
+        // XP only on the first attempt at a module, matching how lesson
+        // completion works — otherwise a quiz could be resubmitted for XP
+        // indefinitely. Retakes still record a score for the dashboard.
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        user.setXp(user.getXp() + score * 10);
-        userRepository.save(user);
+        if (firstAttempt) {
+            user.setXp(user.getXp() + score * 10);
+            userRepository.save(user);
+        }
         badgeService.evaluate(userId);
 
         return new QuizSubmitResponse(score, total, correctAnswers);
