@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "FinLit-v2",
+    "name": "FinLit",
     "slug": "FinLit-v2",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -34,9 +34,9 @@
           "image": "./assets/images/finlit-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#111B21",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#111B21"
           }
         }
       ]
