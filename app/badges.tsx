@@ -77,7 +77,7 @@ export default function BadgesScreen() {
           {/* Back Button */}
           <Pressable
             onPress={() => router.back()}
-            className="w-9 h-9 bg-white/10 rounded-full items-center justify-center border border-white/20 mb-5 active:opacity-80"
+            className="w-9 h-9 bg-brand-border/40 rounded-full items-center justify-center border border-brand-border/60 mb-5 active:opacity-80"
           >
             <Ionicons name="arrow-back" size={20} color="white" />
           </Pressable>
@@ -93,7 +93,7 @@ export default function BadgesScreen() {
           </Text>
 
           {/* Progress bar */}
-          <View className="w-full h-2 bg-white/10 rounded-full mt-4 overflow-hidden">
+          <View className="w-full h-2 bg-brand-border/40 rounded-full mt-4 overflow-hidden">
             <View
               style={{ width: `${(unlocked.length / badges.length) * 100}%` }}
               className="h-full bg-brand-gold rounded-full"
@@ -185,7 +185,7 @@ export default function BadgesScreen() {
           </View>
 
           {/* Tip */}
-          <View className="flex-row items-start bg-brand-navy/5 dark:bg-slate-700/60 border border-brand-navy/10 rounded-2xl p-4 mt-6">
+          <View className="flex-row items-start bg-brand-navy/5 bg-brand-slateBg border border-brand-navy/10 rounded-2xl p-4 mt-6">
             <Ionicons name="bulb-outline" size={18} color={colors.navy} style={{ marginTop: 2 }} />
             <Text className="text-brand-gray text-xs font-inter ml-2 flex-1 leading-5">
               Complete lessons, maintain streaks, and use app features to unlock more badges.

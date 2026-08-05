@@ -1,20 +1,21 @@
 import { Stack, useRouter, useSegments, useRootNavigationState } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import { Appearance, View } from "react-native";
+import { Appearance, View, Image } from "react-native";
 import { vars } from "nativewind";
 import { useUserStore } from "../store/useUserStore";
 import { getThemeVars } from "../constants/theme";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import "../global.css";
 import "@/types/navigation";
 import {
   useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold
-} from "@expo-google-fonts/inter";
-import { Poppins_700Bold, Poppins_800ExtraBold } from "@expo-google-fonts/poppins";
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+  Poppins_800ExtraBold
+} from "@expo-google-fonts/poppins";
 import { PlusJakartaSans_700Bold, PlusJakartaSans_800ExtraBold } from "@expo-google-fonts/plus-jakarta-sans";
 import * as SplashScreen from "expo-splash-screen";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
@@ -77,15 +78,11 @@ function NavigationGuard() {
 
 export default function RootLayout() {
   const [isHydrated, setIsHydrated] = useState(false);
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const isDarkMode = useUserStore((s) => s.isDarkMode);
 
   const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
     Poppins_700Bold,
     Poppins_800ExtraBold,
     PlusJakartaSans_700Bold,
@@ -110,20 +107,27 @@ export default function RootLayout() {
       SplashScreen.hideAsync().catch(() => {});
     }
   }, [fontsLoaded, fontError, isHydrated]);
+  // Resolve active theme variables style object
+  const themePreference = useUserStore((s) => s.themePreference);
+  const { isDark: isDarkMode } = useThemeColors();
+  const activeThemeVars = getThemeVars("none", "emerald", isDarkMode);
 
-  // Apply the user's preferred color scheme (dark / light / follow system).
+  // Keep the native scheme in sync with the user's choice. In "system" mode
+  // pass null to UNPIN any previously forced scheme so the OS drives changes
+  // live again (without this, an earlier dark/light pin keeps the app stuck).
   useEffect(() => {
     if (typeof Appearance.setColorScheme === "function") {
-      Appearance.setColorScheme(isDarkMode ? "dark" : "light");
+      if (themePreference === "system") {
+        Appearance.setColorScheme(null);
+      } else {
+        Appearance.setColorScheme(isDarkMode ? "dark" : "light");
+      }
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, themePreference]);
 
   if (!isHydrated || (!fontsLoaded && !fontError)) {
     return null;
   }
-
-  // Resolve active theme variables style object
-  const activeThemeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
 
   return (
     <PaystackProvider publicKey={PAYSTACK_PUBLIC_KEY} currency="GHS" defaultChannels={["card", "mobile_money", "bank_transfer"]}>

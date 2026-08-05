@@ -1,20 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { getThemeVars } from "../../constants/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useUserStore } from "../../store/useUserStore";
+import { useThemeColors } from "@/hooks/useThemeColors";
 
 export default function TabsLayout() {
-  const colorBlindMode = useUserStore((s) => s.colorBlindMode);
-  const appThemeColor = useUserStore((s) => s.appThemeColor);
-  const isDarkMode = useUserStore((s) => s.isDarkMode);
-  const themeVars = getThemeVars(colorBlindMode, appThemeColor, isDarkMode);
+
   const insets = useSafeAreaInsets();
 
-  const activeColor = themeVars["--color-brand-emerald"];
-  const inactiveColor = themeVars["--color-brand-gray"];
-  const tabBgColor = themeVars["--color-brand-bg"];
-  const tabBorderColor = themeVars["--color-brand-border"];
+  const colors = useThemeColors();
+  const activeColor = colors.emerald;
+  const inactiveColor = colors.gray;
+  const tabBgColor = colors.bg;
+  const tabBorderColor = colors.border;
 
   return (
     <Tabs
@@ -33,7 +30,7 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: tabBgColor,
           borderTopColor: tabBorderColor,
-          borderTopWidth: colorBlindMode === 'high-contrast' ? 2 : 1,
+          borderTopWidth: 1,
           height: 60 + (insets.bottom > 0 ? insets.bottom : 10),
           paddingBottom: insets.bottom > 0 ? insets.bottom + 2 : 12,
           paddingTop: 8,

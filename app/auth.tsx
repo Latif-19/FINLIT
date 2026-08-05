@@ -5,41 +5,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AuthScreen() {
   return (
-    <SafeAreaView className="flex-1 bg-brand-slateBg justify-between px-6 py-8">
+    <SafeAreaView className="flex-1 bg-brand-slateBg items-center px-6 py-8">
       {/* Decorative Top Accent Backdrop */}
       <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
 
       {/* Top Branding Section */}
-      <View className="items-center mt-6">
-        <View className="w-24 h-24 bg-brand-bg rounded-3xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
-          <Image
+      <View className="items-center flex-1 justify-center">
+        <Image
             source={require("../assets/images/finlit-logo.png")}
-            className="w-20 h-20"
+            className="w-64 h-64"
             resizeMode="contain"
-          />
-        </View>
-        <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
-          FinLit
-        </Text>
-        <Text className="text-xs uppercase font-inter-semibold text-brand-emerald tracking-widest mt-2 bg-brand-emerald/10 px-3.5 py-1.5 rounded-full">
+        />
+        <Text className="text-[28px] font-inter-bold text-brand-emerald mt-4">
           Financial Freedom Guide
         </Text>
       </View>
 
-      {/* Mid Section: Engaging Value Proposition */}
-      <View className="my-8 px-2">
-        <Text className="text-[32px] font-inter-bold text-brand-textPrimary text-center tracking-tight leading-[38px]">
-          Master Your Money.{"\n"}
-          <Text className="text-brand-emerald">Own Your Future.</Text>
-        </Text>
-        
-
-
-
-      </View>
-
       {/* Bottom Actions Section */}
-      <View className="w-full mb-4">
+        <View className="w-full max-w-xs mx-auto mb-12 bg-brand-slateBg rounded-2xl p-2">
         {/* Create Account Button */}
         <Pressable
           onPress={() => router.push("/register")}
@@ -47,9 +30,9 @@ export default function AuthScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
             opacity: pressed ? 0.95 : 1,
           })}
-          className="bg-brand-navy h-14 rounded-2xl justify-center items-center shadow-lg shadow-brand-navy/15"
+          className="bg-brand-emerald h-12 rounded-2xl justify-center items-center shadow-lg shadow-brand-emerald/15"
         >
-          <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
+          <Text className="text-white text-center font-inter-semibold text-base">
             Create Free Account
           </Text>
         </Pressable>
@@ -61,9 +44,9 @@ export default function AuthScreen() {
             transform: [{ scale: pressed ? 0.98 : 1 }],
             opacity: pressed ? 0.95 : 1,
           })}
-          className="border border-brand-navy/20 bg-brand-bg h-14 rounded-2xl justify-center items-center mt-4 active:bg-brand-slateBg"
+          className="border border-brand-navy/20 bg-brand-bg h-12 rounded-2xl justify-center items-center mt-2 shadow-lg shadow-brand-navy/15 active:bg-brand-slateBg"
         >
-          <Text className="text-brand-textPrimary text-center font-inter-semibold text-base">
+          <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
             Already have an account? Sign In
           </Text>
         </Pressable>

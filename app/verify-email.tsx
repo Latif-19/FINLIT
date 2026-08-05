@@ -186,7 +186,7 @@ export default function VerifyEmailScreen() {
             className="bg-brand-navy h-14 rounded-2xl justify-center items-center shadow-lg shadow-brand-navy/15 mt-6"
           >
             {isLoading ? (
-              <ActivityIndicator color="#ffffff" />
+              <ActivityIndicator color={colors.bg} />
             ) : (
               <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">
                 Verify & Continue

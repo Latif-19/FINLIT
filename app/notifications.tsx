@@ -80,13 +80,6 @@ const SOCIAL_ITEMS: NotificationItem[] = [
   },
 ];
 
-const NOTIFICATION_ICONS: Record<AppNotification["type"], { icon: IoniconsName; color: string; bg: string }> = {
-  lesson_reminder: { icon: "book-outline", color: "#16A34A", bg: "bg-green-50" },
-  streak_reminder: { icon: "flame-outline", color: "#F59E0B", bg: "bg-amber-50" },
-  badge_earned: { icon: "trophy-outline", color: "#7C3AED", bg: "bg-purple-50" },
-  leaderboard_milestone: { icon: "podium-outline", color: "#2563EB", bg: "bg-blue-50" },
-};
-
 function getTimeAgo(dateString: string): string {
   const now = new Date();
   const date = new Date(dateString);
@@ -100,37 +93,17 @@ function getTimeAgo(dateString: string): string {
   return `${diffDays}d ago`;
 }
 
-function NotificationCard({ notification }: { notification: AppNotification }) {
-  const style = NOTIFICATION_ICONS[notification.type];
-  return (
-    <View className={`flex-row items-start p-4 ${notification.read ? "opacity-60" : ""}`}>
-      <View className={`w-10 h-10 rounded-xl ${style.bg} justify-center items-center mr-3`}>
-        <Ionicons name={style.icon} size={20} color={style.color} />
-      </View>
-      <View className="flex-1 mr-2">
-        <View className="flex-row items-center gap-2">
-          <Text className="text-[14px] font-inter-semibold text-brand-textPrimary flex-1" numberOfLines={1}>
-            {notification.title}
-          </Text>
-          {!notification.read && (
-            <View className="w-2 h-2 rounded-full bg-brand-emerald" />
-          )}
-        </View>
-        <Text className="text-[12px] text-brand-gray mt-0.5 leading-[16px]" numberOfLines={2}>
-          {notification.body}
-        </Text>
-        <Text className="text-[10px] text-brand-gray mt-1 font-inter-medium">
-          {getTimeAgo(notification.createdAt)}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
 export default function NotificationsScreen() {
   const colors = useThemeColors();
   const notificationPrefs = useUserStore((s) => s.notificationPrefs);
   const setNotificationPref = useUserStore((s) => s.setNotificationPref);
+
+  const NOTIFICATION_ICONS: Record<AppNotification["type"], { icon: IoniconsName; color: string; bg: string }> = {
+    lesson_reminder: { icon: "book-outline", color: colors.success, bg: "bg-green-50" },
+    streak_reminder: { icon: "flame-outline", color: "#F59E0B", bg: "bg-amber-50" },
+    badge_earned: { icon: "trophy-outline", color: colors.danger, bg: "bg-purple-50" },
+    leaderboard_milestone: { icon: "podium-outline", color: "#2563EB", bg: "bg-blue-50" },
+  };
 
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -174,6 +147,33 @@ export default function NotificationsScreen() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  function NotificationCard({ notification }: { notification: AppNotification }) {
+    const style = NOTIFICATION_ICONS[notification.type];
+    return (
+      <View className={`flex-row items-start p-4 ${notification.read ? "opacity-60" : ""}`}>
+        <View className={`w-10 h-10 rounded-xl ${style.bg} justify-center items-center mr-3`}>
+          <Ionicons name={style.icon} size={20} color={style.color} />
+        </View>
+        <View className="flex-1 mr-2">
+          <View className="flex-row items-center gap-2">
+            <Text className="text-[14px] font-inter-semibold text-brand-textPrimary flex-1" numberOfLines={1}>
+              {notification.title}
+            </Text>
+            {!notification.read && (
+              <View className="w-2 h-2 rounded-full bg-brand-emerald" />
+            )}
+          </View>
+          <Text className="text-[12px] text-brand-gray mt-0.5 leading-[16px]" numberOfLines={2}>
+            {notification.body}
+          </Text>
+          <Text className="text-[10px] text-brand-gray mt-1 font-inter-medium">
+            {getTimeAgo(notification.createdAt)}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
   const renderToggleRow = (item: NotificationItem) => (
     <View key={item.key} className="flex-row items-center py-3.5 px-4">
       <View className="w-[38px] h-[38px] rounded-[10px] bg-brand-emerald/10 justify-center items-center mr-3">
@@ -186,8 +186,8 @@ export default function NotificationsScreen() {
       <Switch
         value={notificationPrefs[item.key] ?? item.defaultValue}
         onValueChange={() => handleToggle(item.key)}
-        trackColor={{ false: '#e2e8f0', true: '#16A34A' }}
-        thumbColor="#ffffff"
+        trackColor={{ false: colors.gray, true: colors.success }}
+        thumbColor={colors.text}
       />
     </View>
   );
@@ -197,7 +197,7 @@ export default function NotificationsScreen() {
       {/* Header */}
       <View className="flex-row items-center px-5 pt-4 pb-3">
         <Pressable onPress={() => router.back()} className="w-10 h-10 rounded-full bg-brand-bg justify-center items-center border border-brand-border">
-          <Ionicons name="arrow-back" size={24} color={colors.dark} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </Pressable>
         <View className="ml-3 flex-1">
           <Text className="text-[22px] font-inter-bold text-brand-textPrimary">Notifications</Text>
@@ -220,7 +220,7 @@ export default function NotificationsScreen() {
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16A34A" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.success} />}
       >
         {/* Recent Notifications */}
         <Text className="text-xs font-inter-semibold text-brand-gray tracking-wider mt-4 mb-2.5 ml-1">

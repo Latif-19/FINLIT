@@ -552,18 +552,18 @@ export default function AssessmentResultScreen() {
 
   // Determine financial tier configuration
   let tier = "Financial Novice";
-  let tierColor = "#b45309"; // amber-700
+  let tierColor = colors.warning; // amber-700 equivalent
   let tierTextClass = "text-amber-800";
   let badgeIcon = "school";
 
   if (score > 8 && score <= 12) {
     tier = "Smart Money Manager";
-    tierColor = "#16A34A"; // brand-emerald
+    tierColor = colors.emerald;
     tierTextClass = "text-green-800";
     badgeIcon = "ribbon";
   } else if (score > 12) {
     tier = "Wealth Builder Pro";
-    tierColor = "#1d4ed8"; // blue-700
+    tierColor = colors.info; // blue-700 equivalent
     tierTextClass = "text-blue-800";
     badgeIcon = "trophy";
   }
@@ -637,7 +637,7 @@ export default function AssessmentResultScreen() {
           <View className="items-center">
             {/* Visual radial indicator */}
             <View
-              className={`w-20 h-20 rounded-full items-center justify-center border-4 border-white shadow-sm`}
+              className={`w-20 h-20 rounded-full items-center justify-center border-4 border-brand-bg shadow-sm`}
               style={{ backgroundColor: tierColor + "15", borderColor: tierColor }}
             >
               <Ionicons name={badgeIcon as any} size={36} color={tierColor} />
@@ -822,11 +822,11 @@ export default function AssessmentResultScreen() {
         </View>
 
         {/* Dashboard Curation Info */}
-        <View className="bg-blue-50 border border-blue-100 p-4 rounded-2xl flex-row items-start mt-4">
-          <Ionicons name="color-wand-outline" size={22} color="#1d4ed8" style={{ marginRight: 12, marginTop: 2 }} />
+        <View className="bg-brand-emerald/10 border border-brand-emerald/20 p-4 rounded-2xl flex-row items-start mt-4">
+          <Ionicons name="color-wand-outline" size={22} color={colors.emerald} style={{ marginRight: 12, marginTop: 2 }} />
           <View className="flex-1">
-            <Text className="text-blue-900 font-inter-bold text-sm">Your Dashboard Is Ready</Text>
-            <Text className="text-blue-700 text-xs mt-1 leading-4">
+            <Text className="text-brand-emerald font-inter-bold text-sm">Your Dashboard Is Ready</Text>
+            <Text className="text-brand-textPrimary text-xs mt-1 leading-4">
               {"We've personalized your dashboard with lessons, goals, recommendations, news, and financial insights based on your assessment."}
             </Text>
           </View>

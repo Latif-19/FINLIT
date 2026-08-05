@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -21,6 +22,7 @@ import "@/types/navigation";
 
 export default function LoginScreen() {
   const colors = useThemeColors();
+  const insets = useSafeAreaInsets();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -74,29 +76,28 @@ export default function LoginScreen() {
       {/* Decorative Accent Background */}
       <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
 
+      {/* Back Button (pinned to safe area, outside the scrollable content) */}
+      <Pressable
+        onPress={() => router.back()}
+        style={{ top: insets.top + 8 }}
+        className="absolute left-6 z-10 p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
+      >
+        <Ionicons name="arrow-back" size={22} color={colors.navy} />
+      </Pressable>
+
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, justifyContent: "center", paddingVertical: 40 }}
         className="px-6"
         automaticallyAdjustKeyboardInsets={true}
         showsVerticalScrollIndicator={false}
       >
-        {/* Back Button */}
-        <Pressable
-          onPress={() => router.back()}
-          className="absolute top-14 left-6 z-10 p-2.5 bg-brand-bg rounded-full shadow-md border border-brand-border active:opacity-80"
-        >
-          <Ionicons name="arrow-back" size={22} color={colors.navy} />
-        </Pressable>
-
         {/* Branding header */}
         <View className="items-center mt-12">
-          <View className="w-16 h-16 bg-brand-bg rounded-2xl items-center justify-center shadow-md border border-brand-border overflow-hidden">
             <Image
               source={require("../assets/images/finlit-logo.png")}
-              className="w-14 h-14"
+              className="w-16 h-16"
               resizeMode="contain"
             />
-          </View>
           <Text className="text-[32px] font-inter-bold text-brand-textPrimary mt-4 tracking-tight">
             Welcome Back
           </Text>
@@ -115,7 +116,7 @@ export default function LoginScreen() {
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                placeholder="Enter your email"
+                placeholder="Enter your email" placeholderTextColor={colors.text}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
@@ -131,7 +132,7 @@ export default function LoginScreen() {
               <TextInput
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Enter your password"
+                placeholder="Enter your password" placeholderTextColor={colors.text}
                 secureTextEntry={!passwordVisible}
                 autoCapitalize="none"
                 className="flex-1 py-3.5 text-base text-brand-textPrimary font-inter"
@@ -175,7 +176,7 @@ export default function LoginScreen() {
             className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/15 justify-center items-center active:opacity-90"
           >
             {isLoading ? (
-              <ActivityIndicator size="small" color="#ffffff" />
+              <ActivityIndicator size="small" color={colors.bg} />
             ) : (
               <Text className="text-brand-textOnDark text-center font-inter-semibold text-base">Login</Text>
             )}

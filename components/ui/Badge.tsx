@@ -12,7 +12,7 @@ export function Badge({ label, variant ="forest", size ="md", icon }: BadgeProps
  const getVariantStyle = () => {
  switch (variant) {
  case"accent":
- return"bg-brand-gold/15 border border-brand-gold/30 text-[#052E1F]";
+ return"bg-brand-gold/15 border border-brand-gold/30 text-brand-navy";
  case"success":
  return"bg-emerald-500/10 border border-emerald-500/20 text-emerald-600";
  case"warning":

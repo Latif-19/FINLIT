@@ -28,44 +28,44 @@ interface BreakdownItem {
   color: string;
 }
 
-const getTierInfo = (score: number): TierInfo => {
+const getTierInfo = (score: number, colors: any): TierInfo => {
   if (score >= 13) {
     return {
       label: "Wealth Builder Pro",
-      color: "#1d4ed8",
-      bg: "#dbeafe",
+      color: colors.info,
+      bg: colors.info + "15",
       icon: "trophy",
     };
   }
   if (score >= 9) {
     return {
       label: "Smart Money Manager",
-      color: "#16A34A",
-      bg: "#dcfce7",
+      color: colors.emerald,
+      bg: colors.emerald + "15",
       icon: "ribbon",
     };
   }
   return {
     label: "Financial Novice",
-    color: "#b45309",
-    bg: "#fef3c7",
+    color: colors.warning,
+    bg: colors.warning + "15",
     icon: "school",
   };
 };
 
-const getBreakdowns = (score: number): BreakdownItem[] => [
+const getBreakdowns = (score: number, colors: any): BreakdownItem[] => [
   {
     category: "Budgeting",
     level: score >= 11 ? "Advanced" : score >= 7 ? "Intermediate" : "Beginner",
     icon: "wallet-outline",
-    color: score >= 11 ? "#16A34A" : score >= 7 ? "#b45309" : "#6b7280",
+    color: score >= 11 ? colors.emerald : score >= 7 ? colors.warning : colors.gray,
   },
   {
     category: "Savings",
     level:
       score >= 13 ? "Consistent" : score >= 8 ? "Moderate" : "Starting Out",
     icon: "cash-outline",
-    color: score >= 13 ? "#16A34A" : score >= 8 ? "#b45309" : "#6b7280",
+    color: score >= 13 ? colors.emerald : score >= 8 ? colors.warning : colors.gray,
   },
   {
     category: "Investing",
@@ -76,20 +76,21 @@ const getBreakdowns = (score: number): BreakdownItem[] => [
           ? "Interested"
           : "Uninitiated",
     icon: "trending-up-outline",
-    color: score >= 12 ? "#16A34A" : score >= 6 ? "#b45309" : "#6b7280",
+    color: score >= 12 ? colors.emerald : score >= 6 ? colors.warning : colors.gray,
   },
 ];
 
 const getLevelInfo = (
-  score: number
+  score: number,
+  colors: any
 ): { level: string; label: string; color: string } => {
   if (score >= 13) {
-    return { level: "Level 3", label: "Pro Builder", color: "#1d4ed8" };
+    return { level: "Level 3", label: "Pro Builder", color: colors.info };
   }
   if (score >= 8) {
-    return { level: "Level 2", label: "Manager", color: "#16A34A" };
+    return { level: "Level 2", label: "Manager", color: colors.emerald };
   }
-  return { level: "Level 1", label: "Novice", color: "#b45309" };
+  return { level: "Level 1", label: "Novice", color: colors.warning };
 };
 
 export default function AssessmentReviewScreen() {
@@ -98,9 +99,9 @@ export default function AssessmentReviewScreen() {
   const goal = useUserStore((s) => s.goal);
   const lastAssessedAt = useUserStore((s) => s.lastAssessedAt);
 
-  const tier = getTierInfo(score);
-  const breakdowns = getBreakdowns(score);
-  const levelInfo = getLevelInfo(score);
+  const tier = getTierInfo(score, colors);
+  const breakdowns = getBreakdowns(score, colors);
+  const levelInfo = getLevelInfo(score, colors);
   const hasAssessed = score > 0;
 
   return (
@@ -259,7 +260,7 @@ export default function AssessmentReviewScreen() {
             onPress={() => router.push("/assessment")}
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 rounded-2xl shadow-lg active:opacity-80"
           >
-            <Ionicons name="refresh-outline" size={20} color="#ffffff" />
+            <Ionicons name="refresh-outline" size={20} color={colors.bg} />
             <Text className="text-base font-inter-bold text-brand-textOnDark">
               Retake Assessment
             </Text>
@@ -282,7 +283,7 @@ export default function AssessmentReviewScreen() {
             onPress={() => router.push("/assessment")}
             className="bg-brand-emerald flex-row items-center justify-center gap-2 py-4 px-8 rounded-2xl shadow-lg active:opacity-80"
           >
-            <Ionicons name="rocket-outline" size={20} color="#ffffff" />
+            <Ionicons name="rocket-outline" size={20} color={colors.bg} />
             <Text className="text-base font-inter-bold text-brand-textOnDark">
               Take Assessment
             </Text>

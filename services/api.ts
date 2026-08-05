@@ -50,7 +50,10 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000,
+  // Generous timeout: the deployed backend (Render free tier) sleeps when idle
+  // and takes 30–60s to cold start, so a short timeout would make requests
+  // fail with "cannot reach the server" while the server is simply waking up.
+  timeout: 90000,
 });
 
 // Attach the access token to every outgoing request.

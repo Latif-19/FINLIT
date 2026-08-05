@@ -1,7 +1,8 @@
 import { router } from "expo-router";
-import React from "react";
+
 import { ScrollView, Text, View, Pressable, Switch, Image, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { Ionicons } from "@expo/vector-icons";
 import { useUserStore } from "../../store/useUserStore";
 import { useThemeColors } from "../../hooks/useThemeColors";
@@ -16,9 +17,11 @@ export default function ProfileScreen() {
   const avatar = useUserStore((s) => s.avatar);
   const streak = useUserStore((s) => s.streak);
   const createdAt = useUserStore((s) => s.createdAt);
-
-  const isDarkMode = useUserStore((s) => s.isDarkMode);
-  const setDarkMode = useUserStore((s) => s.setDarkMode);
+  // Theme preference handling
+  const themePreference = useUserStore((s) => s.themePreference);
+  const setThemePreference = useUserStore((s) => s.setThemePreference);
+  // Reactive — follows the OS scheme live, so "System Default" actually works.
+  const { isDark: isDarkMode } = useThemeColors();
 
   const colors = useThemeColors();
 
@@ -51,15 +54,28 @@ export default function ProfileScreen() {
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      const newUri = result.assets[0].uri;
-      useUserStore.getState().setAvatar(newUri);
       try {
-        await profileService.updateProfile({
-          name: userName,
-          avatar: newUri,
-        });
-      } catch {
-        // Optimistic local update already applied
+        // Shrink the photo to a small avatar so it uploads fast and stays
+        // inside the backend's avatar column, then embed it as a base64 data
+        // URI. A plain file:// URI would only exist on this device and would
+        // break everywhere else (and on reload), so we never store that.
+        const manipResult = await ImageManipulator.manipulateAsync(
+          result.assets[0].uri,
+          [{ resize: { width: 512, height: 512 } }],
+          { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG, base64: true }
+        );
+        const dataUri = `data:image/jpeg;base64,${manipResult.base64}`;
+        useUserStore.getState().setAvatar(dataUri);
+        try {
+          await profileService.updateProfile({
+            name: userName,
+            avatar: dataUri,
+          });
+        } catch {
+          // Optimistic local update already applied
+        }
+      } catch (e) {
+        Alert.alert("Upload failed", "Could not process that image. Please try another photo.");
       }
     }
   };
@@ -90,7 +106,7 @@ export default function ProfileScreen() {
             ) : avatar ? (
               <Text className="text-5xl">{avatar}</Text>
             ) : (
-              <Text className="text-brand-textPrimary text-3xl font-inter-bold">
+              <Text className="text-brand-dark text-3xl font-inter-bold">
                 {userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "FE"}
               </Text>
             )}
@@ -186,15 +202,42 @@ export default function ProfileScreen() {
         {/* Accessibility & Theming */}
         <Text className="text-brand-gray text-[10px] font-inter-semibold uppercase tracking-widest mt-8 mb-3 ml-2">ACCESSIBILITY & THEMING</Text>
         <View className="bg-brand-bg rounded-2xl border border-brand-border p-5 shadow-md shadow-brand-shadow">
-          <Pressable 
-            onPress={() => setDarkMode(!isDarkMode)} 
-            accessibilityRole="button" 
-            accessibilityLabel={`Switch to ${isDarkMode ? "light" : "dark"} mode`} 
-            className="flex-row items-center justify-between bg-brand-slateBg border border-brand-border rounded-xl p-3 active:opacity-80"
-          >
-            <Text className="text-brand-textPrimary text-sm font-inter-bold">{isDarkMode ? "Light Mode" : "Dark Mode"}</Text>
-            <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={20} color={colors.navy} />
-          </Pressable>
+            {/* Toggle Light/Dark Mode */}
+            <Pressable 
+              onPress={() => setThemePreference(isDarkMode ? "light" : "dark")} 
+              accessibilityRole="button" 
+              accessibilityLabel={`Switch to ${isDarkMode ? "light" : "dark"} mode`} 
+              className="flex-row items-center justify-between bg-brand-slateBg border border-brand-border rounded-xl p-3 active:opacity-80">
+              <Text className="text-brand-dark text-sm font-inter-bold">{isDarkMode ? "Light Mode" : "Dark Mode"}</Text>
+              <Ionicons name={isDarkMode ? "sunny-outline" : "moon-outline"} size={20} color={colors.navy} />
+            </Pressable>
+            {/* System Default Mode */}
+            <Pressable 
+              onPress={() => setThemePreference("system")} 
+              accessibilityRole="button" 
+              accessibilityLabel="Switch to System Default mode"
+              className="flex-row items-center justify-between bg-brand-slateBg border border-brand-border rounded-xl p-3 mt-2 active:opacity-80">
+              <Text className="text-brand-dark text-sm font-inter-bold">System Default</Text>
+              <Ionicons name="settings-outline" size={20} color={colors.navy} />
+            </Pressable>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
         </View>
 
         {/* Subscription Status Section */}

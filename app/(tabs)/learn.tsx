@@ -417,7 +417,7 @@ export default function LearnScreen() {
         {/* Certificate Progress Card */}
         <View className="bg-brand-bg rounded-2xl p-4 border-2 border-brand-border shadow-sm mb-5">
           <View className="flex-row justify-between items-center">
-            <View className="flex-row items-center bg-[#16A34A12] px-2 py-1 rounded-md gap-[3px]">
+            <View className="flex-row items-center bg-brand-emerald/10 px-2 py-1 rounded-md gap-[3px]">
               <Ionicons name="ribbon-outline" size={15} color={colors.emerald} />
               <Text className="text-[9px] font-inter-bold text-green-600">
                 ACCREDITED PATHWAY
@@ -469,7 +469,7 @@ export default function LearnScreen() {
             }
 
             const isBig = index % 2 === 0;
-            const nodeIconColor = isCompleted ? "#ffffff" : isCurrent ? colors.navy : "#64748b";
+            const nodeIconColor = isCompleted ? colors.bg : isCurrent ? colors.navy : colors.gray;
 
             return (
               <View
@@ -497,7 +497,7 @@ export default function LearnScreen() {
                       : isCurrent
                       ? "bg-yellow-400 border-b-[6px] border-b-orange-500"
                       : !isUnlocked
-                      ? "bg-slate-300 border-b-[6px] border-b-slate-400"
+                      ? "bg-brand-slateBg border-b-[6px] border-b-brand-border"
                       : ""
                   }`}
                 >
@@ -508,7 +508,7 @@ export default function LearnScreen() {
                     style={!isUnlocked ? { opacity: 0.6 } : undefined}
                   />
                   {!isUnlocked && (
-                    <View className="absolute -bottom-[2px] -right-[2px] bg-slate-500 w-6 h-6 rounded-full justify-center items-center border-2 border-white shadow-sm">
+                    <View className="absolute -bottom-[2px] -right-[2px] bg-brand-gray w-6 h-6 rounded-full justify-center items-center border-2 border-brand-bg shadow-sm">
                       <Ionicons name="lock-closed" size={12} color="white" />
                     </View>
                   )}
@@ -542,7 +542,7 @@ export default function LearnScreen() {
               className={`w-[86px] h-[86px] rounded-[43px] justify-center items-center shadow-md ${
                 lessonsCompleted >= LESSON_MODULES.length
                   ? "bg-yellow-400 border-b-[6px] border-b-yellow-700"
-                  : "bg-slate-300 border-b-[6px] border-b-slate-400"
+                  : "bg-brand-slateBg border-b-[6px] border-b-brand-border"
               }`}
             >
               <Text className="text-[30px]">🏆</Text>
@@ -584,7 +584,7 @@ export default function LearnScreen() {
         animationType="slide"
         onRequestClose={() => setSelectedModule(null)}
       >
-        <View className="flex-1 bg-slate-900/40 justify-end">
+        <View className="flex-1 bg-brand-navy/80 justify-end">
           <Pressable className="flex-1" onPress={() => setSelectedModule(null)} />
           <View className="bg-brand-bg rounded-t-3xl p-6 border-2 border-brand-border border-b-0 shadow-xl">
             {selectedModule && (
@@ -677,7 +677,7 @@ export default function LearnScreen() {
                       />
                     );
                   })()}
-                  <View className="absolute top-[1px] left-[2px] right-[2px] h-[3px] bg-white/40 rounded-[1.5px]" />
+                  <View className="absolute top-[1px] left-[2px] right-[2px] h-[3px] bg-brand-border/40 rounded-[1.5px]" />
                 </View>
 
                 {/* Hearts */}
@@ -705,7 +705,7 @@ export default function LearnScreen() {
                         borderBottomWidth: 10,
                         borderBottomColor: "transparent",
                         borderRightWidth: 12,
-                        borderRightColor: "#F1F5F9",
+                        borderRightColor: colors.border,
                         marginTop: 20,
                         marginLeft: 6,
                         zIndex: 2,
@@ -829,7 +829,7 @@ export default function LearnScreen() {
                           borderBottomWidth: 10,
                           borderBottomColor: "transparent",
                           borderRightWidth: 12,
-                          borderRightColor: "#F1F5F9",
+                          borderRightColor: colors.border,
                           marginTop: 20,
                           marginLeft: 6,
                           zIndex: 2,

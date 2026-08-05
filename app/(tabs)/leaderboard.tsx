@@ -75,8 +75,8 @@ export default function LeaderboardScreen() {
         </Text>
 
         {/* Current user rank card */}
-        <View className="bg-white/10 border border-white/20 rounded-2xl p-4 mt-6 flex-row items-center">
-          <View className="w-12 h-12 bg-white/10 rounded-2xl items-center justify-center border border-white/20">
+        <View className="bg-brand-border/30 border border-brand-border/40 rounded-2xl p-4 mt-6 flex-row items-center">
+          <View className="w-12 h-12 bg-brand-border/30 rounded-2xl items-center justify-center border border-brand-border/40">
             <Text className="text-2xl">{avatar}</Text>
           </View>
           <View className="flex-1 ml-3">

@@ -69,8 +69,10 @@ public class User {
     /** When the current reset code stops being valid. */
     private Instant resetCodeExpiresAt;
 
-    /** Emoji avatar shown across the app. Defaults to the FinLit owl. */
-    @Column(nullable = false)
+    /** Emoji avatar shown across the app. Defaults to the FinLit owl.
+     *  May also hold a base64 data URI (data:image/jpeg;base64,...) for a
+     *  real uploaded photo — hence TEXT, not varchar(255). */
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String avatar = "🦉"; // 🦉
 
     private String age;

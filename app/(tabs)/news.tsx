@@ -388,7 +388,7 @@ export default function NewsScreen() {
                 </Text>
                 <View
                   className={`rounded-full px-1.5 py-0.5 ${
-                    isActive ? "bg-white/20" : "bg-brand-slateBg"
+                    isActive ? "bg-brand-border/40" : "bg-brand-slateBg"
                   }`}
                 >
                   <Text

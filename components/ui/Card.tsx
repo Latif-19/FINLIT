@@ -19,14 +19,14 @@ export function Card({
  const getVariantStyle = () => {
  switch (variant) {
  case"elevated":
- return"bg-brand-bg rounded-[34px] border border-white/70 p-6 shadow-2xl shadow-black/10 overflow-hidden";
+ return"bg-brand-bg rounded-[34px] border border-brand-border/70 p-6 shadow-2xl shadow-brand-navy/10 overflow-hidden";
  case"flat":
  return"bg-brand-slateBg rounded-[28px] border border-brand-border/60 p-4";
  case"accent":
  return"bg-brand-navy rounded-[34px] p-6 shadow-2xl shadow-brand-navy/20 overflow-hidden";
  case"default":
  default:
- return"bg-brand-bg rounded-[34px] border border-white/70 p-5 shadow-xl shadow-black/8 overflow-hidden";
+ return"bg-brand-bg rounded-[34px] border border-brand-border/70 p-5 shadow-xl shadow-brand-navy/10 overflow-hidden";
  }
  };
 

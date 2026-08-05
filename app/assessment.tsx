@@ -99,7 +99,7 @@ export default function AssessmentScreen() {
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-brand-slateBg">
       {/* Decorative Accent Background */}
-      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 dark:bg-slate-700/60 rounded-b-[100px] -z-10" />
+      <View className="absolute top-0 left-0 right-0 h-64 bg-brand-navy/5 rounded-b-[100px] -z-10" />
 
       {/* Header Container */}
       <View className="flex-row items-center px-6 pt-14 pb-4">
@@ -171,7 +171,7 @@ export default function AssessmentScreen() {
                   className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                     isSelected
                       ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                      : "border-brand-border bg-slate-50/20"
+                      : "border-brand-border bg-brand-slateBg"
                   }`}
                 >
                   <Text
@@ -235,7 +235,7 @@ export default function AssessmentScreen() {
                 className={`p-4 rounded-2xl border mb-3 flex-row items-center justify-between active:opacity-80 ${
                   isSelected
                     ? "bg-brand-emerald/10 border-brand-emerald shadow-sm"
-                    : "border-brand-border bg-slate-50/20"
+                    : "border-brand-border bg-brand-slateBg"
                 }`}
               >
                 <Text
@@ -286,7 +286,7 @@ export default function AssessmentScreen() {
       <Modal visible={isAnalyzing} transparent animationType="fade">
         <View className="flex-1 bg-brand-navy/95 items-center justify-center px-8">
           <View className="items-center mb-8">
-            <View className="w-20 h-20 bg-white/10 rounded-full items-center justify-center mb-4">
+            <View className="w-20 h-20 bg-brand-border/40 rounded-full items-center justify-center mb-4">
               <ActivityIndicator size="large" color={colors.emerald} />
             </View>
             <Text className="text-brand-textOnDark text-2xl font-inter-bold tracking-tight text-center">

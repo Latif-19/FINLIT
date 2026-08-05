@@ -8,7 +8,7 @@ import {
   TextInput,
   Modal,
   KeyboardAvoidingView,
-  Platform,
+  Image, Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "expo-router";
@@ -20,6 +20,18 @@ import { communityService } from "../../services/community";
 import { COMMUNITY_CATEGORIES, Post, Reply } from "@/data/community";
 
 const CATEGORIES = COMMUNITY_CATEGORIES;
+
+const isImageUri = (str?: string | null) => {
+  if (!str) return false;
+  return (
+    str.startsWith("http") ||
+    str.startsWith("file:") ||
+    str.startsWith("content:") ||
+    str.startsWith("data:") ||
+    str.includes("/")
+  );
+};
+
 
 // Turns a backend ISO timestamp into "Just now / 5m ago / 2h ago / 3d ago".
 // If the value is already a label (e.g. an optimistic "Just now"), returns it as-is.
@@ -215,7 +227,7 @@ export default function CommunityScreen() {
           className="flex-row mt-5"
           contentContainerStyle={{ gap: 8, paddingRight: 16 }}
         >
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.map((cat: string) => (
             <Pressable
               key={cat}
               onPress={() => setSelectedCategory(cat)}
@@ -367,7 +379,7 @@ export default function CommunityScreen() {
           position: "absolute",
           bottom: 24,
           right: 24,
-          shadowColor: "#000",
+          shadowColor: colors.navy,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 4.65,
@@ -440,7 +452,7 @@ export default function CommunityScreen() {
                 Select Category Topic
               </Text>
               <View className="flex-row flex-wrap gap-2 mb-6">
-                {CATEGORIES.slice(1).map((cat) => (
+                {CATEGORIES.slice(1).map((cat: string) => (
                   <Pressable
                     key={cat}
                     onPress={() => setNewPostCategory(cat)}

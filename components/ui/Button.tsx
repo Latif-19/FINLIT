@@ -62,7 +62,7 @@ export function Button({
  case"outline":
  return"text-brand-emerald font-inter-bold";
  case"accent":
- return"text-[#052E1F] font-inter-bold";
+ return"text-brand-navy font-inter-bold";
  case"text":
  return"text-brand-textPrimary font-inter-semibold";
  case"primary":
@@ -85,7 +85,7 @@ export function Button({
  className={`${fullWidth ?"w-full":"self-start"} ${getContainerStyle()} ${getSizeStyle()} flex-row items-center justify-center gap-2`}
  >
  {loading ? (
- <ActivityIndicator color={variant ==="primary"?"#FFFFFF": colors.emerald} size="small"/>
+ <ActivityIndicator color={variant === "primary" ? colors.bg : colors.emerald} size="small"/>
  ) : (
  <>
  {icon}

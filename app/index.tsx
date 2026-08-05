@@ -2,9 +2,11 @@ import { useEffect, useRef } from "react";
 import { View, Image, Animated } from "react-native";
 import { router } from "expo-router";
 import { useUserStore } from "../store/useUserStore";
+import { useThemeColors } from "@/hooks/useThemeColors";
 import "@/types/navigation";
 
 export default function SplashScreen() {
+  const colors = useThemeColors();
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export default function SplashScreen() {
             style={{
               width: widthInterpolated,
               height: "100%",
-              backgroundColor: "#16A34A", // brand-emerald
+              backgroundColor: colors.success,
             }}
           />
         </View>

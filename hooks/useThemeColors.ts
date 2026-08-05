@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Appearance, AppState } from "react-native";
 import { getSemanticColors, getThemeVars } from "../constants/theme";
 import { useUserStore } from "../store/useUserStore";
+import { Colors } from "../constants/theme";
 
 export function useThemeColors() {
   const [systemColorScheme, setSystemColorScheme] = useState(Appearance.getColorScheme());
@@ -27,7 +28,7 @@ export function useThemeColors() {
       ? systemColorScheme === "dark"
       : themePreference === "dark";
 
-  const themeVars = getThemeVars(isDark);
+  const themeVars = getThemeVars("none", "emerald", isDark);
   const semantic = getSemanticColors(isDark);
 
   return {
@@ -44,5 +45,7 @@ export function useThemeColors() {
     danger: semantic.danger,
     warning: semantic.warning,
     info: semantic.info,
+    text: isDark ? Colors.dark.text : Colors.light.text,
+    isDark,
   };
 }

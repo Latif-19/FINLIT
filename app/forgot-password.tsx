@@ -370,7 +370,7 @@ export default function ForgotPasswordScreen() {
                 className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
+                  <ActivityIndicator size="small" color={colors.bg} className="mr-2" />
                 ) : null}
                 <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Sending Code..." : "Send Reset Code"}
@@ -397,7 +397,7 @@ export default function ForgotPasswordScreen() {
                     onChangeText={(text) => handleOtpChange(text, index)}
                     onKeyPress={(e) => handleOtpKeyPress(e, index)}
                     placeholder="•"
-                    placeholderTextColor="#d1d5db"
+                    placeholderTextColor={colors.gray}
                     keyboardType="number-pad"
                     // Long enough to accept a pasted full code, which
                     // handleOtpChange then spreads across every box.
@@ -442,7 +442,7 @@ export default function ForgotPasswordScreen() {
                 className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
+                  <ActivityIndicator size="small" color={colors.bg} className="mr-2" />
                 ) : null}
                 <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Verifying..." : "Verify Code"}
@@ -541,7 +541,7 @@ export default function ForgotPasswordScreen() {
                 className="bg-brand-navy h-14 rounded-2xl mt-6 shadow-md shadow-brand-navy/10 justify-center items-center flex-row"
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="#ffffff" className="mr-2" />
+                  <ActivityIndicator size="small" color={colors.bg} className="mr-2" />
                 ) : null}
                 <Text className="text-brand-textOnDark text-center font-inter-bold text-base">
                   {isLoading ? "Resetting Password..." : "Reset Password"}

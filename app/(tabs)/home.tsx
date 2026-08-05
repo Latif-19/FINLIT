@@ -174,7 +174,7 @@ export default function HomeScreen() {
           <Pressable
             onPress={() => setAvatarModalOpen(true)}
             style={({ pressed }) => ({ transform: [{ scale: pressed ? 0.95 : 1 }] })}
-            className="w-16 h-16 bg-white/10 rounded-2xl items-center justify-center border-2 border-white/20 shadow-sm overflow-hidden"
+            className="w-16 h-16 bg-brand-border/40 rounded-2xl items-center justify-center border-2 border-brand-border/80 shadow-sm overflow-hidden"
           >
             {isImageUri(avatar) ? (
               <Image source={{ uri: avatar }} className="w-full h-full" resizeMode="cover" />
@@ -182,14 +182,14 @@ export default function HomeScreen() {
               <Text className="text-3xl">{avatar}</Text>
             )}
             <View className="absolute -bottom-1 -right-1 bg-brand-emerald w-5 h-5 rounded-full items-center justify-center border border-brand-navy">
-              <Ionicons name="pencil" size={10} color="white" />
+              <Ionicons name="pencil" size={10} color={colors.bg} />
             </View>
           </Pressable>
         </View>
 
         {/* User Badges Row */}
         <View className="mt-6 flex-row flex-wrap items-center gap-2">
-          <View className="px-3.5 py-1.5 rounded-2xl bg-white/10 border border-white/5 flex-row items-center">
+          <View className="px-3.5 py-1.5 rounded-2xl bg-brand-border/30 border border-brand-border/20 flex-row items-center">
             <Ionicons name="ribbon" size={13} color={colors.gold} />
             <Text className="text-brand-textOnDark text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
               {score >= 13
@@ -200,7 +200,7 @@ export default function HomeScreen() {
             </Text>
           </View>
           {userGoal && (
-            <View className="px-3.5 py-1.5 rounded-2xl bg-white/10 border border-white/5 flex-row items-center">
+            <View className="px-3.5 py-1.5 rounded-2xl bg-brand-border/30 border border-brand-border/20 flex-row items-center">
               <Ionicons name="flag" size={13} color={colors.emerald} />
               <Text className="text-brand-textOnDark text-[10px] font-inter-semibold uppercase tracking-wider ml-1.5">
                 Target: {userGoal}
@@ -302,7 +302,7 @@ export default function HomeScreen() {
                 Learning
               </Text>
               <View className="w-6 h-6 bg-brand-navy/10 rounded-lg items-center justify-center">
-                <Ionicons name="time" size={12} color={colors.navy} />
+                <Ionicons name="time" size={12} color={colors.text} />
               </View>
             </View>
             <Text className="text-brand-textPrimary text-2xl font-inter-bold mt-2">
@@ -402,7 +402,7 @@ export default function HomeScreen() {
               className="bg-brand-navy/5 border border-brand-border rounded-2xl items-center justify-center gap-2"
             >
               <View className="w-10 h-10 bg-brand-navy rounded-full items-center justify-center">
-                <Ionicons name="arrow-forward" size={18} color="white" />
+                <Ionicons name="arrow-forward" size={18} color={colors.text} />
               </View>
               <Text className="text-[11px] font-inter-bold text-brand-textPrimary text-center px-2 leading-4">
                 More News
@@ -447,7 +447,7 @@ export default function HomeScreen() {
               </View>
             </View>
             <View className="w-9 h-9 bg-brand-navy rounded-xl items-center justify-center shadow-sm">
-              <Ionicons name="arrow-forward" size={16} color="white" />
+              <Ionicons name="arrow-forward" size={16} color={colors.text} />
             </View>
           </Pressable>
         ))}
