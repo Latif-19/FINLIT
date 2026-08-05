@@ -69,7 +69,7 @@ public class TutorService {
     private final BadgeService badgeService;
 
     public TutorService(@Value("${app.gemini.api-key:}") String apiKey,
-                        @Value("${app.gemini.model:gemini-2.5-flash}") String model,
+                        @Value("${app.gemini.model:gemini-3.5-flash}") String model,
                         @Value("${app.gemini.thinking-budget:128}") int thinkingBudget,
                         UserRepository userRepository,
                         BadgeService badgeService) {
