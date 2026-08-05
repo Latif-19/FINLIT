@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+module.exports = { darkMode: 'class',
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
     "./components/**/*.{js,jsx,ts,tsx}",
@@ -20,11 +20,15 @@ module.exports = {
         }
       },
       fontFamily: {
-        inter: ['Inter_400Regular'],
-        'inter-medium': ['Inter_500Medium'],
-        'inter-semibold': ['Inter_600SemiBold'],
-        'inter-bold': ['Inter_700Bold'],
-        poppins: ['Poppins_700Bold'],
+        inter: ['Poppins_400Regular'],
+        'inter-medium': ['Poppins_500Medium'],
+        'inter-semibold': ['Poppins_600SemiBold'],
+        'inter-bold': ['Poppins_700Bold'],
+        'inter-extrabold': ['Poppins_800ExtraBold'],
+        poppins: ['Poppins_400Regular'],
+        'poppins-medium': ['Poppins_500Medium'],
+        'poppins-semibold': ['Poppins_600SemiBold'],
+        'poppins-bold': ['Poppins_700Bold'],
         'poppins-extrabold': ['Poppins_800ExtraBold'],
         jakarta: ['PlusJakartaSans_700Bold'],
         'jakarta-extrabold': ['PlusJakartaSans_800ExtraBold'],

@@ -5,24 +5,24 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = '#00A884';
+const tintColorDark = '#25D366';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#111B21',
+    background: '#FFFFFF',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: '#667781',
+    tabIconDefault: '#667781',
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#E9EDEF',
+    background: '#111B21',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: '#8696A0',
+    tabIconDefault: '#8696A0',
     tabIconSelected: tintColorDark,
   },
 };
@@ -74,24 +74,24 @@ export const THEME_PRESETS = {
     none: {
       emerald: {
         light: {
-          '--color-brand-navy': '#0A2540',
-          '--color-brand-emerald': '#10B981',
-          '--color-brand-gold': '#D4AF37',
-          '--color-brand-bg': '#FFFFFF',
-          '--color-brand-slateBg': '#F8FAFC',
-          '--color-brand-dark': '#111827',
-          '--color-brand-gray': '#6B7280',
-          '--color-brand-border': '#E2E8F0',
+          '--color-brand-navy': '#075E54', // header / toolbar background (WhatsApp teal)
+          '--color-brand-emerald': '#00A884', // accent / active elements (WhatsApp teal)
+          '--color-brand-gold': '#25D366', // secondary accent (WhatsApp green)
+          '--color-brand-bg': '#FFFFFF', // main background
+          '--color-brand-slateBg': '#F0F2F5', // secondary background / cards
+          '--color-brand-dark': '#111B21', // primary text on light (near-black)
+          '--color-brand-gray': '#667781', // icons / secondary text
+          '--color-brand-border': '#D9DDE0', // borders
         },
         dark: {
-          '--color-brand-navy': '#7FA8D9',
-          '--color-brand-emerald': '#34D399',
-          '--color-brand-gold': '#E8C158',
-          '--color-brand-bg': '#0B1220',
-          '--color-brand-slateBg': '#16203A',
-          '--color-brand-dark': '#F1F5F9',
-          '--color-brand-gray': '#94A3B8',
-          '--color-brand-border': '#26314A',
+          '--color-brand-navy': '#1F2C34', // header / toolbar background (WhatsApp dark app bar)
+          '--color-brand-emerald': '#25D366', // accent / outgoing chat bubble
+          '--color-brand-gold': '#00A884', // secondary accent (WhatsApp teal)
+          '--color-brand-bg': '#111B21', // main background (WhatsApp dark)
+          '--color-brand-slateBg': '#202C33', // secondary background / cards (WhatsApp panel)
+          '--color-brand-dark': '#E9EDEF', // primary text on dark (off-white)
+          '--color-brand-gray': '#8696A0', // icons / secondary text
+          '--color-brand-border': '#2A3942', // borders
         },
       },
       blue: {
@@ -308,6 +308,8 @@ export const THEME_PRESETS = {
           '--color-brand-dark': '#25111B',
           '--color-brand-gray': '#616161',
           '--color-brand-border': '#DDEFF2',
+          '--color-gradient-start': '#E0F7FA',
+          '--color-gradient-end': '#80DEEA',
         },
         dark: {
           '--color-brand-navy': '#EB9DBE',
@@ -318,6 +320,8 @@ export const THEME_PRESETS = {
           '--color-brand-dark': '#F5EDF2',
           '--color-brand-gray': '#B0A0AC',
           '--color-brand-border': '#3A1E2D',
+          '--color-gradient-start': '#2E2A2A',
+          '--color-gradient-end': '#0F0F0F',
         },
       },
       purple: {
@@ -330,6 +334,8 @@ export const THEME_PRESETS = {
           '--color-brand-dark': '#261019',
           '--color-brand-gray': '#6E5C64',
           '--color-brand-border': '#F7DFE6',
+          '--color-gradient-start': '#F3E5F5',
+          '--color-gradient-end': '#E1BEE7',
         },
         dark: {
           '--color-brand-navy': '#E893AC',
@@ -340,20 +346,24 @@ export const THEME_PRESETS = {
           '--color-brand-dark': '#F5EAEF',
           '--color-brand-gray': '#B29BA3',
           '--color-brand-border': '#3A1D28',
+          '--color-gradient-start': '#4A148C',
+          '--color-gradient-end': '#7B1FA2',
         },
       },
     },
     'high-contrast': {
       emerald: {
         light: {
-          '--color-brand-navy': '#000000',
+          '--color-brand-navy': '#EB9DBE',
           '--color-brand-emerald': '#008000',
           '--color-brand-gold': '#D97706',
-          '--color-brand-bg': '#FFFFFF',
-          '--color-brand-slateBg': '#FFFFFF',
-          '--color-brand-dark': '#000000',
-          '--color-brand-gray': '#000000',
-          '--color-brand-border': '#000000',
+          '--color-brand-bg': '#170A12',
+          '--color-brand-slateBg': '#251320',
+          '--color-brand-dark': '#F5EDF2',
+          '--color-brand-gray': '#B0A0AC',
+          '--color-brand-border': '#3A1E2D',
+          '--color-gradient-start': '#2E2A2A',
+          '--color-gradient-end': '#0F0F0F',
         },
         dark: {
           '--color-brand-navy': '#FFFFFF',
@@ -368,14 +378,16 @@ export const THEME_PRESETS = {
       },
       blue: {
         light: {
-          '--color-brand-navy': '#000000',
-          '--color-brand-emerald': '#0000FF',
+          '--color-brand-navy': '#FFFFFF',
+          '--color-brand-emerald': '#5C7CFA',
           '--color-brand-gold': '#D97706',
-          '--color-brand-bg': '#FFFFFF',
-          '--color-brand-slateBg': '#FFFFFF',
-          '--color-brand-dark': '#000000',
-          '--color-brand-gray': '#000000',
-          '--color-brand-border': '#000000',
+          '--color-brand-bg': '#170A12',
+          '--color-brand-slateBg': '#251320',
+          '--color-brand-dark': '#F5EDF2',
+          '--color-brand-gray': '#B0A0AC',
+          '--color-brand-border': '#3A1E2D',
+          '--color-gradient-start': '#2E2A2A',
+          '--color-gradient-end': '#0F0F0F',
         },
         dark: {
           '--color-brand-navy': '#FFFFFF',
@@ -390,14 +402,16 @@ export const THEME_PRESETS = {
       },
       purple: {
         light: {
-          '--color-brand-navy': '#000000',
-          '--color-brand-emerald': '#800080',
+          '--color-brand-navy': '#FFFFFF',
+          '--color-brand-emerald': '#D946EF',
           '--color-brand-gold': '#D97706',
-          '--color-brand-bg': '#FFFFFF',
-          '--color-brand-slateBg': '#FFFFFF',
-          '--color-brand-dark': '#000000',
-          '--color-brand-gray': '#000000',
-          '--color-brand-border': '#000000',
+          '--color-brand-bg': '#170A12',
+          '--color-brand-slateBg': '#251320',
+          '--color-brand-dark': '#F5EDF2',
+          '--color-brand-gray': '#B0A0AC',
+          '--color-brand-border': '#3A1E2D',
+          '--color-gradient-start': '#2E2A2A',
+          '--color-gradient-end': '#0F0F0F',
         },
         dark: {
           '--color-brand-navy': '#FFFFFF',
@@ -441,7 +455,7 @@ export const THEME_PRESETS = {
           '--color-brand-gold': '#808080',
           '--color-brand-bg': '#FFFFFF',
           '--color-brand-slateBg': '#F3F4F6',
-          '--color-brand-dark': '#000000',
+          '--color-brand-dark': '#F5EDF2',
           '--color-brand-gray': '#555555',
           '--color-brand-border': '#D1D5DB',
         },
@@ -463,7 +477,7 @@ export const THEME_PRESETS = {
           '--color-brand-gold': '#D1D5DB',
           '--color-brand-bg': '#FFFFFF',
           '--color-brand-slateBg': '#F9FAFB',
-          '--color-brand-dark': '#000000',
+          '--color-brand-dark': '#F5EDF2',
           '--color-brand-gray': '#666666',
           '--color-brand-border': '#E5E7EB',
         },

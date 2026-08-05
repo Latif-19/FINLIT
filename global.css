@@ -3,23 +3,47 @@
 @tailwind utilities;
 
 :root {
-  --color-brand-navy: #0A2540;
-  --color-brand-emerald: #16A34A;
-  --color-brand-gold: #D4AF37;
+  --color-brand-navy: #075E54;
+  --color-brand-emerald: #00A884;
+  --color-brand-gold: #25D366;
   --color-brand-bg: #FFFFFF;
-  --color-brand-slateBg: #F8FAFC;
-  --color-brand-dark: #111827;
-  --color-brand-gray: #6B7280;
+  --color-brand-slateBg: #F0F2F5;
+  --color-brand-dark: #111B21;
+  --color-brand-gray: #667781;
+  --color-brand-border: #D9DDE0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-brand-bg: #1e293b;
-    --color-brand-slateBg: #0f172a;
+    --color-brand-navy: #1F2C34;
+    --color-brand-emerald: #25D366;
+    --color-brand-gold: #00A884;
+    --color-brand-bg: #111B21;
+    --color-brand-slateBg: #202C33;
+    --color-brand-dark: #E9EDEF;
+    --color-brand-gray: #8696A0;
+    --color-brand-border: #2A3942;
   }
 }
 
 .dark {
-  --color-brand-bg: #1e293b;
-  --color-brand-slateBg: #0f172a;
+  --color-brand-navy: #1F2C34;
+  --color-brand-emerald: #25D366;
+  --color-brand-gold: #00A884;
+  --color-brand-bg: #111B21;
+  --color-brand-slateBg: #202C33;
+  --color-brand-dark: #E9EDEF;
+  --color-brand-gray: #8696A0;
+  --color-brand-border: #2A3942;
+  color: #E9EDEF;
+}
+
+body {
+  color: #111B21;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #E9EDEF;
+  }
 }
